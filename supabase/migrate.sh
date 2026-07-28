@@ -15,7 +15,8 @@ if [ -f "$PROJECT_ROOT/.env" ]; then
   export $(grep -v '^#' "$PROJECT_ROOT/.env" | xargs)
 fi
 
-DATABASE_URL="${DATABASE_URL:?DATABASE_URL not set in .env}"
+DATABASE_URL="${DATABASE_URL:-$NEXT_PUBLIC_DATABASE_URL}"
+: "${DATABASE_URL:?DATABASE_URL not set in .env}"
 
 echo "📦 Running migrations against Supabase..."
 echo ""
