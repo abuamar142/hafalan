@@ -60,6 +60,8 @@ export interface SetoranItem {
   jam: string
   ayat_start: number | null
   ayat_end: number | null
+  guru_id: string | null
+  guru_nama: string
 }
 
 export interface ProfileSantri extends Student {

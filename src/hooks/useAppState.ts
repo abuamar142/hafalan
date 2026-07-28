@@ -79,6 +79,22 @@ export function useAppState() {
       const subsRaw = (submissionsRes.data ?? []) as Array<
         Submission & { students?: { nama: string } | null }
       >
+
+      // Build guru names map from settings (user_id -> guru name)
+      // We need to fetch all guru settings for all users to resolve guru_names
+      const guruIds = [...new Set(subsRaw.map((s) => s.guru_id).filter(Boolean))] as string[]
+      const guruNamesMap: Record<string, string> = {}
+      if (guruIds.length > 0) {
+        const { data: guruSettings } = await supabase
+          .from('settings')
+          .select('value, user_id')
+          .eq('key', 'guru')
+          .in('user_id', guruIds)
+        for (const gs of guruSettings ?? []) {
+          guruNamesMap[gs.user_id] = gs.value
+        }
+      }
+
       const submissions: SetoranItem[] = subsRaw.map((s) => ({
         id: s.id,
         santri_id: s.student_id,
@@ -90,6 +106,8 @@ export function useAppState() {
         jam: s.jam,
         ayat_start: s.ayat_start ?? null,
         ayat_end: s.ayat_end ?? null,
+        guru_id: s.guru_id ?? null,
+        guru_nama: s.guru_id ? (guruNamesMap[s.guru_id] || 'Ustadz') : 'Ustadz',
       }))
 
       // Parse settings

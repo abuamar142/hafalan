@@ -4,7 +4,14 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 
-const NAV_ITEMS = [
+interface NavItem {
+  label: string
+  href: string
+  icon: React.ReactNode
+  children?: { label: string; href: string }[]
+}
+
+const NAV_ITEMS: NavItem[] = [
   {
     label: 'Santri',
     href: '/santri',
@@ -38,6 +45,10 @@ const NAV_ITEMS = [
         <path d="M8 11h8" />
       </svg>
     ),
+    children: [
+      { label: 'Tambah Setoran', href: '/setoran/tambah' },
+      { label: 'Riwayat Setoran', href: '/setoran/riwayat' },
+    ],
   },
   {
     label: 'Laporan',
@@ -64,6 +75,7 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
   const router = useRouter()
   const supabase = createClient()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null)
 
   async function handleLogout() {
     if (!confirm('Yakin ingin keluar?')) return
@@ -92,20 +104,71 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
         {/* Nav */}
         <nav className="flex-1 px-3">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname.startsWith(item.href)
+            const isParentActive = item.children?.some((child) => pathname.startsWith(child.href)) ?? false
+            const isExpanded = expandedMenu === item.label || isParentActive
+            const hasChildren = item.children && item.children.length > 0
+            const isActive = hasChildren ? isParentActive : pathname.startsWith(item.href)
             return (
-              <button
-                key={item.href}
-                onClick={() => navigateTo(item.href)}
-                className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {item.icon}
-                {item.label}
-              </button>
+              <div key={item.href}>
+                <button
+                  onClick={() => {
+                    if (hasChildren) {
+                      if (!isExpanded) {
+                        navigateTo(item.children![0].href)
+                      }
+                      setExpandedMenu(isExpanded ? null : item.label)
+                    } else {
+                      navigateTo(item.href)
+                    }
+                  }}
+                  className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/70 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {item.icon}
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {hasChildren && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setExpandedMenu(isExpanded ? null : item.label)
+                      }}
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  )}
+                </button>
+                {hasChildren && isExpanded && (
+                  <div className="ml-5 mb-1">
+                    {item.children!.map((child) => {
+                      const isChildActive = pathname.startsWith(child.href)
+                      return (
+                        <button
+                          key={child.href}
+                          onClick={() => navigateTo(child.href)}
+                          className={`mb-0.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors ${
+                            isChildActive
+                              ? 'bg-white/15 text-white'
+                              : 'text-white/60 hover:bg-white/8 hover:text-white'
+                          }`}
+                        >
+                          {child.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
             )
           })}
         </nav>
