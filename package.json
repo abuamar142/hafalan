@@ -1,7 +1,7 @@
 {
-  "name": "quran-tracker",
+  "name": "hafalan",
   "version": "3.0.0",
-  "description": "Tracker Hafalan Al-Quran Multi Santri — Supabase Backend",
+  "description": "Hafalan Quran Tracker — catat hafalan & setoran santri",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
