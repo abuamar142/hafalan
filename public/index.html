@@ -46,8 +46,10 @@
       <h1 style="font-size:15px;font-weight:500;margin:0">SMA Islam Bunga Bangsa</h1>
       <div style="font-size:11px;opacity:.8" id="header-guru"></div>
     </div>
-    <button onclick="showModal('modal-setting')" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Pengaturan</button>
-    <button onclick="doLogout()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Keluar</button>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button onclick="showModal('modal-setting')" class="hdr-btn">Pengaturan</button>
+      <button onclick="doLogout()" class="hdr-btn hdr-btn-quit">Keluar</button>
+    </div>
   </header>
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="showTab('santri')">Santri</div>

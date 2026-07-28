@@ -54,6 +54,7 @@ async function doRegister(){
 }
 
 async function doLogout(){
+  if(!confirm('Yakin ingin keluar?'))return;
   await _supabase.auth.signOut();
   currentUser=null;
   document.getElementById('app').style.display='none';
