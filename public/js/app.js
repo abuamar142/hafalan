@@ -249,13 +249,15 @@ function renderSantriList(){
 
 // ── PROFILE ──────────────────────────────────────────
 async function openProfil(id){
-  activeSantriId=id;
-  await loadProfileSantri(id);
-  if(!profileSantri)return;
-  document.getElementById('profil-nama-header').textContent=profileSantri.nama;
-  document.getElementById('profil-screen').style.display='block';
-  document.getElementById('app').style.display='none';
-  renderProfilStats();renderPJuzGrid();renderPSetoran();
+  try {
+    activeSantriId=id;
+    await loadProfileSantri(id);
+    if(!profileSantri){console.warn('openProfil: profileSantri null');return}
+    document.getElementById('profil-nama-header').textContent=profileSantri.nama;
+    document.getElementById('profil-screen').style.display='block';
+    document.getElementById('app').style.display='none';
+    renderProfilStats();renderPJuzGrid();renderPSetoran();
+  } catch(e) { console.error('openProfil error:', e); }
 }
 function closeProfil(){
   activeSantriId=null;profileSantri=null;
