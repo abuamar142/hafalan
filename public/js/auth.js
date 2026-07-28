@@ -48,6 +48,8 @@ async function doRegister(){
     const { data, error } = await _supabase.auth.signUp({email,password:pass,options:{data:{name}}});
     if(error)throw error;
     currentUser=data.user;
+    await _supabase.from('settings').upsert({key:'guru',value:name,user_id:data.user.id});
+    state.guru=name;
     isDemo=false;
     startApp();
   }catch(e){showAuthErr('reg-err',e.message||'Gagal mendaftar')}
