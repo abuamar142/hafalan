@@ -11,7 +11,7 @@ function tutupLaporan(){
 function lapHeader(judul,sub){
   return`<div class="lap-header">
     <div class="lap-logo">📖</div>
-    <div class="lap-title">${state.lembaga||'Tracker Hafalan Al-Quran'}</div>
+    <div class="lap-title">${state.lembaga||'Hafalan — SMA Islam Bunga Bangsa'}</div>
     <div class="lap-sub">${judul}${state.guru?' · '+state.guru:''}</div>
     <div class="lap-date">Dicetak: ${nowStr()}</div>
     ${sub?`<div class="lap-date">${sub}</div>`:''}

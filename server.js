@@ -12,5 +12,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n  📖  Tracker Hafalan — berjalan di http://localhost:${PORT}\n`);
+  console.log(`\n  📖  Hafalan — berjalan di http://localhost:${PORT}\n`);
 });
