@@ -5,20 +5,23 @@ async function startApp(){
   app.style.display='flex';app.style.flexDirection='column';
   if(!isDemo) await refreshAll();
   if(isDemo) document.getElementById('demo-banner').style.display='block';
-  if(state.lembaga) document.getElementById('lembaga-name').textContent=state.lembaga;
+  renderGuruName();
   buildSurahSelect();updateSantriSelect();
   renderSantriList();renderRekap();renderSetoranGlobal();
 }
 
+function renderGuruName(){
+  const el=document.getElementById('header-guru');
+  el.textContent=state.guru?'Ustadz/Guru: '+state.guru:'';
+}
+
 // ── SETTINGS ──
 async function saveSetting(){
-  state.lembaga=document.getElementById('inp-lembaga').value.trim();
   state.guru=document.getElementById('inp-guru').value.trim();
-  if(state.lembaga)document.getElementById('lembaga-name').textContent=state.lembaga;
+  renderGuruName();
   try{
     const { data: { user } } = await _supabase.auth.getUser();
     await _supabase.from('settings').upsert([
-      { key:'lembaga', value:state.lembaga, user_id:user.id },
       { key:'guru', value:state.guru, user_id:user.id }
     ]);
   }catch(e){console.error('saveSetting',e)}

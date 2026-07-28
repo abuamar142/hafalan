@@ -102,9 +102,8 @@ async function importDemoData(userId){
       if(memos.length) await _supabase.from('memorization').insert(memos);
     }
   }
-  if(DEMO_STATE.lembaga || DEMO_STATE.guru){
+  if(DEMO_STATE.guru){
     await _supabase.from('settings').upsert([
-      { key:'lembaga', value: DEMO_STATE.lembaga||'', user_id: userId },
       { key:'guru', value: DEMO_STATE.guru||'', user_id: userId }
     ]);
   }

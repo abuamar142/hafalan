@@ -6,7 +6,6 @@ async function loadSettings() {
   const { data } = await _supabase.from('settings').select('key, value').eq('user_id', user.id);
   if (data) {
     data.forEach(r => {
-      if (r.key === 'lembaga') state.lembaga = r.value;
       if (r.key === 'guru') state.guru = r.value;
     });
   }

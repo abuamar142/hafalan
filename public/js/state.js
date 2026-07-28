@@ -1,5 +1,5 @@
 // ── STATE ──
-let state={lembaga:"",guru:"",santri:[],setoran:[]};
+let state={lembaga:"SMA Islam Bunga Bangsa",guru:"",santri:[],setoran:[]};
 let isDemo=false,activeSantriId=null,activeJuz=null;
 let profileSantri=null;
 let currentUser=null;

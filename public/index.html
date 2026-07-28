@@ -43,8 +43,8 @@
   <div id="demo-banner">Mode Demo — Data contoh, tersimpan di Supabase</div>
   <header>
     <div>
-      <div style="font-size:11px;opacity:.8" id="header-sub">SMA Islam Bunga Bangsa</div>
-      <h1 id="lembaga-name">Hafalan</h1>
+      <h1 style="font-size:15px;font-weight:500;margin:0">SMA Islam Bunga Bangsa</h1>
+      <div style="font-size:11px;opacity:.8" id="header-guru"></div>
     </div>
     <button onclick="showModal('modal-setting')" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Pengaturan</button>
     <button onclick="doLogout()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Keluar</button>
@@ -165,8 +165,7 @@
 </div>
 <div class="modal-bg" id="modal-setting" style="display:none" onclick="if(event.target===this)closeModal('modal-setting')">
   <div class="modal">
-    <h2>Pengaturan Lembaga</h2>
-    <div class="form-group"><label>Nama TPQ / Lembaga</label><input type="text" id="inp-lembaga" placeholder="TPQ Al-Ikhlas..."></div>
+    <h2>Pengaturan</h2>
     <div class="form-group"><label>Nama Ustadz / Guru</label><input type="text" id="inp-guru" placeholder="Ustadz Ahmad..."></div>
     <div class="modal-actions">
       <button class="btn btn-danger btn-sm" onclick="resetData()">Reset Semua Data</button>

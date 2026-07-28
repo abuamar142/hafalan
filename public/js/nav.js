@@ -10,7 +10,6 @@ function showTab(id){
 function showModal(id){
   document.getElementById(id).style.display='flex';
   if(id==='modal-setting'){
-    document.getElementById('inp-lembaga').value=state.lembaga||'';
     document.getElementById('inp-guru').value=state.guru||'';
   }
 }
