@@ -151,7 +151,7 @@ async function startApp(){
   if(isDemo) document.getElementById('demo-banner').style.display='block';
   if(state.lembaga) document.getElementById('lembaga-name').textContent=state.lembaga;
   buildSurahSelect();updateSantriSelect();
-  renderSantriList();renderRekap();renderSetoranGlobal();renderBackupInfo();
+  renderSantriList();renderRekap();renderSetoranGlobal();
 }
 
 // ── NAVIGATION ───────────────────────────────────────
@@ -159,7 +159,7 @@ function showTab(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
-  ['santri','rekap','setoran-tab','laporan','backup'].forEach((t,i)=>{
+  ['santri','rekap','setoran-tab','laporan'].forEach((t,i)=>{
     if(t===id)document.querySelectorAll('.nav-tab')[i].classList.add('active');
   });
 }
@@ -214,7 +214,7 @@ async function tambahSantri(){
     document.getElementById('inp-kelas').value='';
     document.getElementById('inp-usia').value='';
     await loadSantriList();
-    renderSantriList();renderRekap();updateSantriSelect();renderBackupInfo();
+    renderSantriList();renderRekap();updateSantriSelect();
   }catch(e){alert('Gagal menyimpan: '+e.message)}
 }
 
@@ -224,7 +224,7 @@ async function hapusSantriConfirm(){
       await _supabase.from('students').delete().eq('id',activeSantriId);
       closeProfil();
       await refreshAll();
-      renderSantriList();renderRekap();updateSantriSelect();renderSetoranGlobal();renderBackupInfo();
+      renderSantriList();renderRekap();updateSantriSelect();renderSetoranGlobal();
     }catch(e){alert('Gagal menghapus: '+e.message)}
   }
 }
@@ -377,7 +377,7 @@ async function tambahSetoran(){
     document.getElementById('inp-catatan').value='';
     await loadSetoranList();
     await loadSantriList();
-    renderSetoranGlobal();renderSantriList();renderRekap();renderBackupInfo();
+    renderSetoranGlobal();renderSantriList();renderRekap();
   }catch(e){alert('Gagal menyimpan setoran: '+e.message)}
 }
 function setoranCardHtml(x,showSantri=true){
@@ -457,130 +457,12 @@ async function resetData(){
       await _supabase.from('settings').delete().eq('user_id',user.id);
       await refreshAll();
       closeModal('modal-setting');
-      renderSantriList();renderRekap();renderSetoranGlobal();updateSantriSelect();renderBackupInfo();
+      renderSantriList();renderRekap();renderSetoranGlobal();updateSantriSelect();
     }catch(e){alert('Gagal reset: '+e.message)}
   }
 }
 
-// ── BACKUP ───────────────────────────────────────────
-async function eksporData(){
-  try{
-    const { data: { user } } = await _supabase.auth.getUser();
-    const { data: students } = await _supabase.from('students').select('*').eq('user_id',user.id);
-    const studentIds=(students||[]).map(s=>s.id);
-    const { data: memos } = studentIds.length?await _supabase.from('memorization').select('*').in('student_id',studentIds):{data:[]};
-    const { data: subs } = studentIds.length?await _supabase.from('submissions').select('*').in('student_id',studentIds):{data:[]};
-    const { data: sets } = await _supabase.from('settings').select('key, value').eq('user_id',user.id);
-    // Build export format
-    const exportStudents=(students||[]).map(s=>{
-      const studentMemos=(memos||[]).filter(m=>m.student_id===s.id);
-      const hafalan={};
-      studentMemos.forEach(m=>{hafalan[m.surah_no]=m.status});
-      return{id:s.id,nama:s.nama,kelas:s.kelas,usia:s.usia,color:s.color,hafalan};
-    });
-    const exportSubs=(subs||[]).map(s=>({
-      id:s.id,santri_id:s.student_id,surah_no:s.surah_no,nilai:s.nilai,catatan:s.catatan,tanggal:s.tanggal,jam:s.jam
-    }));
-    const settingsObj={};
-    (sets||[]).forEach(r=>{settingsObj[r.key]=r.value});
-    const data={
-      lembaga:settingsObj.lembaga||'',
-      guru:settingsObj.guru||'',
-      santri:exportStudents,
-      setoran:exportSubs
-    };
-    const blob=new Blob([JSON.stringify({...data,_versi:'1.0',_ekspor:new Date().toISOString()},null,2)],{type:'application/json'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download=`hafalan-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);
-  }catch(e){alert('Gagal ekspor: '+e.message)}
-}
-
-function eksporCSV(){
-  const rows=[['Nama Santri','Kelas','Surah','Juz','Nilai','Catatan','Tanggal','Jam']];
-  state.setoran.forEach(x=>{
-    const s=getSantri(x.santri_id)||{nama:x.santri_nama,kelas:''};
-    const su=ALL_SURAHS.find(a=>a.no===x.surah_no);
-    rows.push([s.nama||x.santri_nama,s.kelas||'',getSurahNama(x.surah_no),su?.juz||'',x.nilai,x.catatan||'',x.tanggal,x.jam||'']);
-  });
-  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`hafalan-setoran-${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(a.href);
-}
-
-async function imporData(input){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=async e=>{
-    try{
-      const data=JSON.parse(e.target.result);
-      if(!data.santri||!Array.isArray(data.santri))throw new Error('Format tidak valid');
-      if(!confirm(`File berisi ${data.santri.length} santri dan ${(data.setoran||[]).length} setoran. Lanjutkan?`))return;
-      const { data: { user } } = await _supabase.auth.getUser();
-      // Clear existing data first
-      const { data: existing } = await _supabase.from('students').select('id').eq('user_id',user.id);
-      if(existing){
-        const ids=existing.map(s=>s.id);
-        if(ids.length){
-          await _supabase.from('submissions').delete().in('student_id',ids);
-          await _supabase.from('memorization').delete().in('student_id',ids);
-        }
-        await _supabase.from('students').delete().eq('user_id',user.id);
-      }
-      await _supabase.from('settings').delete().eq('user_id',user.id);
-      // Import data from JSON file
-      const studentMap={};
-      for(const s of data.santri){
-        const newId=Date.now()+Math.floor(Math.random()*1000);
-        studentMap[s.id]=newId;
-        await _supabase.from('students').insert({
-          id:newId,user_id:user.id,nama:s.nama,kelas:s.kelas||'',usia:s.usia||'',color:s.color||''
-        });
-        if(s.hafalan){
-          const memos=Object.entries(s.hafalan).map(([surahNo,status])=>({
-            student_id:newId,surah_no:parseInt(surahNo),status
-          }));
-          if(memos.length)await _supabase.from('memorization').insert(memos);
-        }
-      }
-      if(data.lembaga||data.guru){
-        await _supabase.from('settings').upsert([
-          {key:'lembaga',value:data.lembaga||'',user_id:user.id},
-          {key:'guru',value:data.guru||'',user_id:user.id}
-        ]);
-      }
-      for(const sub of(data.setoran||[])){
-        const mappedId=studentMap[sub.santri_id||sub.student_id];
-        if(mappedId){
-          await _supabase.from('submissions').insert({
-            id:sub.id,student_id:mappedId,surah_no:sub.surah_no,
-            nilai:sub.nilai||'',catatan:sub.catatan||'',tanggal:sub.tanggal||'',jam:sub.jam||''
-          });
-        }
-      }
-      isDemo=false;
-      await refreshAll();
-      if(state.lembaga)document.getElementById('lembaga-name').textContent=state.lembaga;
-      renderSantriList();renderRekap();renderSetoranGlobal();updateSantriSelect();renderBackupInfo();
-      const st=document.getElementById('impor-status');
-      st.style.display='block';st.textContent='Berhasil mengimpor '+data.santri.length+' santri.';
-      setTimeout(()=>st.style.display='none',4000);
-    }catch(err){alert('File tidak valid: '+err.message);}
-    input.value='';
-  };
-  reader.readAsText(file);
-}
-
-function renderBackupInfo(){
-  document.getElementById('backup-info').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
-    <div><div style="color:var(--tx3);font-size:11px">Total santri</div><div style="font-weight:500">${state.santri.length} santri</div></div>
-    <div><div style="color:var(--tx3);font-size:11px">Total setoran</div><div style="font-weight:500">${state.setoran.length} setoran</div></div>
-    <div><div style="color:var(--tx3);font-size:11px">Mode</div><div style="font-weight:500">${isDemo?'Demo':'Supabase'}</div></div>
-    <div><div style="color:var(--tx3);font-size:11px">Diperbarui</div><div style="font-weight:500">${nowStr()}</div></div>
-  </div>`;
-}
-
-// ── LAPORAN / PRINT ──────────────────────────────────
+// ── LAPORAN / PRINT
 function bukaLaporan(html){
   document.getElementById('print-content').innerHTML=html;
   document.getElementById('print-area').style.display='block';

@@ -54,7 +54,7 @@
     <div class="nav-tab" onclick="showTab('rekap')">Rekap</div>
     <div class="nav-tab" onclick="showTab('setoran-tab')">Setoran</div>
     <div class="nav-tab" onclick="showTab('laporan')">Laporan</div>
-    <div class="nav-tab" onclick="showTab('backup')">Backup</div>
+
   </div>
 
   <div class="screen active" id="tab-santri">
@@ -110,27 +110,7 @@
     </div>
   </div>
 
-  <div class="screen" id="tab-backup">
-    <div class="backup-section">
-      <h3>Ekspor Data</h3>
-      <div class="info-box">Simpan seluruh data ke file <strong>.json</strong> yang bisa dipulihkan kapan saja, atau ekspor ke <strong>.csv</strong> untuk diolah di Excel.</div>
-      <div class="backup-row">
-        <button class="btn btn-primary" onclick="eksporData()">Ekspor JSON</button>
-        <button class="btn btn-secondary" onclick="eksporCSV()">Ekspor CSV</button>
-      </div>
-    </div>
-    <div class="backup-section">
-      <h3>Impor Data</h3>
-      <div class="info-box"><strong>Perhatian:</strong> data yang ada akan ditimpa saat impor.</div>
-      <label class="btn btn-secondary" style="cursor:pointer">Pilih File Backup (.json)
-        <input type="file" accept=".json" id="inp-impor" style="display:none" onchange="imporData(this)"></label>
-      <div id="impor-status" style="font-size:12px;color:var(--g);margin-top:8px;display:none"></div>
-    </div>
-    <div class="backup-section">
-      <h3>Info Data</h3>
-      <div class="card" id="backup-info"></div>
-    </div>
-  </div>
+
 
   <div id="profil-screen" style="display:none">
     <header style="background:var(--g);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20">
