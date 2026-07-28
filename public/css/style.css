@@ -18,19 +18,40 @@
 }}
 body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
 
-#activation{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;gap:12px}
-#activation h1{font-size:20px;font-weight:500}
-.act-badge{background:var(--gl);color:var(--g);font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px}
-#activation input{display:block;width:100%;max-width:300px;padding:11px 14px;border:1.5px solid var(--bd);border-radius:var(--rad);background:var(--bg);color:var(--tx);font-size:15px;letter-spacing:2px;text-align:center}
-#activation input:focus{outline:none;border-color:var(--g)}
-.btn-full{width:100%;max-width:300px;padding:12px;border:none;border-radius:var(--rad);font-size:15px;font-weight:500;cursor:pointer}
-.btn-act-primary{background:var(--g);color:#fff}
-.btn-act-demo{background:var(--card);color:var(--tx);border:1.5px solid var(--bd)}
-.btn-act-primary:hover,.btn-act-demo:hover{opacity:.88}
-.act-divider{display:flex;align-items:center;gap:10px;width:100%;max-width:300px;color:var(--tx3);font-size:12px}
+/* ── Auth Page ── */
+#activation{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;padding:24px 16px;gap:16px}
+.auth-card{width:100%;max-width:380px;background:var(--bg);border:1px solid var(--bd);border-radius:16px;padding:32px 24px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.auth-brand{text-align:center;margin-bottom:28px}
+.auth-icon{width:56px;height:56px;margin:0 auto 12px;background:var(--gl);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px}
+#activation h1{font-size:22px;font-weight:600;margin-bottom:4px}
+.auth-subtitle{font-size:13px;color:var(--tx2)}
+.auth-desc{font-size:13px;color:var(--tx2);line-height:1.5;margin-bottom:20px}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:13px;font-weight:500;color:var(--tx);margin-bottom:6px}
+.auth-field input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:var(--rad);background:var(--bg);color:var(--tx);font-size:14px;text-align:left;transition:border-color .2s,box-shadow .2s}
+.auth-field input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3px var(--gl)}
+.auth-field input::placeholder{color:var(--tx3)}
+.auth-pass-wrap{position:relative}
+.auth-pass-wrap input{padding-right:44px}
+.pass-toggle{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--tx3);cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
+.pass-toggle:hover{color:var(--tx);background:var(--card)}
+.pass-toggle .eye-closed{display:none}
+.pass-toggle.visible .eye-open{display:none}
+.pass-toggle.visible .eye-closed{display:inline}
+.auth-error{padding:10px 12px;background:var(--rl);color:var(--r);border-radius:8px;font-size:12px;line-height:1.4;margin-bottom:12px;border-left:3px solid var(--r)}
+.auth-btn{width:100%;padding:12px;border:none;border-radius:var(--rad);font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s,transform .1s}
+.auth-btn:active{transform:scale(.98)}
+.auth-btn-primary{background:var(--g);color:#fff}
+.auth-btn-primary:hover{opacity:.88}
+.auth-btn-secondary{background:transparent;color:var(--tx2);border:1.5px solid var(--bd)}
+.auth-btn-secondary:hover{background:var(--card)}
+.act-divider{display:flex;align-items:center;gap:12px;color:var(--tx3);font-size:12px;margin:16px 0}
 .act-divider::before,.act-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
-.err{color:var(--r);font-size:12px;display:none}
-.demo-note{font-size:11px;color:var(--tx3);max-width:300px;line-height:1.6;padding:10px 14px;background:var(--card);border-radius:8px;border-left:3px solid var(--a)}
+.auth-err{color:var(--r);font-size:12px;display:none}
+.demo-note{font-size:11px;color:var(--tx3);max-width:380px;width:100%;line-height:1.6;padding:10px 14px;background:var(--card);border-radius:8px;border-left:3px solid var(--a)}
+#auth-login,#auth-register{animation:authFadeIn .3s ease}
+@keyframes authFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-color-scheme:dark){.auth-card{box-shadow:0 4px 24px rgba(0,0,0,.25)}}
 
 #demo-banner{background:var(--al);color:var(--a);font-size:12px;font-weight:500;text-align:center;padding:7px;display:none;flex-shrink:0}
 
