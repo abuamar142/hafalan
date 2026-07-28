@@ -31,7 +31,11 @@ async function tambahSetoran(){
       jam,
       guru_id: currentUser?.id || null
     });
+    document.getElementById('inp-santri-sel').value='';
+    document.getElementById('inp-surah-sel').value='';
     document.getElementById('inp-catatan').value='';
+    const n=new Date(),p=v=>String(v).padStart(2,'0');
+    document.getElementById('inp-waktu').value=`${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())}T${p(n.getHours())}:${p(n.getMinutes())}`;
     await loadSetoranList();
     await loadSantriList();
     renderSetoranGlobal();renderSantriList();renderRekap();
