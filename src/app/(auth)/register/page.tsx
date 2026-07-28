@@ -52,7 +52,7 @@ export default function RegisterPage() {
       })
     }
 
-    router.push('/dashboard')
+    router.push('/santri')
     router.refresh()
   }
 
