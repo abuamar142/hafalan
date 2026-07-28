@@ -1,4 +1,9 @@
 node_modules/
 data/
 .env
+.env.local
+.envsitter/
 .opencode/
+.serena/
+.next/
+out/

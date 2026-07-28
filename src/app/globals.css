@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1D9E75;
+  --color-primary-light: #E1F5EE;
+  --color-primary-medium: #5DCAA5;
+  --color-primary-dark: #085041;
+  --color-accent: #BA7517;
+  --color-accent-light: #FAEEDA;
+  --color-purple: #534AB7;
+  --color-purple-light: #EEEDFE;
+  --color-red: #A32D2D;
+  --color-red-light: #FCEBEB;
+  --color-text: #2C2C2A;
+  --color-text-secondary: #5F5E5A;
+  --color-text-muted: #888780;
+  --color-border: #D3D1C7;
+  --color-surface: #fff;
+  --color-card: #F1EFE8;
+  --radius: 10px;
+}
+
+/* ── Dark mode ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #5DCAA5;
+    --color-primary-light: #04342C;
+    --color-primary-medium: #1D9E75;
+    --color-accent: #EF9F27;
+    --color-accent-light: #412402;
+    --color-purple: #AFA9EC;
+    --color-purple-light: #26215C;
+    --color-red: #F09595;
+    --color-red-light: #501313;
+    --color-text: #D3D1C7;
+    --color-text-secondary: #B4B2A9;
+    --color-text-muted: #888780;
+    --color-border: #444441;
+    --color-surface: #2C2C2A;
+    --color-card: #3d3d3a;
+  }
+}
+
+/* ── Base ── */
+body {
+  font-family: system-ui, sans-serif;
+  background: var(--color-surface);
+  color: var(--color-text);
+  min-height: 100vh;
+}
+
+/* ── Print ── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #print-area,
+  #print-area * {
+    visibility: visible;
+  }
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  @page {
+    margin: 15mm;
+  }
+}

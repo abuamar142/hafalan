@@ -1,0 +1,108 @@
+'use client'
+
+import { createContext, useContext, useState } from 'react'
+import Header from '@/components/Header'
+import NavTabs from '@/components/NavTabs'
+import Modal from '@/components/Modal'
+import { useAppState } from '@/hooks/useAppState'
+import type { SantriWithCount, Memorization } from '@/lib/types'
+
+interface DashboardContextValue {
+  state: ReturnType<typeof useAppState>['state']
+  loading: boolean
+  refreshAll: () => Promise<void>
+  getStudent: (id: number) => SantriWithCount | undefined
+  getStudentMemorization: (id: number) => Memorization[]
+  getStudentSubmissionCount: (id: number) => number
+  addStudent: (nama: string, kelas: string, usia: string) => Promise<void>
+  deleteStudent: (id: number) => Promise<void>
+}
+
+export const DashboardContext = createContext<DashboardContextValue | null>(null)
+
+export function useDashboard() {
+  const ctx = useContext(DashboardContext)
+  if (!ctx) throw new Error('useDashboard must be used within DashboardLayout')
+  return ctx
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const app = useAppState()
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [guruInput, setGuruInput] = useState('')
+
+  function openSettings() {
+    setGuruInput(app.state.guru)
+    setSettingsOpen(true)
+  }
+
+  async function handleSaveGuru() {
+    await app.updateGuru(guruInput.trim())
+    setSettingsOpen(false)
+  }
+
+  return (
+    <DashboardContext.Provider
+      value={{
+        state: app.state,
+        loading: app.loading,
+        refreshAll: app.refreshAll,
+        getStudent: app.getStudent,
+        getStudentMemorization: app.getStudentMemorization,
+        getStudentSubmissionCount: app.getStudentSubmissionCount,
+        addStudent: app.addStudent,
+        deleteStudent: app.deleteStudent,
+      }}
+    >
+      <div className="flex min-h-screen flex-col bg-surface text-text">
+        {/* Header */}
+        <Header guru={app.state.guru} onOpenSettings={openSettings} />
+
+        {/* Nav */}
+        <NavTabs />
+
+        {/* Loading */}
+        {app.loading && (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-sm text-text-muted">Memuat data...</div>
+          </div>
+        )}
+
+        {/* Content */}
+        {!app.loading && <main className="p-3.5">{children}</main>}
+      </div>
+
+      {/* Settings Modal */}
+      <Modal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        title="Pengaturan"
+      >
+        <div className="mb-3">
+          <label className="mb-1.5 block text-xs text-text-secondary">
+            Nama Ustadz / Guru
+          </label>
+          <input
+            type="text"
+            value={guruInput}
+            onChange={(e) => setGuruInput(e.target.value)}
+            placeholder="Ustadz Ahmad..."
+            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
+          />
+        </div>
+        <div className="mt-3.5 flex justify-end">
+          <button
+            onClick={handleSaveGuru}
+            className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity"
+          >
+            Simpan
+          </button>
+        </div>
+      </Modal>
+    </DashboardContext.Provider>
+  )
+}
