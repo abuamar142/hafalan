@@ -109,41 +109,39 @@
       <button class="btn btn-purple" style="width:100%" onclick="cetakIndividu()">Cetak Laporan Individu</button>
     </div>
   </div>
+</div>
 
-
-
-  <div id="profil-screen" style="display:none">
-    <header style="background:var(--g);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20">
-      <button class="back-btn" onclick="closeProfil()">←</button>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:11px;opacity:.8">Profil Santri</div>
-        <div style="font-size:15px;font-weight:500" id="profil-nama-header"></div>
-      </div>
-      <button onclick="hapusSantriConfirm()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer">Hapus</button>
-    </header>
-    <div style="padding:14px">
-      <div class="stat-row">
-        <div class="stat-card"><div class="stat-num" id="p-hafal">0</div><div class="stat-lbl">Surah Hafal</div></div>
-        <div class="stat-card"><div class="stat-num" id="p-juz">0</div><div class="stat-lbl">Juz Selesai</div></div>
-        <div class="stat-card"><div class="stat-num" id="p-pct">0%</div><div class="stat-lbl">Progress</div></div>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="p-bar" style="width:0%"></div></div>
-      <div id="p-juz-detail" style="display:none">
-        <div class="juz-header">
-          <button style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--tx)" onclick="closePJuz()">←</button>
-          <div>
-            <div style="font-size:15px;font-weight:500" id="p-juz-title">Juz 1</div>
-            <div style="font-size:11px;color:var(--tx3)" id="p-juz-sub"></div>
-          </div>
+<div id="profil-screen" style="display:none">
+  <header style="background:var(--g);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20">
+    <button class="back-btn" onclick="closeProfil()">←</button>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:11px;opacity:.8">Profil Santri</div>
+      <div style="font-size:15px;font-weight:500" id="profil-nama-header"></div>
+    </div>
+    <button onclick="hapusSantriConfirm()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer">Hapus</button>
+  </header>
+  <div style="padding:14px">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-num" id="p-hafal">0</div><div class="stat-lbl">Surah Hafal</div></div>
+      <div class="stat-card"><div class="stat-num" id="p-juz">0</div><div class="stat-lbl">Juz Selesai</div></div>
+      <div class="stat-card"><div class="stat-num" id="p-pct">0%</div><div class="stat-lbl">Progress</div></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="p-bar" style="width:0%"></div></div>
+    <div id="p-juz-detail" style="display:none">
+      <div class="juz-header">
+        <button style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--tx)" onclick="closePJuz()">←</button>
+        <div>
+          <div style="font-size:15px;font-weight:500" id="p-juz-title">Juz 1</div>
+          <div style="font-size:11px;color:var(--tx3)" id="p-juz-sub"></div>
         </div>
-        <div id="p-surah-list"></div>
       </div>
-      <div id="p-juz-grid-wrap">
-        <div style="font-size:12px;color:var(--tx3);margin-bottom:8px">Ketuk juz untuk detail surah</div>
-        <div class="juz-grid" id="p-juz-grid"></div>
-        <div style="margin-top:14px" class="section-title">Riwayat Setoran</div>
-        <div id="p-setoran-list" style="margin-top:8px"></div>
-      </div>
+      <div id="p-surah-list"></div>
+    </div>
+    <div id="p-juz-grid-wrap">
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:8px">Ketuk juz untuk detail surah</div>
+      <div class="juz-grid" id="p-juz-grid"></div>
+      <div style="margin-top:14px" class="section-title">Riwayat Setoran</div>
+      <div id="p-setoran-list" style="margin-top:8px"></div>
     </div>
   </div>
 </div>
