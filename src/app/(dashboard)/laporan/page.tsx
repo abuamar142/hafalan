@@ -14,6 +14,7 @@ import {
   getColor,
   initials,
   nowStr,
+  formatWaktu,
 } from '@/lib/helpers'
 import { ALL_SURAHS } from '@/lib/constants'
 import type { SantriWithCount } from '@/lib/types'
@@ -140,7 +141,7 @@ export default function LaporanPage() {
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.santri_nama}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${getSurahNama(sub.surah_no)}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}` : ''}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${sub.nilai}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.tanggal}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).tanggal}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan || '-'}</td>
         </tr>`
       )
@@ -262,8 +263,8 @@ export default function LaporanPage() {
         <tr>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${getSurahNama(sub.surah_no)}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}` : ''}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${sub.nilai}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.tanggal}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.jam}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).tanggal}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).jam}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan || '-'}</td>
         </tr>`
       )

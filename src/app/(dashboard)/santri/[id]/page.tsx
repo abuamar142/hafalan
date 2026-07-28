@@ -12,6 +12,7 @@ import {
   getPctFromCount,
   getColor,
   initials,
+  formatWaktu,
 } from '@/lib/helpers'
 import { ALL_SURAHS } from '@/lib/constants'
 import type { Memorization, SetoranItem } from '@/lib/types'
@@ -322,7 +323,7 @@ export default function ProfilPage({
                     ) : null}
                   </div>
                   <div className="mt-0.5 text-[13px] text-text-muted">
-                    {sub.tanggal} · {sub.jam}
+                    {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}
                   </div>
                   {sub.catatan && (
                     <div className="mt-1 text-[13px] text-text-secondary">

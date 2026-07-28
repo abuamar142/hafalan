@@ -22,8 +22,7 @@ export interface Submission {
   surah_no: number
   nilai: string
   catatan: string
-  tanggal: string
-  jam: string
+  waktu: string
   guru_id: string | null
   ayat_start: number | null
   ayat_end: number | null
@@ -56,8 +55,7 @@ export interface SetoranItem {
   surah_no: number
   nilai: string
   catatan: string
-  tanggal: string
-  jam: string
+  waktu: string
   ayat_start: number | null
   ayat_end: number | null
   guru_id: string | null
@@ -71,8 +69,7 @@ export interface ProfileSantri extends Student {
     surah_no: number
     nilai: string
     catatan: string
-    tanggal: string
-    jam: string
+    waktu: string
     ayat_start: number | null
     ayat_end: number | null
   }[]
@@ -100,8 +97,7 @@ export interface DemoSetoran {
   surah_no: number
   nilai: string
   catatan: string
-  tanggal: string
-  jam: string
+  waktu: string
   ayat_start: number
   ayat_end: number
 }

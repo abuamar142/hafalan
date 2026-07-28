@@ -61,3 +61,22 @@ export function getSurahNama(no: number) {
   const s = ALL_SURAHS.find((x) => x.no === no)
   return s ? s.nama : 'Surah ' + no
 }
+
+/**
+ * Convert ISO timestamptz to local display format.
+ * Uses user's browser timezone (auto-detected).
+ */
+export function formatWaktu(iso: string): { tanggal: string; jam: string } {
+  const d = new Date(iso)
+  return {
+    tanggal: d.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }),
+    jam: d.toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+  }
+}

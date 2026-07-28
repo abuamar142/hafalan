@@ -2,31 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { useDashboard } from '../../layout'
-import { getSurahNama } from '@/lib/helpers'
+import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
-
-function formatDate(dateStr: string): string {
-  const months: Record<string, string> = {
-    Januari: 'Jan',
-    Februari: 'Feb',
-    Maret: 'Mar',
-    April: 'Apr',
-    Mei: 'May',
-    Juni: 'Jun',
-    Juli: 'Jul',
-    Agustus: 'Aug',
-    September: 'Sep',
-    Oktober: 'Oct',
-    November: 'Nov',
-    Desember: 'Dec',
-  }
-  for (const [full, short] of Object.entries(months)) {
-    if (dateStr.includes(full)) {
-      return dateStr.replace(full, short)
-    }
-  }
-  return dateStr
-}
 
 export default function RiwayatSetoranPage() {
   const { state } = useDashboard()
@@ -137,7 +114,7 @@ export default function RiwayatSetoranPage() {
                 </div>
               )}
               <div className="text-[12px] text-text-muted whitespace-nowrap">
-                {formatDate(item.tanggal)} &middot; {item.jam}
+                {formatWaktu(item.waktu).tanggal} &middot; {formatWaktu(item.waktu).jam}
               </div>
             </div>
           </div>

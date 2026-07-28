@@ -75,15 +75,6 @@ export default function TambahSetoranPage() {
       } = await supabase.auth.getUser()
 
       const wDate = new Date(waktu)
-      const formattedDate = wDate.toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      })
-      const formattedTime = wDate.toLocaleTimeString('id-ID', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
 
       await supabase.from('submissions').insert({
         id: Date.now(),
@@ -91,8 +82,7 @@ export default function TambahSetoranPage() {
         surah_no: Number(surahNo),
         nilai,
         catatan: catatan.trim(),
-        tanggal: formattedDate,
-        jam: formattedTime,
+        waktu: wDate.toISOString(),
         guru_id: user?.id || null,
         ayat_start: ayatStart,
         ayat_end: ayatEnd === '' ? ayatStart : ayatEnd,
