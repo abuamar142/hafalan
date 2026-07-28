@@ -1,0 +1,13 @@
+{
+  "name": "quran-tracker",
+  "version": "3.0.0",
+  "description": "Tracker Hafalan Al-Quran Multi Santri — Supabase Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

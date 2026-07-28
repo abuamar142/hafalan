@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tracker Hafalan — Multi Santri</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="activation" style="display:none">
+  <div style="font-size:44px">📖</div>
+  <h1>Tracker Hafalan Al-Quran</h1>
+  <div class="act-badge">Versi Multi-Santri · Ustadz / TPQ</div>
+
+  <!-- Login Form -->
+  <div id="auth-login">
+    <p style="font-size:13px;color:var(--tx2);max-width:300px;line-height:1.6;margin-bottom:14px">Masuk dengan akun yang sudah terdaftar.</p>
+    <input type="email" id="auth-email" placeholder="Email" style="width:100%;margin-bottom:8px">
+    <input type="password" id="auth-pass" placeholder="Password" style="width:100%;margin-bottom:8px">
+    <div class="err" id="auth-err" style="display:none"></div>
+    <button class="btn-full btn-act-primary" onclick="doLogin()">Masuk</button>
+    <div class="act-divider">belum punya akun?</div>
+    <button class="btn-full btn-act-demo" onclick="showRegister()">Daftar Akun Baru</button>
+  </div>
+
+  <!-- Register Form -->
+  <div id="auth-register" style="display:none">
+    <p style="font-size:13px;color:var(--tx2);max-width:300px;line-height:1.6;margin-bottom:14px">Buat akun baru untuk mulai menggunakan tracker.</p>
+    <input type="text" id="reg-name" placeholder="Nama Lengkap" style="width:100%;margin-bottom:8px">
+    <input type="email" id="reg-email" placeholder="Email" style="width:100%;margin-bottom:8px">
+    <input type="password" id="reg-pass" placeholder="Password (min. 6 karakter)" style="width:100%;margin-bottom:8px">
+    <div class="err" id="reg-err" style="display:none"></div>
+    <button class="btn-full btn-act-primary" onclick="doRegister()">Daftar</button>
+    <div class="act-divider">sudah punya akun?</div>
+    <button class="btn-full btn-act-demo" onclick="showLogin()">Masuk</button>
+  </div>
+
+  <div class="demo-note" id="demo-note" style="display:none">Mode demo menggunakan data contoh TPQ Al-Ikhlas dengan 6 santri. Data tersimpan di server.</div>
+</div>
+
+<div id="app">
+  <div id="demo-banner">Mode Demo — Data contoh, tersimpan di Supabase</div>
+  <header>
+    <div>
+      <div style="font-size:11px;opacity:.8" id="header-sub">Multi-Santri · TPQ / Ustadz</div>
+      <h1 id="lembaga-name">Tracker Hafalan</h1>
+    </div>
+    <button onclick="showModal('modal-setting')" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Pengaturan</button>
+    <button onclick="doLogout()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">Keluar</button>
+  </header>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showTab('santri')">Santri</div>
+    <div class="nav-tab" onclick="showTab('rekap')">Rekap</div>
+    <div class="nav-tab" onclick="showTab('setoran-tab')">Setoran</div>
+    <div class="nav-tab" onclick="showTab('laporan')">Laporan</div>
+    <div class="nav-tab" onclick="showTab('backup')">Backup</div>
+  </div>
+
+  <div class="screen active" id="tab-santri">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;color:var(--tx2)" id="jumlah-santri">0 santri</div>
+      <button class="btn btn-primary btn-sm" onclick="showModal('modal-tambah')">+ Tambah Santri</button>
+    </div>
+    <div id="santri-list"></div>
+  </div>
+
+  <div class="screen" id="tab-rekap">
+    <div class="card" style="margin-bottom:12px">
+      <div class="section-title">Ranking progress santri</div>
+      <div id="rekap-list"></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-num" id="r-total">0</div><div class="stat-lbl">Total Santri</div></div>
+      <div class="stat-card"><div class="stat-num" id="r-hafal">0</div><div class="stat-lbl">Rata-rata Surah</div></div>
+      <div class="stat-card"><div class="stat-num" id="r-setoran">0</div><div class="stat-lbl">Total Setoran</div></div>
+    </div>
+  </div>
+
+  <div class="screen" id="tab-setoran-tab">
+    <div class="card" style="margin-bottom:14px">
+      <div class="form-group"><label>Nama Santri</label>
+        <select id="inp-santri-sel"><option value="">-- Pilih Santri --</option></select></div>
+      <div class="form-group"><label>Surah yang disetorkan</label>
+        <select id="inp-surah-sel"><option value="">-- Pilih Surah --</option></select></div>
+      <div class="form-group"><label>Nilai</label>
+        <select id="inp-nilai"><option>Mumtaz</option><option>Jayyid Jiddan</option><option>Jayyid</option><option>Maqbul</option><option>Perlu Ulang</option></select></div>
+      <div class="form-group"><label>Tanggal &amp; Waktu Setoran</label>
+        <input type="datetime-local" id="inp-waktu"></div>
+      <div class="form-group"><label>Catatan ustadz (opsional)</label>
+        <textarea id="inp-catatan" rows="3" placeholder="Tajwid, makharijul huruf, dll..." style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:14px;font-family:inherit;resize:vertical"></textarea></div>
+      <button class="btn btn-primary" style="width:100%" onclick="tambahSetoran()">+ Catat Setoran</button>
+    </div>
+    <div class="section-title">Riwayat Terbaru</div>
+    <div id="setoran-history-global"></div>
+  </div>
+
+  <div class="screen" id="tab-laporan">
+    <div class="card" style="margin-bottom:12px">
+      <div class="section-title" style="margin-bottom:8px">Laporan Kolektif</div>
+      <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;line-height:1.6">Rekap progress seluruh santri. Cocok untuk laporan ke pengurus TPQ atau orang tua.</p>
+      <button class="btn btn-primary" style="width:100%" onclick="cetakKolektif()">Cetak / Simpan PDF — Semua Santri</button>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:8px">Laporan Individu</div>
+      <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;line-height:1.6">Progress personal lengkap dengan riwayat setoran dan kolom tanda tangan ustadz.</p>
+      <div class="form-group" style="margin-bottom:12px"><label>Pilih Santri</label>
+        <select id="inp-lap-santri"><option value="">-- Pilih Santri --</option></select></div>
+      <button class="btn btn-purple" style="width:100%" onclick="cetakIndividu()">Cetak Laporan Individu</button>
+    </div>
+  </div>
+
+  <div class="screen" id="tab-backup">
+    <div class="backup-section">
+      <h3>Ekspor Data</h3>
+      <div class="info-box">Simpan seluruh data ke file <strong>.json</strong> yang bisa dipulihkan kapan saja, atau ekspor ke <strong>.csv</strong> untuk diolah di Excel.</div>
+      <div class="backup-row">
+        <button class="btn btn-primary" onclick="eksporData()">Ekspor JSON</button>
+        <button class="btn btn-secondary" onclick="eksporCSV()">Ekspor CSV</button>
+      </div>
+    </div>
+    <div class="backup-section">
+      <h3>Impor Data</h3>
+      <div class="info-box"><strong>Perhatian:</strong> data yang ada akan ditimpa saat impor.</div>
+      <label class="btn btn-secondary" style="cursor:pointer">Pilih File Backup (.json)
+        <input type="file" accept=".json" id="inp-impor" style="display:none" onchange="imporData(this)"></label>
+      <div id="impor-status" style="font-size:12px;color:var(--g);margin-top:8px;display:none"></div>
+    </div>
+    <div class="backup-section">
+      <h3>Info Data</h3>
+      <div class="card" id="backup-info"></div>
+    </div>
+  </div>
+
+  <div id="profil-screen" style="display:none">
+    <header style="background:var(--g);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20">
+      <button class="back-btn" onclick="closeProfil()">←</button>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;opacity:.8">Profil Santri</div>
+        <div style="font-size:15px;font-weight:500" id="profil-nama-header"></div>
+      </div>
+      <button onclick="hapusSantriConfirm()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer">Hapus</button>
+    </header>
+    <div style="padding:14px">
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-num" id="p-hafal">0</div><div class="stat-lbl">Surah Hafal</div></div>
+        <div class="stat-card"><div class="stat-num" id="p-juz">0</div><div class="stat-lbl">Juz Selesai</div></div>
+        <div class="stat-card"><div class="stat-num" id="p-pct">0%</div><div class="stat-lbl">Progress</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="p-bar" style="width:0%"></div></div>
+      <div id="p-juz-detail" style="display:none">
+        <div class="juz-header">
+          <button style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--tx)" onclick="closePJuz()">←</button>
+          <div>
+            <div style="font-size:15px;font-weight:500" id="p-juz-title">Juz 1</div>
+            <div style="font-size:11px;color:var(--tx3)" id="p-juz-sub"></div>
+          </div>
+        </div>
+        <div id="p-surah-list"></div>
+      </div>
+      <div id="p-juz-grid-wrap">
+        <div style="font-size:12px;color:var(--tx3);margin-bottom:8px">Ketuk juz untuk detail surah</div>
+        <div class="juz-grid" id="p-juz-grid"></div>
+        <div style="margin-top:14px" class="section-title">Riwayat Setoran</div>
+        <div id="p-setoran-list" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="print-area">
+  <button class="lap-close-btn" onclick="tutupLaporan()">Tutup</button>
+  <div id="print-content"></div>
+</div>
+
+<div class="modal-bg" id="modal-tambah" style="display:none" onclick="if(event.target===this)closeModal('modal-tambah')">
+  <div class="modal">
+    <h2>Tambah Santri Baru</h2>
+    <div class="form-group"><label>Nama Lengkap *</label><input type="text" id="inp-nama" placeholder="Nama santri..."></div>
+    <div class="form-group"><label>Kelas / Halaqah</label><input type="text" id="inp-kelas" placeholder="Kelas A, Halaqah 1..."></div>
+    <div class="form-group"><label>Usia (tahun)</label><input type="number" id="inp-usia" min="5" max="99"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-tambah')">Batal</button>
+      <button class="btn btn-primary" onclick="tambahSantri()">Simpan</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-setting" style="display:none" onclick="if(event.target===this)closeModal('modal-setting')">
+  <div class="modal">
+    <h2>Pengaturan Lembaga</h2>
+    <div class="form-group"><label>Nama TPQ / Lembaga</label><input type="text" id="inp-lembaga" placeholder="TPQ Al-Ikhlas..."></div>
+    <div class="form-group"><label>Nama Ustadz / Guru</label><input type="text" id="inp-guru" placeholder="Ustadz Ahmad..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" onclick="resetData()">Reset Semua Data</button>
+      <button class="btn btn-primary" onclick="saveSetting()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/data.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
