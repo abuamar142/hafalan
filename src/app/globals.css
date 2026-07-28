@@ -5,6 +5,7 @@
   --color-primary-light: #E1F5EE;
   --color-primary-medium: #5DCAA5;
   --color-primary-dark: #085041;
+  --color-sidebar: #0e6b50;
   --color-accent: #BA7517;
   --color-accent-light: #FAEEDA;
   --color-purple: #534AB7;
@@ -63,6 +64,9 @@ body {
     left: 0;
     top: 0;
     width: 100%;
+  }
+  aside {
+    display: none !important;
   }
   @page {
     margin: 15mm;

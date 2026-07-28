@@ -1,8 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState } from 'react'
-import Header from '@/components/Header'
-import NavTabs from '@/components/NavTabs'
+import Sidebar from '@/components/Sidebar'
 import Modal from '@/components/Modal'
 import { useAppState } from '@/hooks/useAppState'
 import type { SantriWithCount, Memorization } from '@/lib/types'
@@ -58,22 +57,27 @@ export default function DashboardLayout({
         deleteStudent: app.deleteStudent,
       }}
     >
-      <div className="flex min-h-screen flex-col bg-surface text-text">
-        {/* Header */}
-        <Header guru={app.state.guru} onOpenSettings={openSettings} />
+      <div className="flex min-h-screen bg-surface text-text">
+        {/* Sidebar */}
+        <Sidebar guru={app.state.guru} onOpenSettings={openSettings} />
 
-        {/* Nav */}
-        <NavTabs />
+        {/* Main content area */}
+        <div className="flex min-h-screen flex-1 flex-col">
+          {/* Spacer for mobile hamburger — content starts below it on small screens */}
+          <div className="h-12 md:hidden" />
 
-        {/* Loading */}
-        {app.loading && (
-          <div className="flex items-center justify-center py-16">
-            <div className="text-sm text-text-muted">Memuat data...</div>
-          </div>
-        )}
+          {/* Loading */}
+          {app.loading && (
+            <div className="flex flex-1 items-center justify-center py-16">
+              <div className="text-sm text-text-muted">Memuat data...</div>
+            </div>
+          )}
 
-        {/* Content */}
-        {!app.loading && <main className="p-3.5">{children}</main>}
+          {/* Content */}
+          {!app.loading && (
+            <main className="flex-1 p-4 md:p-6">{children}</main>
+          )}
+        </div>
       </div>
 
       {/* Settings Modal */}
