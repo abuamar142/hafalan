@@ -138,7 +138,7 @@ export default function LaporanPage() {
         (sub) => `
         <tr>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.santri_nama}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${getSurahNama(sub.surah_no)}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${getSurahNama(sub.surah_no)}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}` : ''}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${sub.nilai}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.tanggal}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan || '-'}</td>
@@ -260,7 +260,7 @@ export default function LaporanPage() {
       .map(
         (sub) => `
         <tr>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${getSurahNama(sub.surah_no)}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${getSurahNama(sub.surah_no)}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}` : ''}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${sub.nilai}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.tanggal}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.jam}</td>

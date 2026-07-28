@@ -88,6 +88,8 @@ export function useAppState() {
         catatan: s.catatan,
         tanggal: s.tanggal,
         jam: s.jam,
+        ayat_start: s.ayat_start ?? null,
+        ayat_end: s.ayat_end ?? null,
       }))
 
       // Parse settings

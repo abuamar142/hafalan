@@ -21,6 +21,22 @@ export default function SetoranPage() {
   const [waktu, setWaktu] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [ayatStart, setAyatStart] = useState<number>(1)
+  const [ayatEnd, setAyatEnd] = useState<number | ''>('')
+  
+  // Get max ayat for selected surah segment
+  const maxAyat = surahNo ? ALL_SURAHS.find(s => s.no === Number(surahNo))?.ayat : 1
+
+  // Reset ayat defaults when surah changes
+  useEffect(() => {
+    if (surahNo) {
+      const surah = ALL_SURAHS.find(s => s.no === Number(surahNo))
+      if (surah) {
+        setAyatStart(1)
+        setAyatEnd(surah.ayat)
+      }
+    }
+  }, [surahNo])
 
   const resetDatetime = useCallback(() => {
     setWaktu(toLocalDatetimeString(new Date()))
@@ -78,6 +94,8 @@ export default function SetoranPage() {
         tanggal: formattedDate,
         jam: formattedTime,
         guru_id: user?.id || null,
+        ayat_start: ayatStart,
+        ayat_end: ayatEnd === '' ? ayatStart : ayatEnd,
       })
 
       // Reset form
@@ -85,6 +103,8 @@ export default function SetoranPage() {
       setSurahNo('')
       setNilai(NILAI_OPTIONS[0])
       setCatatan('')
+      setAyatStart(1)
+      setAyatEnd('')
       resetDatetime()
 
       await refreshAll()
@@ -148,6 +168,38 @@ export default function SetoranPage() {
             ))}
           </select>
         </div>
+
+        {/* Ayat Range */}
+        {surahNo && (
+          <div className="mb-3">
+            <label className="mb-1.5 block text-xs text-text-secondary">
+              Ayat (dari — sampai)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={1}
+                max={maxAyat}
+                value={ayatStart}
+                onChange={(e) => setAyatStart(Math.max(1, Number(e.target.value) || 1))}
+                className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
+              />
+              <span className="text-sm text-text-muted">—</span>
+              <input
+                type="number"
+                min={1}
+                max={maxAyat}
+                value={ayatEnd}
+                onChange={(e) => setAyatEnd(e.target.value === '' ? '' : Math.max(1, Math.min(maxAyat || 999, Number(e.target.value) || 1)))}
+                placeholder={String(maxAyat)}
+                className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
+              />
+            </div>
+            <div className="mt-1 text-[11px] text-text-muted">
+              {ayatEnd === '' ? '1 ayat saja' : `${ayatEnd - ayatStart + 1} ayat`}
+            </div>
+          </div>
+        )}
 
         {/* Nilai */}
         <div className="mb-3">
@@ -224,6 +276,11 @@ export default function SetoranPage() {
             <div className="min-w-0 flex-1">
               <div className="text-sm font-medium text-text">
                 {sub.santri_nama} — {getSurahNama(sub.surah_no)}
+                {sub.ayat_start && sub.ayat_end ? (
+                  <span className="text-text-muted ml-1">
+                    : {sub.ayat_start}{sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}
+                  </span>
+                ) : null}
               </div>
               <div className="mt-0.5 text-[13px] text-text-muted">
                 {sub.tanggal} • {sub.jam}

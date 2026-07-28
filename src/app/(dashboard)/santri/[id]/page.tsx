@@ -315,6 +315,11 @@ export default function ProfilPage({
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium text-text">
                     {getSurahNama(sub.surah_no)}
+                    {sub.ayat_start && sub.ayat_end ? (
+                      <span className="text-text-muted ml-1">
+                        : {sub.ayat_start}{sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}
+                      </span>
+                    ) : null}
                   </div>
                   <div className="mt-0.5 text-[13px] text-text-muted">
                     {sub.tanggal} · {sub.jam}

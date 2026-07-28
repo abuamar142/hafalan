@@ -25,6 +25,8 @@ export interface Submission {
   tanggal: string
   jam: string
   guru_id: string | null
+  ayat_start: number | null
+  ayat_end: number | null
 }
 
 export interface Settings {
@@ -56,6 +58,8 @@ export interface SetoranItem {
   catatan: string
   tanggal: string
   jam: string
+  ayat_start: number | null
+  ayat_end: number | null
 }
 
 export interface ProfileSantri extends Student {
@@ -67,6 +71,8 @@ export interface ProfileSantri extends Student {
     catatan: string
     tanggal: string
     jam: string
+    ayat_start: number | null
+    ayat_end: number | null
   }[]
 }
 
@@ -94,6 +100,8 @@ export interface DemoSetoran {
   catatan: string
   tanggal: string
   jam: string
+  ayat_start: number
+  ayat_end: number
 }
 
 export interface DemoState {
