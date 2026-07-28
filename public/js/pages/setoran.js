@@ -28,7 +28,8 @@ async function tambahSetoran(){
       nilai,
       catatan,
       tanggal,
-      jam
+      jam,
+      guru_id: currentUser?.id || null
     });
     document.getElementById('inp-catatan').value='';
     await loadSetoranList();
