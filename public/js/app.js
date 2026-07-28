@@ -12,7 +12,7 @@ async function startApp(){
 
 function renderGuruName(){
   const el=document.getElementById('header-guru');
-  el.textContent=state.guru?'Ustadz/Guru: '+state.guru:'';
+  el.textContent=state.guru||'';
 }
 
 // ── SETTINGS ──
@@ -26,27 +26,6 @@ async function saveSetting(){
     ]);
   }catch(e){console.error('saveSetting',e)}
   closeModal('modal-setting');
-}
-
-async function resetData(){
-  if(confirm('Hapus SEMUA data? Tidak bisa dibatalkan.')){
-    try{
-      const { data: { user } } = await _supabase.auth.getUser();
-      const { data: students } = await _supabase.from('students').select('id').eq('user_id',user.id);
-      if(students){
-        const ids=students.map(s=>s.id);
-        if(ids.length){
-          await _supabase.from('submissions').delete().in('student_id',ids);
-          await _supabase.from('memorization').delete().in('student_id',ids);
-        }
-        await _supabase.from('students').delete().eq('user_id',user.id);
-      }
-      await _supabase.from('settings').delete().eq('user_id',user.id);
-      await refreshAll();
-      closeModal('modal-setting');
-      renderSantriList();renderRekap();renderSetoranGlobal();updateSantriSelect();
-    }catch(e){alert('Gagal reset: '+e.message)}
-  }
 }
 
 // ── INIT ──
