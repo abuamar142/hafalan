@@ -31,14 +31,14 @@ const NAV_ITEMS: NavItem[] = [
     icon: <LayoutDashboard className="w-5 h-5" />,
   },
   {
-    label: 'Kelompok',
-    href: '/kelompok',
+    label: 'Management',
+    href: '/management',
     icon: <FolderOpen className="w-5 h-5" />,
-  },
-  {
-    label: 'Santri',
-    href: '/santri',
-    icon: <Users className="w-5 h-5" />,
+    children: [
+      { label: 'Kelas', href: '/kelas' },
+      { label: 'Kelompok', href: '/kelompok' },
+      { label: 'Siswa', href: '/santri' },
+    ],
   },
   {
     label: 'Setoran',

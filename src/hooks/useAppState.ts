@@ -7,7 +7,8 @@ import { getMemorizationByStudentIds } from '@/lib/data/memorization'
 import { getSubmissions } from '@/lib/data/submissions'
 import { getSettings, getGuruNames } from '@/lib/data/settings'
 import { getGroups, getAllGroupTeachers } from '@/lib/data/groups'
-import type { Memorization, Settings, SantriWithCount, SetoranItem, Group, GroupTeacher } from '@/lib/types'
+import { getClasses } from '@/lib/data/classes'
+import type { Memorization, Settings, SantriWithCount, SetoranItem, Group, GroupTeacher, Class } from '@/lib/types'
 import { computeHafalCounts, computeStudentsWithCount } from '@/lib/domain/hafalan'
 
 interface AppState {
@@ -18,6 +19,7 @@ interface AppState {
   guru: string
   groups: Group[]
   groupTeachers: GroupTeacher[]
+  classes: Class[]
 }
 
 export function useAppState() {
@@ -29,6 +31,7 @@ export function useAppState() {
     guru: '',
     groups: [],
     groupTeachers: [],
+    classes: [],
   })
   const [loading, setLoading] = useState(true)
 
@@ -41,18 +44,19 @@ export function useAppState() {
         data: { user },
       } = await supabase.auth.getUser()
       if (!user) {
-        setState({ students: [], memorization: [], submissions: [], settings: [], guru: '', groups: [], groupTeachers: [] })
+        setState({ students: [], memorization: [], submissions: [], settings: [], guru: '', groups: [], groupTeachers: [], classes: [] })
         setLoading(false)
         return
       }
 
-      // 1. Fetch students, settings, submissions in parallel
-      const [students, settings, subsRaw, groups, groupTeachers] = await Promise.all([
+      // 1. Fetch students, settings, submissions, groups, teachers, classes in parallel
+      const [students, settings, subsRaw, groups, groupTeachers, classes] = await Promise.all([
         getStudents(),
         getSettings(),
         getSubmissions(),
         getGroups(),
         getAllGroupTeachers(),
+        getClasses(),
       ])
 
       // 2. Fetch memorization for all students to compute hafal counts
@@ -87,7 +91,7 @@ export function useAppState() {
         if (r.key === 'guru') guru = r.value
       }
 
-      setState({ students: studentsWithCount, memorization, submissions, settings, guru, groups, groupTeachers })
+      setState({ students: studentsWithCount, memorization, submissions, settings, guru, groups, groupTeachers, classes })
     } catch (err) {
       console.error('useAppState fetchAll', err)
     } finally {
