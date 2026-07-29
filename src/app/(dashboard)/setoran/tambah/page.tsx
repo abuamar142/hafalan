@@ -7,7 +7,10 @@ import { addSubmissionAction } from '@/lib/actions/submissions'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
-import { CheckCircle2, Save } from 'lucide-react'
+import { Save, BookOpen, History } from 'lucide-react'
+import { getColor, initials, getPct, getTotalHafal, formatWaktu, getSurahNama } from '@/lib/helpers'
+import { Combobox } from '@/components/ui/Combobox'
+import { useToast } from '@/components/ui/Toast'
 
 function toLocalDatetimeString(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -16,6 +19,7 @@ function toLocalDatetimeString(d: Date) {
 
 export default function TambahSetoranPage() {
   const { state, refreshSubmissions } = useDashboard()
+  const { toast } = useToast()
 
   const [santriId, setSantriId] = useState('')
   const [surahNo, setSurahNo] = useState('')
@@ -23,24 +27,26 @@ export default function TambahSetoranPage() {
   const [catatan, setCatatan] = useState('')
   const [waktu, setWaktu] = useState('')
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
   const [ayatStart, setAyatStart] = useState<number>(1)
   const [ayatEnd, setAyatEnd] = useState<number | ''>('')
 
-  // Get max ayat for selected surah segment
-  const maxAyat = surahNo ? ALL_SURAHS.find(s => s.no === Number(surahNo))?.ayat : 1
+  // Selected entities
+  const selectedStudent = state.students.find(s => s.id === Number(santriId))
+  const selectedSurah = surahNo ? ALL_SURAHS.find(s => s.no === Number(surahNo)) : null
+  const maxAyat = selectedSurah ? selectedSurah.ayat : 1
+
+  // Student recent history
+  const studentHistory = state.submissions
+    .filter((sub) => sub.santri_id === Number(santriId))
+    .slice(0, 3)
 
   // Reset ayat defaults when surah changes
   useEffect(() => {
-    if (surahNo) {
-      const surah = ALL_SURAHS.find(s => s.no === Number(surahNo))
-      if (surah) {
-        setAyatStart(1)
-        setAyatEnd(surah.ayat)
-      }
+    if (selectedSurah) {
+      setAyatStart(1)
+      setAyatEnd(selectedSurah.ayat)
     }
-  }, [surahNo])
+  }, [surahNo, selectedSurah])
 
   const resetDatetime = useCallback(() => {
     setWaktu(toLocalDatetimeString(new Date()))
@@ -62,15 +68,28 @@ export default function TambahSetoranPage() {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [resetDatetime])
 
+  // Map options
+  const santriOptions = state.students.map((s) => ({
+    id: s.id,
+    label: s.nama,
+    sublabel: `${s.kelas || 'Tanpa Kelas'} ${s.group_name ? `• ${s.group_name}` : ''}`,
+    searchText: `${s.nama} ${s.kelas || ''} ${s.group_name || ''}`,
+  }))
+
+  const surahOptions = ALL_SURAHS.map((s) => ({
+    id: s.no,
+    label: `${s.no}. ${s.nama}`,
+    sublabel: `Juz ${s.juz} • ${s.ayat} Ayat`,
+    searchText: `${s.no} ${s.nama} juz ${s.juz}`,
+  }))
+
   async function handleSubmit() {
     if (!santriId || !surahNo) {
-      setError('Santri dan Surah harus dipilih')
+      toast('Santri dan Surah harus dipilih', 'error')
       return
     }
 
     setSaving(true)
-    setError('')
-    setSuccess(false)
 
     try {
       const formData = new FormData()
@@ -94,156 +113,289 @@ export default function TambahSetoranPage() {
       resetDatetime()
 
       await refreshSubmissions()
-
-      // Show success toast briefly
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
+      toast('Setoran berhasil disimpan!', 'success')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      setError('Gagal menyimpan: ' + msg)
+      toast('Gagal menyimpan: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-6">
+    <div className="space-y-6">
+      <div className="mb-2">
         <h2 className="text-2xl font-bold tracking-tight text-text">Tambah Setoran</h2>
         <p className="text-sm text-text-muted mt-1">
           Catat setoran hafalan harian santri.
         </p>
       </div>
 
-      {success && (
-        <div className="mb-6 flex items-center gap-2 rounded-md border-l-[3px] border-primary bg-primary/10 px-4 py-3 text-sm text-primary">
-          <CheckCircle2 className="w-4 h-4" />
-          Setoran berhasil disimpan!
-        </div>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Form Column */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="border-border/40 shadow-sm bg-surface">
+            <CardContent className="p-6 space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                
+                {/* Searchable Santri Select */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label htmlFor="santri-select" className="block text-sm font-medium text-text-secondary">Santri</label>
+                  <Combobox
+                    id="santri-select"
+                    options={santriOptions}
+                    value={santriId}
+                    onChange={setSantriId}
+                    placeholder="Cari dan pilih santri..."
+                    searchPlaceholder="Ketik nama atau kelas santri..."
+                    emptyText="Siswa tidak ditemukan"
+                  />
+                </div>
 
-      <Card className="border-border/40 shadow-sm">
-        <CardContent className="p-6 space-y-5">
-          {error && (
-            <div className="rounded-md border-l-[3px] border-red bg-red-light px-3 py-2.5 text-sm text-red">
-              {error}
-            </div>
-          )}
+                {/* Searchable Surah Select */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label htmlFor="surah-select" className="block text-sm font-medium text-text-secondary">Surah</label>
+                  <Combobox
+                    id="surah-select"
+                    options={surahOptions}
+                    value={surahNo}
+                    onChange={setSurahNo}
+                    placeholder="Cari dan pilih surah..."
+                    searchPlaceholder="Ketik nama atau nomor surah..."
+                    emptyText="Surah tidak ditemukan"
+                  />
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="space-y-1.5 md:col-span-2">
-              <label htmlFor="santri-select" className="block text-sm font-medium text-text-secondary">Santri</label>
-              <select
-                id="santri-select"
-                value={santriId}
-                onChange={(e) => setSantriId(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
-              >
-                <option value="">Pilih Santri</option>
-                {state.students.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.nama} {s.kelas ? `(${s.kelas})` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {/* Interactive Surah & Ayat Preview */}
+                {selectedSurah && (
+                  <div className="space-y-3.5 p-4 bg-card/40 rounded-lg border border-border/40 md:col-span-2">
+                    {/* Surah details */}
+                    <div className="flex items-center justify-between border-b border-border/30 pb-3">
+                      <div>
+                        <p className="text-[10px] uppercase font-bold tracking-wider text-text-muted">Surah Terpilih</p>
+                        <h4 className="text-sm font-bold text-text">
+                          {selectedSurah.no}. {selectedSurah.nama}
+                        </h4>
+                        <p className="text-xs text-text-muted mt-0.5">
+                          Juz {selectedSurah.juz} • {selectedSurah.ayat} Ayat
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-primary select-none leading-none block" style={{ fontFamily: 'var(--font-arabic), serif' }}>
+                          {selectedSurah.arab}
+                        </span>
+                      </div>
+                    </div>
 
-            <div className="space-y-1.5 md:col-span-2">
-              <label htmlFor="surah-select" className="block text-sm font-medium text-text-secondary">Surah</label>
-              <select
-                id="surah-select"
-                value={surahNo}
-                onChange={(e) => setSurahNo(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
-              >
-                <option value="">Pilih Surah</option>
-                {ALL_SURAHS.map((s) => (
-                  <option key={s.no} value={s.no}>
-                    {s.no}. {s.nama} (Juz {s.juz})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-             {surahNo && (
-              <div className="space-y-1.5 md:col-span-2">
-                <span className="block text-sm font-medium text-text-secondary">
-                  Rentang Ayat
-                </span>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <label htmlFor="ayat-mulai" className="sr-only">Ayat Mulai</label>
-                    <Input
-                      id="ayat-mulai"
-                      type="number"
-                      min={1}
-                      max={maxAyat}
-                      value={ayatStart}
-                      onChange={(e) => setAyatStart(Math.max(1, Number(e.target.value) || 1))}
-                    />
+                    {/* Ayat Range Inputs */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-text-secondary">Rentang Ayat</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAyatStart(1)
+                            setAyatEnd(selectedSurah.ayat)
+                          }}
+                          className="text-xs font-medium text-primary hover:underline cursor-pointer"
+                        >
+                          Set Semua Ayat (1 - {selectedSurah.ayat})
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <label htmlFor="ayat-mulai" className="text-[10px] text-text-muted mb-1 block">Dari Ayat</label>
+                          <Input
+                            id="ayat-mulai"
+                            type="number"
+                            min={1}
+                            max={maxAyat}
+                            value={ayatStart}
+                            onChange={(e) => setAyatStart(Math.max(1, Math.min(maxAyat, Number(e.target.value) || 1)))}
+                          />
+                        </div>
+                        <span className="text-text-muted mt-5 shrink-0 text-sm">hingga</span>
+                        <div className="flex-1">
+                          <label htmlFor="ayat-selesai" className="text-[10px] text-text-muted mb-1 block">Sampai Ayat</label>
+                          <Input
+                            id="ayat-selesai"
+                            type="number"
+                            min={1}
+                            max={maxAyat}
+                            value={ayatEnd}
+                            onChange={(e) => setAyatEnd(e.target.value === '' ? '' : Math.max(1, Math.min(maxAyat, Number(e.target.value) || 1)))}
+                            placeholder={String(maxAyat)}
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-text-muted">
+                        Total: <span className="font-semibold text-text-secondary">{ayatEnd === '' ? '1' : Number(ayatEnd) - Number(ayatStart) + 1}</span> ayat
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-text-muted">hingga</span>
-                  <div className="flex-1">
-                    <label htmlFor="ayat-selesai" className="sr-only">Ayat Selesai</label>
-                    <Input
-                      id="ayat-selesai"
-                      type="number"
-                      min={1}
-                      max={maxAyat}
-                      value={ayatEnd}
-                      onChange={(e) => setAyatEnd(e.target.value === '' ? '' : Math.max(1, Math.min(maxAyat || 999, Number(e.target.value) || 1)))}
-                      placeholder={String(maxAyat)}
-                    />
+                )}
+
+                {/* Predikat / Nilai direct selection */}
+                <div className="space-y-2 md:col-span-2">
+                  <label htmlFor="nilai-select" className="block text-sm font-medium text-text-secondary">Predikat / Nilai</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                    {NILAI_OPTIONS.map((n) => {
+                      const isSelected = nilai === n
+                      return (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setNilai(n)}
+                          className={`px-3 py-2.5 rounded-md text-xs font-semibold border transition-all text-center cursor-pointer ${
+                            isSelected
+                              ? 'bg-primary border-primary text-white shadow-sm ring-2 ring-primary/20'
+                              : 'border-border bg-surface text-text-secondary hover:bg-card/65'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
-                <div className="text-xs text-text-muted mt-1">
-                  Total: <span className="font-medium">{ayatEnd === '' ? '1' : ayatEnd - ayatStart + 1}</span> ayat
+
+                {/* Waktu Setoran */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label htmlFor="waktu-input" className="block text-sm font-medium text-text-secondary">Waktu Setoran</label>
+                  <Input
+                    id="waktu-input"
+                    type="datetime-local"
+                    value={waktu}
+                    onChange={(e) => setWaktu(e.target.value)}
+                  />
                 </div>
+
+                {/* Catatan */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label htmlFor="catatan-textarea" className="block text-sm font-medium text-text-secondary">Catatan (Opsional)</label>
+                  <textarea
+                    id="catatan-textarea"
+                    value={catatan}
+                    onChange={(e) => setCatatan(e.target.value)}
+                    placeholder="Tuliskan evaluasi tajwid atau kelancaran..."
+                    rows={3}
+                    className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors resize-none text-text focus:border-primary font-sans"
+                  />
+                </div>
+
               </div>
-            )}
+            </CardContent>
+          </Card>
 
-            <div className="space-y-1.5">
-              <label htmlFor="nilai-select" className="block text-sm font-medium text-text-secondary">Predikat / Nilai</label>
-              <select
-                id="nilai-select"
-                value={nilai}
-                onChange={(e) => setNilai(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
-              >
-                {NILAI_OPTIONS.map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-text-secondary">Waktu Setoran</label>
-              <Input
-                type="datetime-local"
-                value={waktu}
-                onChange={(e) => setWaktu(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-1.5 md:col-span-2">
-              <label className="block text-sm font-medium text-text-secondary">Catatan (Opsional)</label>
-              <textarea
-                value={catatan}
-                onChange={(e) => setCatatan(e.target.value)}
-                placeholder="Tuliskan evaluasi tajwid atau kelancaran..."
-                rows={3}
-                className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors resize-none"
-              />
-            </div>
+          <div className="flex justify-end">
+            <Button onClick={handleSubmit} disabled={saving} className="gap-2 px-6 shadow-sm cursor-pointer">
+              <Save className="w-4 h-4" />
+              {saving ? 'Menyimpan...' : 'Simpan Setoran'}
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <div className="mt-6 flex justify-end">
-        <Button onClick={handleSubmit} disabled={saving} className="gap-2 px-6">
-          <Save className="w-4 h-4" />
-          {saving ? 'Menyimpan...' : 'Simpan Setoran'}
-        </Button>
+        {/* Sidebar Status Column */}
+        <div className="lg:col-span-1">
+          {!selectedStudent ? (
+            <Card className="border-border/30 bg-card/20 border-dashed h-full min-h-[300px] flex flex-col items-center justify-center p-6 text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <h4 className="text-sm font-semibold text-text">Belum ada Santri Terpilih</h4>
+              <p className="text-xs text-text-muted max-w-xs mt-1.5 leading-relaxed">
+                Pilih santri dari kolom sebelah kiri untuk melihat ringkasan hafalan, pencapaian juz, serta riwayat setoran terbaru mereka.
+              </p>
+            </Card>
+          ) : (
+            <Card className="border-border/40 shadow-sm bg-surface sticky top-6">
+              <CardContent className="p-5 space-y-5">
+                {/* Student Profile Info */}
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white shadow-sm ring-1 ring-black/5"
+                    style={{ backgroundColor: getColor(selectedStudent, selectedStudent.id) }}
+                  >
+                    {initials(selectedStudent.nama)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-base font-bold text-text truncate">{selectedStudent.nama}</h4>
+                    <div className="flex items-center gap-1.5 mt-0.5 text-xs text-text-muted">
+                      <span className="bg-card px-2 py-0.5 rounded-md border border-border/50 font-medium">
+                        {selectedStudent.kelas || 'Tanpa kelas'}
+                      </span>
+                      {selectedStudent.group_name && (
+                        <>
+                          <span className="w-1 h-1 rounded-full bg-border"></span>
+                          <span className="truncate">{selectedStudent.group_name}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Metrics */}
+                <div className="space-y-2 bg-card p-3 rounded-lg border border-border/40">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-text-muted font-medium">Progress Hafalan</span>
+                    <span className="font-bold text-primary">{getPct(selectedStudent)}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-border/40">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+                      style={{ width: `${getPct(selectedStudent)}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <span className="text-text-muted">Total Surah Dihafal</span>
+                    <span className="font-semibold text-text-secondary">{getTotalHafal(selectedStudent)} surah</span>
+                  </div>
+                </div>
+
+                {/* Recent Submissions History */}
+                <div className="space-y-2.5">
+                  <h5 className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+                    <History className="w-3.5 h-3.5 text-text-muted" />
+                    Riwayat Setoran Terbaru
+                  </h5>
+                  <div className="space-y-2">
+                    {studentHistory.length === 0 ? (
+                      <p className="text-xs text-text-muted italic py-3 text-center bg-card/20 rounded-md border border-dashed border-border/40">
+                        Belum ada riwayat setoran.
+                      </p>
+                    ) : (
+                      studentHistory.map((sub) => (
+                        <div key={sub.id} className="p-2.5 rounded-lg border border-border/30 bg-card/10 hover:bg-card/30 transition-colors">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="text-xs font-semibold text-text truncate">
+                              {getSurahNama(sub.surah_no)}
+                            </span>
+                            <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                              {sub.nilai}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-text-muted mt-1 flex justify-between">
+                            <span>
+                              Ayat {sub.ayat_start}{sub.ayat_end && sub.ayat_end !== sub.ayat_start ? ` - ${sub.ayat_end}` : ''}
+                            </span>
+                            <span>
+                              {formatWaktu(sub.waktu).tanggal}
+                            </span>
+                          </div>
+                          {sub.catatan && (
+                            <p className="text-[10px] text-text-secondary mt-1 bg-surface p-1 rounded border border-border/40 line-clamp-2">
+                              {sub.catatan}
+                            </p>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   )

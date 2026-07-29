@@ -18,6 +18,8 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Modal from '@/components/Modal'
 import Pagination from '@/components/Pagination'
+import { Combobox } from '@/components/ui/Combobox'
+import { useToast } from '@/components/ui/Toast'
 import {
   Plus,
   Eye,
@@ -35,6 +37,18 @@ import {
 
 export default function SantriPage() {
   const { state, refreshStudents, getStudentMemorization } = useDashboard()
+  const { toast } = useToast()
+
+  const groupOptions = useMemo(() => {
+    return state.groups.map((g) => {
+      const cName = state.classes.find(c => c.id === g.class_id)?.name || 'Tanpa Kelas'
+      return {
+        id: g.id,
+        label: `${g.name} (${cName})`,
+        searchText: `${g.name} ${cName}`,
+      }
+    })
+  }, [state.groups, state.classes])
 
   const ITEMS_PER_PAGE = 10
   const [searchQuery, setSearchQuery] = useState('')
@@ -149,9 +163,11 @@ export default function SantriPage() {
       setGroupId('')
       setAddOpen(false)
       await refreshStudents()
+      toast('Siswa berhasil ditambahkan!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal menyimpan: ' + msg)
+      toast('Gagal menambahkan siswa: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
@@ -173,9 +189,11 @@ export default function SantriPage() {
       await updateStudentAction(selectedStudent.id, nama.trim(), Number(groupId))
       setEditOpen(false)
       await refreshStudents()
+      toast('Siswa berhasil diperbarui!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal memperbarui: ' + msg)
+      toast('Gagal memperbarui siswa: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
@@ -187,9 +205,10 @@ export default function SantriPage() {
     try {
       await deleteStudentAction(id)
       await refreshStudents()
+      toast('Siswa berhasil dihapus!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      alert('Gagal menghapus siswa: ' + msg)
+      toast('Gagal menghapus siswa: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
@@ -203,9 +222,10 @@ export default function SantriPage() {
       const next = toggleSurahCycle(current)
       await toggleMemorizationAction(selectedStudent.id, surahNo, next)
       await refreshStudents()
+      toast('Status hafalan berhasil diperbarui!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      alert('Gagal memperbarui status hafalan: ' + msg)
+      toast('Gagal memperbarui status hafalan: ' + msg, 'error')
     } finally {
       setToggling(false)
     }
@@ -390,23 +410,15 @@ export default function SantriPage() {
             <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Kelompok Halaqah <span className="text-red">*</span>
             </label>
-            <select
+            <Combobox
               id="add-group-select"
+              options={groupOptions}
               value={groupId}
-              onChange={(e) => setGroupId(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors text-text"
-              disabled={saving}
-            >
-              <option value="">-- Pilih Kelompok --</option>
-              {state.groups.map((g) => {
-                const cName = state.classes.find(c => c.id === g.class_id)?.name || 'Tanpa Kelas'
-                return (
-                  <option key={g.id} value={g.id}>
-                    {g.name} ({cName})
-                  </option>
-                )
-              })}
-            </select>
+              onChange={setGroupId}
+              placeholder="Pilih Kelompok..."
+              searchPlaceholder="Cari kelompok..."
+              emptyText="Kelompok tidak ditemukan"
+            />
           </div>
         </div>
 
@@ -445,23 +457,15 @@ export default function SantriPage() {
             <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Kelompok Halaqah <span className="text-red">*</span>
             </label>
-            <select
+            <Combobox
               id="edit-group-select"
+              options={groupOptions}
               value={groupId}
-              onChange={(e) => setGroupId(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors text-text"
-              disabled={saving}
-            >
-              <option value="">-- Pilih Kelompok --</option>
-              {state.groups.map((g) => {
-                const cName = state.classes.find(c => c.id === g.class_id)?.name || 'Tanpa Kelas'
-                return (
-                  <option key={g.id} value={g.id}>
-                    {g.name} ({cName})
-                  </option>
-                )
-              })}
-            </select>
+              onChange={setGroupId}
+              placeholder="Pilih Kelompok..."
+              searchPlaceholder="Cari kelompok..."
+              emptyText="Kelompok tidak ditemukan"
+            />
           </div>
         </div>
 

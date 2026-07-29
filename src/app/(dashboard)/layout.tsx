@@ -7,6 +7,7 @@ import Modal from '@/components/Modal'
 import { useAppState, QK } from '@/hooks/useAppState'
 import { createClient } from '@/lib/supabase/client'
 import type { SantriWithCount, Memorization } from '@/lib/types'
+import { ToastProvider } from '@/components/ui/Toast'
 
 type App = ReturnType<typeof useAppState>
 
@@ -137,7 +138,9 @@ export default function DashboardLayout({
 }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <DashboardContent>{children}</DashboardContent>
+      <ToastProvider>
+        <DashboardContent>{children}</DashboardContent>
+      </ToastProvider>
     </QueryClientProvider>
   )
 }

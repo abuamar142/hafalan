@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react'
 import { useDashboard } from '../../layout'
 import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
+import { Combobox } from '@/components/ui/Combobox'
+import { Input } from '@/components/ui/Input'
 
 const PAGE_SIZE = 20
 
@@ -50,6 +52,40 @@ export default function RiwayatSetoranPage() {
     return state.groups
   }, [state.groups, kelasFilter])
 
+  // Options mapped for Combobox
+  const kelasComboboxOptions = useMemo(() => {
+    return [
+      { id: '', label: 'Semua Kelas', searchText: 'semua kelas' },
+      ...state.classes.map((c) => ({
+        id: c.name,
+        label: c.name,
+        searchText: c.name,
+      })),
+    ]
+  }, [state.classes])
+
+  const kelompokComboboxOptions = useMemo(() => {
+    return [
+      { id: '', label: 'Semua Kelompok', searchText: 'semua kelompok' },
+      ...kelompokOptions.map((g) => ({
+        id: g.name,
+        label: g.name,
+        searchText: g.name,
+      })),
+    ]
+  }, [kelompokOptions])
+
+  const guruComboboxOptions = useMemo(() => {
+    return [
+      { id: '', label: 'Semua Guru', searchText: 'semua guru' },
+      ...guruOptions.map((g) => ({
+        id: g,
+        label: g,
+        searchText: g,
+      })),
+    ]
+  }, [guruOptions])
+
   // Filtered list
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim()
@@ -80,82 +116,75 @@ export default function RiwayatSetoranPage() {
   const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
   return (
-    <>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-4 text-sm font-medium text-text">Riwayat Setoran</div>
+      <div className="mb-2">
+        <h2 className="text-2xl font-bold tracking-tight text-text">Riwayat Setoran</h2>
+        <p className="text-sm text-text-muted mt-1">Daftar riwayat setoran hafalan santri.</p>
+      </div>
 
       {/* Search + Filters */}
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => applySearch(e.target.value)}
-          placeholder="Cari nama santri atau surah..."
-          aria-label="Cari nama santri"
-          className="min-w-0 flex-[2] rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
-        />
-        <select
-          value={kelasFilter}
-          onChange={(e) => applyKelasFilter(e.target.value)}
-          className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-44"
-        >
-          <option value="">Semua Kelas</option>
-          {state.classes.map((c) => (
-            <option key={c.id} value={c.name}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={kelompokFilter}
-          onChange={(e) => applyKelompokFilter(e.target.value)}
-          className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-44"
-        >
-          <option value="">Semua Kelompok</option>
-          {kelompokOptions.map((g) => (
-            <option key={g.id} value={g.name}>
-              {g.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={guruFilter}
-          onChange={(e) => applyGuruFilter(e.target.value)}
-          className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-40"
-        >
-          <option value="">Semua Guru</option>
-          {guruOptions.map((g) => (
-            <option key={g} value={g}>
-              {g}
-            </option>
-          ))}
-        </select>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap items-center">
+        <div className="relative w-full sm:min-w-0 sm:flex-[2]">
+          <Input
+            type="text"
+            value={search}
+            onChange={(e) => applySearch(e.target.value)}
+            placeholder="Cari nama santri atau surah..."
+            aria-label="Cari nama santri"
+            className="w-full text-sm"
+          />
+        </div>
+        <div className="w-full sm:w-44 shrink-0">
+          <Combobox
+            options={kelasComboboxOptions}
+            value={kelasFilter}
+            onChange={applyKelasFilter}
+            placeholder="Semua Kelas"
+            searchPlaceholder="Cari kelas..."
+          />
+        </div>
+        <div className="w-full sm:w-44 shrink-0">
+          <Combobox
+            options={kelompokComboboxOptions}
+            value={kelompokFilter}
+            onChange={applyKelompokFilter}
+            placeholder="Semua Kelompok"
+            searchPlaceholder="Cari kelompok..."
+          />
+        </div>
+        <div className="w-full sm:w-44 shrink-0">
+          <Combobox
+            options={guruComboboxOptions}
+            value={guruFilter}
+            onChange={applyGuruFilter}
+            placeholder="Semua Guru"
+            searchPlaceholder="Cari guru..."
+          />
+        </div>
       </div>
 
       {/* List */}
-      {filtered.length === 0 && (
-        <div className="py-7 text-center text-[13px] text-text-muted">
+      {filtered.length === 0 ? (
+        <div className="py-16 text-center text-sm text-text-muted border border-border/50 border-dashed rounded-lg bg-surface">
           Belum ada setoran
         </div>
-      )}
-
-      {pageItems.map((item) => {
-        const { tanggal, jam } = formatWaktu(item.waktu)
-        return (
-          <div
-            key={item.id}
-            className="rounded-md bg-card p-3.5 border border-border mb-2"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              {/* Kiri: nama, hafalan, catatan */}
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-text truncate">
+      ) : (
+        <div className="space-y-3">
+          {pageItems.map((item) => (
+            <div
+              key={item.id}
+              className="rounded-lg bg-surface p-4 border border-border/50 hover:shadow-md transition-all duration-200 bento-shadow flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+            >
+              {/* Left: nama, hafalan, catatan */}
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="text-[15px] font-bold text-text truncate">
                   {item.santri_nama}
                 </div>
-                <div className="text-[13px] text-text-secondary">
+                <div className="text-xs font-semibold text-text-secondary">
                   {getSurahNama(item.surah_no)}
                   {item.ayat_start != null && item.ayat_end != null && (
-                    <span className="text-text-muted">
+                    <span className="text-text-muted font-normal">
                       {' '}
                       : {item.ayat_start}
                       {item.ayat_end !== item.ayat_start
@@ -165,38 +194,38 @@ export default function RiwayatSetoranPage() {
                   )}
                 </div>
                 {item.catatan && (
-                  <div className="mt-1.5 text-[12px] text-text-muted leading-relaxed">
+                  <div className="mt-2 text-xs text-text-muted leading-relaxed bg-card p-2 rounded-md border border-border/40 max-w-2xl">
                     {item.catatan}
                   </div>
                 )}
               </div>
 
-              {/* Kanan: nilai, ustadz, tanggal */}
-              <div className="mt-2 flex flex-row items-center gap-3 sm:mt-0 sm:flex-col sm:items-end sm:gap-1">
-                <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-[12px] font-medium text-primary">
+              {/* Right: nilai, ustadz, tanggal */}
+              <div className="mt-3 flex flex-row items-center gap-3 sm:mt-0 sm:flex-col sm:items-end sm:gap-1.5 shrink-0">
+                <span className="shrink-0 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[11px] font-bold text-primary">
                   {item.nilai}
                 </span>
                 {item.guru_nama && (
-                  <div className="text-[12px] text-text-secondary whitespace-nowrap">
+                  <div className="text-xs font-medium text-text-secondary whitespace-nowrap">
                     {item.guru_nama}
                   </div>
                 )}
-                <div className="text-[12px] text-text-muted whitespace-nowrap">
-                  {tanggal} &middot; {jam}
+                <div className="text-[11px] text-text-muted whitespace-nowrap">
+                  {formatWaktu(item.waktu).tanggal} &middot; {formatWaktu(item.waktu).jam}
                 </div>
               </div>
             </div>
-          </div>
-        )
-      })}
+          ))}
+        </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-2">
+        <div className="mt-6 flex items-center justify-center gap-2">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safePage <= 1}
-            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-border disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
           >
             Sebelumnya
           </button>
@@ -204,10 +233,10 @@ export default function RiwayatSetoranPage() {
             <button
               key={p}
               onClick={() => setPage(p)}
-              className={`min-w-[32px] rounded-md px-2 py-1.5 text-[13px] transition-colors ${
+              className={`min-w-[32px] rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors cursor-pointer ${
                 p === safePage
-                  ? 'bg-primary text-white'
-                  : 'text-text-secondary hover:bg-border'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-text-secondary hover:bg-card border border-transparent hover:border-border/50'
               }`}
             >
               {p}
@@ -216,12 +245,12 @@ export default function RiwayatSetoranPage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={safePage >= totalPages}
-            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-border disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
           >
             Selanjutnya
           </button>
         </div>
       )}
-    </>
+    </div>
   )
 }

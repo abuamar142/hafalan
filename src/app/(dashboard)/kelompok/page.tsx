@@ -13,10 +13,24 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Modal from '@/components/Modal'
 import Pagination from '@/components/Pagination'
+import { Combobox } from '@/components/ui/Combobox'
+import { useToast } from '@/components/ui/Toast'
 import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
 
 export default function KelompokPage() {
   const { state, refreshClasses } = useDashboard()
+  const { toast } = useToast()
+
+  const classOptions = useMemo(() => {
+    return [
+      { id: '', label: 'Tanpa Kelas (Unassigned)', searchText: 'tanpa kelas' },
+      ...state.classes.map((c) => ({
+        id: c.id,
+        label: c.name,
+        searchText: c.name,
+      })),
+    ]
+  }, [state.classes])
 
   const ITEMS_PER_PAGE = 10
   const [searchQuery, setSearchQuery] = useState('')
@@ -107,9 +121,11 @@ export default function KelompokPage() {
       setGroupName('')
       setAddOpen(false)
       await refreshClasses()
+      toast('Kelompok berhasil ditambahkan!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal membuat kelompok: ' + msg)
+      toast('Gagal membuat kelompok: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
@@ -127,9 +143,11 @@ export default function KelompokPage() {
       await updateGroupAction(selectedGroup.id, groupName.trim(), selectedClassId, selectedTeacherIds)
       setEditOpen(false)
       await refreshClasses()
+      toast('Kelompok berhasil diperbarui!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal memperbarui kelompok: ' + msg)
+      toast('Gagal memperbarui kelompok: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
@@ -141,9 +159,10 @@ export default function KelompokPage() {
     try {
       await deleteGroupAction(id)
       await refreshClasses()
+      toast('Kelompok berhasil dihapus!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      alert('Gagal menghapus kelompok: ' + msg)
+      toast('Gagal menghapus kelompok: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
@@ -359,21 +378,17 @@ export default function KelompokPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              <label htmlFor="edit-class-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 Kelas
               </label>
-              <select
+              <Combobox
+                id="edit-class-select"
+                options={classOptions}
                 value={selectedClassId === null ? '' : selectedClassId}
-                onChange={(e) => setSelectedClassId(e.target.value === '' ? null : Number(e.target.value))}
-                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors text-text"
-              >
-                <option value="">Tanpa Kelas (Unassigned)</option>
-                {state.classes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setSelectedClassId(val === '' ? null : Number(val))}
+                placeholder="Pilih Kelas..."
+                searchPlaceholder="Cari kelas..."
+              />
             </div>
 
             <div>
