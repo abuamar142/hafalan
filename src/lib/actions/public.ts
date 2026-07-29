@@ -6,8 +6,8 @@ export async function getPublicClassesAction() {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('classes')
-    .select('id, nama')
-    .order('nama', { ascending: true })
+    .select('id, nama:name')
+    .order('name', { ascending: true })
 
   if (error) throw error
   return data || []
@@ -52,7 +52,7 @@ export async function getPublicStudentReportAction(studentId: number) {
         nama,
         class:classes (
           id,
-          nama
+          nama:name
         )
       )
     `)
