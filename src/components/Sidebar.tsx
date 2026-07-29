@@ -117,7 +117,7 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
             const isParentActive = item.children?.some((child) => pathname.startsWith(child.href)) ?? false
             const isExpanded = !manualCollapse.has(item.label) && (expandedMenu === item.label || isParentActive)
             const hasChildren = item.children && item.children.length > 0
-            const isActive = hasChildren ? isParentActive : pathname.startsWith(item.href)
+            const isActive = hasChildren ? isParentActive : (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href))
             return (
               <div key={item.href}>
                 <button
