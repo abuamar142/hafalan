@@ -92,8 +92,8 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
     return (
       <>
         {/* Branding */}
-        <div className="px-5 pt-6 pb-8">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="px-4 pt-5 pb-6">
+          <div className="flex items-center gap-3">
             <Image
               src="/images/logo.jpg"
               alt="Logo"
@@ -101,13 +101,17 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
               height={40}
               className="w-10 h-10 rounded-lg object-cover shadow-sm"
             />
-            <h1 className="text-base font-semibold leading-tight text-text">
-              SMA Islam Bunga Bangsa
-            </h1>
+            <div className="min-w-0">
+              <h1 className="text-base font-semibold leading-tight text-text truncate">
+                SMA Islam Bunga Bangsa
+              </h1>
+              {userName && (
+                <p className="mt-0.5 text-xs text-text-muted font-medium leading-tight truncate">
+                  {userName}
+                </p>
+              )}
+            </div>
           </div>
-          {userName && (
-            <div className="mt-1 text-xs text-text-muted font-medium pl-[52px] leading-tight">{userName}</div>
-          )}
         </div>
 
         {/* Nav */}
