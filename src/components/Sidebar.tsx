@@ -75,7 +75,16 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
   const router = useRouter()
   const supabase = createClient()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [expandedMenu, setExpandedMenu] = useState<string | null>(null)
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(() => {
+    for (const item of NAV_ITEMS) {
+      if (item.children?.some((c) => pathname.startsWith(c.href))) {
+        return item.label
+      }
+    }
+    return null
+  })
+  // Tracks menus user explicitly collapsed — overrides isParentActive auto-expand
+  const [manualCollapse, setManualCollapse] = useState<Set<string>>(new Set())
 
   async function handleLogout() {
     if (!confirm('Yakin ingin keluar?')) return
@@ -105,7 +114,7 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
         <nav className="flex-1 px-3">
           {NAV_ITEMS.map((item) => {
             const isParentActive = item.children?.some((child) => pathname.startsWith(child.href)) ?? false
-            const isExpanded = expandedMenu === item.label || isParentActive
+            const isExpanded = !manualCollapse.has(item.label) && (expandedMenu === item.label || isParentActive)
             const hasChildren = item.children && item.children.length > 0
             const isActive = hasChildren ? isParentActive : pathname.startsWith(item.href)
             return (
@@ -113,7 +122,14 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
                 <button
                   onClick={() => {
                     if (hasChildren) {
-                      if (!isExpanded) {
+                      if (isExpanded) {
+                        setManualCollapse((prev) => new Set(prev).add(item.label))
+                      } else {
+                        setManualCollapse((prev) => {
+                          const next = new Set(prev)
+                          next.delete(item.label)
+                          return next
+                        })
                         navigateTo(item.children![0].href)
                       }
                       setExpandedMenu(isExpanded ? null : item.label)
@@ -141,6 +157,15 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
                       className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation()
+                        if (isExpanded) {
+                          setManualCollapse((prev) => new Set(prev).add(item.label))
+                        } else {
+                          setManualCollapse((prev) => {
+                            const next = new Set(prev)
+                            next.delete(item.label)
+                            return next
+                          })
+                        }
                         setExpandedMenu(isExpanded ? null : item.label)
                       }}
                     >
