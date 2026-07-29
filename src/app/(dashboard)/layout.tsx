@@ -4,19 +4,28 @@ import { createContext, useContext, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Sidebar from '@/components/Sidebar'
 import Modal from '@/components/Modal'
-import { useAppState } from '@/hooks/useAppState'
+import { useAppState, QK } from '@/hooks/useAppState'
 import { updateGuruAction } from '@/lib/actions/settings'
 import type { SantriWithCount, Memorization } from '@/lib/types'
 
+type App = ReturnType<typeof useAppState>
+
 interface DashboardContextValue {
-  state: ReturnType<typeof useAppState>['state']
+  state: App['state']
   loading: boolean
   refreshAll: () => Promise<void>
+  refreshStudents: () => Promise<void>
+  refreshSubmissions: () => Promise<void>
+  refreshMemorization: () => Promise<void>
+  refreshClasses: () => Promise<void>
+  refreshSettings: () => Promise<void>
   getStudent: (id: number) => SantriWithCount | undefined
   getStudentMemorization: (id: number) => Memorization[]
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null)
+
+export { QK }
 
 export function useDashboard() {
   const ctx = useContext(DashboardContext)
@@ -28,11 +37,8 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 })
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+// Inner component — must be nested under QueryClientProvider so useQueryClient works
+function DashboardContent({ children }: { children: React.ReactNode }) {
   const app = useAppState()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guruInput, setGuruInput] = useState('')
@@ -48,12 +54,16 @@ export default function DashboardLayout({
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
     <DashboardContext.Provider
       value={{
         state: app.state,
         loading: app.loading,
         refreshAll: app.refreshAll,
+        refreshStudents: app.refreshStudents,
+        refreshSubmissions: app.refreshSubmissions,
+        refreshMemorization: app.refreshMemorization,
+        refreshClasses: app.refreshClasses,
+        refreshSettings: app.refreshSettings,
         getStudent: app.getStudent,
         getStudentMemorization: app.getStudentMemorization,
       }}
@@ -109,6 +119,17 @@ export default function DashboardLayout({
         </div>
       </Modal>
     </DashboardContext.Provider>
+  )
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <DashboardContent>{children}</DashboardContent>
     </QueryClientProvider>
   )
 }
