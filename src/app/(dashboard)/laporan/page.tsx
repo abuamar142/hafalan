@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useDashboard } from '../layout'
+import { createClient } from '@/lib/supabase/client'
 import {
   getStudentMemorization,
   getAllMemorizationMap,
@@ -22,6 +23,14 @@ export default function LaporanPage() {
   const [selectedStudent, setSelectedStudent] = useState<string>('')
   const [printHtml, setPrintHtml] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [currentUserName, setCurrentUserName] = useState('')
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserName((data.user?.user_metadata?.name as string) || '')
+    })
+  }, [])
 
   const sorted = useMemo(
     () => computeRanking(state.students),
@@ -69,7 +78,7 @@ export default function LaporanPage() {
       const html = generateCollectiveReport({
         students: sorted,
         submissions: state.submissions,
-        guruName: state.guru,
+        guruName: currentUserName,
         fullMemorization: fullSantri,
       })
 
@@ -108,7 +117,7 @@ export default function LaporanPage() {
         student,
         hafalan,
         submissions: mappedSubmissions,
-        guruName: state.guru,
+        guruName: currentUserName,
       })
 
       setPrintHtml(html)

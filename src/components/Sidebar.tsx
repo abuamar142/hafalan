@@ -57,11 +57,11 @@ const NAV_ITEMS: NavItem[] = [
 ]
 
 interface SidebarProps {
-  guru: string
+  userName: string
   onOpenSettings: () => void
 }
 
-export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
+export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -105,8 +105,8 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
               SMA Islam Bunga Bangsa
             </h1>
           </div>
-          {guru && (
-            <div className="mt-1 text-xs text-text-muted font-medium pl-[52px] leading-tight">{guru}</div>
+          {userName && (
+            <div className="mt-1 text-xs text-text-muted font-medium pl-[52px] leading-tight">{userName}</div>
           )}
         </div>
 

@@ -15,7 +15,7 @@ function toLocalDatetimeString(d: Date) {
 }
 
 export default function TambahSetoranPage() {
-  const { state, refreshAll } = useDashboard()
+  const { state, refreshSubmissions } = useDashboard()
 
   const [santriId, setSantriId] = useState('')
   const [surahNo, setSurahNo] = useState('')
@@ -93,7 +93,7 @@ export default function TambahSetoranPage() {
       setAyatEnd('')
       resetDatetime()
 
-      await refreshAll()
+      await refreshSubmissions()
 
       // Show success toast briefly
       setSuccess(true)

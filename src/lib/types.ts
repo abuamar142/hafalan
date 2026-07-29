@@ -27,12 +27,7 @@ export interface Submission {
   guru_id: string | null
   ayat_start: number | null
   ayat_end: number | null
-}
-
-export interface Settings {
-  key: string
-  value: string
-  user_id: string
+  guru_name: string | null
 }
 
 // ── App-level types ──
@@ -81,6 +76,7 @@ export interface GroupTeacher {
   id: number
   group_id: number
   teacher_id: string
+  teacher_name: string
 }
 
 
