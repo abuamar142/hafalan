@@ -47,15 +47,6 @@ export default function RegisterPage() {
       return
     }
 
-    // Save guru name to settings
-    if (data.user) {
-      await supabase.from('settings').upsert({
-        key: 'guru',
-        value: name,
-        user_id: data.user.id,
-      })
-    }
-
     router.push('/santri')
     router.refresh()
   }

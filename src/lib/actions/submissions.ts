@@ -31,6 +31,7 @@ export async function addSubmissionAction(formData: FormData) {
     catatan,
     waktu: wDate.toISOString(),
     guru_id: user.id,
+    guru_name: (user.user_metadata?.name as string) || '',
     ayat_start: ayatStart,
     ayat_end: ayatEnd,
   })

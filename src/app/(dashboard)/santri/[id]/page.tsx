@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useDashboard } from '../../layout'
+import { useDashboard, QK } from '../../layout'
+import type { Memorization } from '@/lib/types'
 import { toggleMemorizationAction } from '@/lib/actions/memorization'
 import { deleteStudentAction } from '@/lib/actions/students'
 import {
@@ -26,7 +28,8 @@ export default function ProfilPage({
   params: Promise<{ id: string }>
 }) {
   const router = useRouter()
-  const { state, refreshAll, getStudent, getStudentMemorization } =
+  const queryClient = useQueryClient()
+  const { state, refreshStudents, refreshMemorization, getStudent, getStudentMemorization } =
     useDashboard()
 
   const [studentId, setStudentId] = useState<number | null>(null)
@@ -85,18 +88,28 @@ export default function ProfilPage({
   // Toggle surah status
   async function toggleSurah(surahNo: number) {
     if (toggling || studentId == null) return
-    setToggling(true)
+    const current = hafalan[surahNo] || 0
+    const next = toggleSurahCycle(current)
+
+    // Optimistic update
+    const prev = queryClient.getQueryData(QK.memorization)
+    queryClient.setQueryData<Memorization[]>(QK.memorization, (old) => {
+      if (!old) return old
+      const idx = old.findIndex((m) => m.student_id === studentId && m.surah_no === surahNo)
+      if (idx >= 0) {
+        const updated = [...old]
+        updated[idx] = { ...updated[idx], status: next }
+        return updated
+      }
+      return [...old, { student_id: studentId, surah_no: surahNo, status: next } as Memorization]
+    })
+
     try {
-      const current = hafalan[surahNo] || 0
-      const next = toggleSurahCycle(current)
-
       await toggleMemorizationAction(studentId, surahNo, next)
-
-      await refreshAll()
+      await refreshMemorization()
     } catch {
-      // silently ignore
-    } finally {
-      setToggling(false)
+      // Rollback on error
+      queryClient.setQueryData(QK.memorization, prev)
     }
   }
 
@@ -105,7 +118,7 @@ export default function ProfilPage({
     if (!confirm(`Hapus santri "${student.nama}"? Semua data terkait akan dihapus.`)) return
     try {
       await deleteStudentAction(studentId)
-      await refreshAll()
+      await refreshStudents()
       router.push('/santri')
     } catch {
       // silently ignore

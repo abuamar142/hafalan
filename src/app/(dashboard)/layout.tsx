@@ -1,11 +1,11 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Sidebar from '@/components/Sidebar'
 import Modal from '@/components/Modal'
 import { useAppState, QK } from '@/hooks/useAppState'
-import { updateGuruAction } from '@/lib/actions/settings'
+import { createClient } from '@/lib/supabase/client'
 import type { SantriWithCount, Memorization } from '@/lib/types'
 
 type App = ReturnType<typeof useAppState>
@@ -18,7 +18,6 @@ interface DashboardContextValue {
   refreshSubmissions: () => Promise<void>
   refreshMemorization: () => Promise<void>
   refreshClasses: () => Promise<void>
-  refreshSettings: () => Promise<void>
   getStudent: (id: number) => SantriWithCount | undefined
   getStudentMemorization: (id: number) => Memorization[]
 }
@@ -42,14 +41,24 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const app = useAppState()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guruInput, setGuruInput] = useState('')
+  const [userName, setUserName] = useState('')
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setUserName((data.user?.user_metadata?.name as string) || '')
+    })
+  }, [])
 
   function openSettings() {
-    setGuruInput(app.state.guru)
+    setGuruInput(userName)
     setSettingsOpen(true)
   }
 
   async function handleSaveGuru() {
-    await updateGuruAction(guruInput.trim())
+    const supabase = createClient()
+    await supabase.auth.updateUser({ data: { name: guruInput.trim() } })
+    setUserName(guruInput.trim())
     setSettingsOpen(false)
   }
 
@@ -63,14 +72,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         refreshSubmissions: app.refreshSubmissions,
         refreshMemorization: app.refreshMemorization,
         refreshClasses: app.refreshClasses,
-        refreshSettings: app.refreshSettings,
         getStudent: app.getStudent,
         getStudentMemorization: app.getStudentMemorization,
       }}
     >
       <div className="flex min-h-screen bg-background text-text">
         {/* Sidebar */}
-        <Sidebar guru={app.state.guru} onOpenSettings={openSettings} />
+        <Sidebar userName={userName} onOpenSettings={openSettings} />
 
         {/* Main content area */}
         <div className="flex min-h-screen flex-1 flex-col">

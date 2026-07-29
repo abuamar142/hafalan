@@ -7,7 +7,6 @@ import {
   deleteGroupAction,
   updateGroupAction,
 } from '@/lib/actions/groups'
-import { getGuruNames } from '@/lib/data/settings'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -59,7 +58,14 @@ export default function KelompokPage() {
 
   // Load all teachers/gurus
   useEffect(() => {
-    getGuruNames().then(setAllTeachers)
+    const supabase = createClient()
+    supabase.rpc('get_all_teachers').then(({ data }) => {
+      const map: Record<string, string> = {}
+      for (const t of (data as Array<{user_id: string, name: string}> | null) ?? []) {
+        map[t.user_id] = t.name
+      }
+      setAllTeachers(map)
+    })
   }, [])
 
   // Load current logged-in user
