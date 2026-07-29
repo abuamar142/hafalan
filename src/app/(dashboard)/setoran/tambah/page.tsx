@@ -132,8 +132,9 @@ export default function TambahSetoranPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-1.5 md:col-span-2">
-              <label className="block text-sm font-medium text-text-secondary">Santri</label>
+              <label htmlFor="santri-select" className="block text-sm font-medium text-text-secondary">Santri</label>
               <select
+                id="santri-select"
                 value={santriId}
                 onChange={(e) => setSantriId(e.target.value)}
                 className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
@@ -148,8 +149,9 @@ export default function TambahSetoranPage() {
             </div>
 
             <div className="space-y-1.5 md:col-span-2">
-              <label className="block text-sm font-medium text-text-secondary">Surah</label>
+              <label htmlFor="surah-select" className="block text-sm font-medium text-text-secondary">Surah</label>
               <select
+                id="surah-select"
                 value={surahNo}
                 onChange={(e) => setSurahNo(e.target.value)}
                 className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
@@ -163,28 +165,36 @@ export default function TambahSetoranPage() {
               </select>
             </div>
 
-            {surahNo && (
+             {surahNo && (
               <div className="space-y-1.5 md:col-span-2">
-                <label className="block text-sm font-medium text-text-secondary">
+                <span className="block text-sm font-medium text-text-secondary">
                   Rentang Ayat
-                </label>
+                </span>
                 <div className="flex items-center gap-3">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={maxAyat}
-                    value={ayatStart}
-                    onChange={(e) => setAyatStart(Math.max(1, Number(e.target.value) || 1))}
-                  />
+                  <div className="flex-1">
+                    <label htmlFor="ayat-mulai" className="sr-only">Ayat Mulai</label>
+                    <Input
+                      id="ayat-mulai"
+                      type="number"
+                      min={1}
+                      max={maxAyat}
+                      value={ayatStart}
+                      onChange={(e) => setAyatStart(Math.max(1, Number(e.target.value) || 1))}
+                    />
+                  </div>
                   <span className="text-text-muted">hingga</span>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={maxAyat}
-                    value={ayatEnd}
-                    onChange={(e) => setAyatEnd(e.target.value === '' ? '' : Math.max(1, Math.min(maxAyat || 999, Number(e.target.value) || 1)))}
-                    placeholder={String(maxAyat)}
-                  />
+                  <div className="flex-1">
+                    <label htmlFor="ayat-selesai" className="sr-only">Ayat Selesai</label>
+                    <Input
+                      id="ayat-selesai"
+                      type="number"
+                      min={1}
+                      max={maxAyat}
+                      value={ayatEnd}
+                      onChange={(e) => setAyatEnd(e.target.value === '' ? '' : Math.max(1, Math.min(maxAyat || 999, Number(e.target.value) || 1)))}
+                      placeholder={String(maxAyat)}
+                    />
+                  </div>
                 </div>
                 <div className="text-xs text-text-muted mt-1">
                   Total: <span className="font-medium">{ayatEnd === '' ? '1' : ayatEnd - ayatStart + 1}</span> ayat
@@ -193,8 +203,9 @@ export default function TambahSetoranPage() {
             )}
 
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-text-secondary">Predikat / Nilai</label>
+              <label htmlFor="nilai-select" className="block text-sm font-medium text-text-secondary">Predikat / Nilai</label>
               <select
+                id="nilai-select"
                 value={nilai}
                 onChange={(e) => setNilai(e.target.value)}
                 className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"

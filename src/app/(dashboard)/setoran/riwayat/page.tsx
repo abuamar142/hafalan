@@ -91,6 +91,7 @@ export default function RiwayatSetoranPage() {
           value={search}
           onChange={(e) => applySearch(e.target.value)}
           placeholder="Cari nama santri atau surah..."
+          aria-label="Cari nama santri"
           className="min-w-0 flex-[2] rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
         />
         <select

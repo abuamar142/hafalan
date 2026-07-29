@@ -17,7 +17,19 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
   const hafal = getTotalHafal(student)
 
   return (
-    <div onClick={onClick} className="cursor-pointer mb-3">
+    <div
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Buka detail ${student.nama}`}
+      className="cursor-pointer mb-3"
+    >
       <Card className="border-border/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 bg-surface">
         <CardContent className="p-4 flex items-center gap-4">
           {/* Avatar */}
