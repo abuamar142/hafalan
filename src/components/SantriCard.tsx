@@ -33,7 +33,7 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
         <div className="text-sm font-medium text-text truncate">{student.nama}</div>
         <div className="text-[11px] text-text-muted">
           {student.kelas || 'Tanpa kelas'}
-          {student.usia ? ` \u00B7 ${student.usia} th` : ''} \u00B7 {hafal} surah
+          {student.usia ? ` · ${student.usia} th` : ''} · {hafal} surah
         </div>
         <div className="mt-1.5 h-[5px] overflow-hidden rounded-[3px] bg-border">
           <div
