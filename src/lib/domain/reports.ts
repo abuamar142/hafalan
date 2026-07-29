@@ -9,6 +9,7 @@ import {
   initials,
   nowStr,
   formatWaktu,
+  escapeHtml,
 } from '../helpers'
 import type { SantriWithCount, SetoranItem } from '../types'
 import { computeReportStats } from './statistics'
@@ -56,8 +57,8 @@ export function generateCollectiveReport(
       return `
         <tr>
           <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center">${i + 1}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;font-weight:500">${s.nama}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center;color:#666">${s.kelas || '-'}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;font-weight:500">${escapeHtml(s.nama)}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center;color:#666">${s.kelas ? escapeHtml(s.kelas) : '-'}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center">${hafal}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center">${juzSelesai}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5">
@@ -80,11 +81,11 @@ export function generateCollectiveReport(
     .map(
       (sub) => `
         <tr>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.santri_nama}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${getSurahNama(sub.surah_no)}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `\u2013${sub.ayat_end}` : ''}` : ''}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${sub.nilai}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${escapeHtml(sub.santri_nama)}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${escapeHtml(getSurahNama(sub.surah_no))}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `\u2013${sub.ayat_end}` : ''}` : ''}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${escapeHtml(sub.nilai)}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).tanggal}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan || '-'}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan ? escapeHtml(sub.catatan) : '-'}</td>
         </tr>`,
     )
     .join('')
@@ -93,7 +94,7 @@ export function generateCollectiveReport(
       <div style="font-family:system-ui,sans-serif;color:#2C2C2A;max-width:800px;margin:0 auto">
         <div style="text-align:center;margin-bottom:24px">
           <div style="font-size:18px;font-weight:700">SMA Islam Bunga Bangsa</div>
-          <div style="font-size:14px;color:#5F5E5A;margin-top:4px">Laporan Kolektif \u00B7 ${guruName || '-'}</div>
+          <div style="font-size:14px;color:#5F5E5A;margin-top:4px">Laporan Kolektif \u00B7 ${escapeHtml(guruName || '-')}</div>
           <div style="font-size:12px;color:#888780;margin-top:2px">${nowStr()}</div>
         </div>
 
@@ -155,7 +156,7 @@ export function generateCollectiveReport(
           <div></div>
           <div style="text-align:center">
             <div>Dicetak pada ${nowStr()}</div>
-            <div style="margin-top:4px">(${guruName || '-'})</div>
+            <div style="margin-top:4px">(${escapeHtml(guruName || '-')})</div>
           </div>
         </div>
       </div>`
@@ -208,11 +209,11 @@ export function generateIndividualReport(
     .map(
       (sub) => `
         <tr>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${getSurahNama(sub.surah_no)}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `\u2013${sub.ayat_end}` : ''}` : ''}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${sub.nilai}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${escapeHtml(getSurahNama(sub.surah_no))}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `\u2013${sub.ayat_end}` : ''}` : ''}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${escapeHtml(sub.nilai)}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).tanggal}</td>
           <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).jam}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan || '-'}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan ? escapeHtml(sub.catatan) : '-'}</td>
         </tr>`,
     )
     .join('')
@@ -228,8 +229,8 @@ export function generateIndividualReport(
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:12px;background:#F1EFE8;border-radius:10px">
           <div style="width:48px;height:48px;border-radius:50%;background:${getColor(student, 0)};display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:500">${initials(student.nama)}</div>
           <div>
-            <div style="font-size:15px;font-weight:600">${student.nama}</div>
-            <div style="font-size:12px;color:#5F5E5A">${student.kelas || 'Tanpa kelas'}${student.usia ? ` \u00B7 ${student.usia} th` : ''}</div>
+            <div style="font-size:15px;font-weight:600">${escapeHtml(student.nama)}</div>
+            <div style="font-size:12px;color:#5F5E5A">${student.kelas ? escapeHtml(student.kelas) : 'Tanpa kelas'}${student.usia ? ` \u00B7 ${escapeHtml(student.usia)} th` : ''}</div>
           </div>
         </div>
 
@@ -261,7 +262,7 @@ export function generateIndividualReport(
         <div style="margin-bottom:16px">
           <div style="font-size:13px;font-weight:600;margin-bottom:6px">Hafalan (${hafalSurahs.length} surah)</div>
           <div style="font-size:12px;color:#5F5E5A;line-height:1.8">
-            ${hafalSurahs.map((s) => s.nama).join(', ')}
+            ${hafalSurahs.map((s) => escapeHtml(s.nama)).join(', ')}
           </div>
         </div>`
             : ''
@@ -273,7 +274,7 @@ export function generateIndividualReport(
         <div style="margin-bottom:16px">
           <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:#BA7517">Murajaah (${murajaahSurahs.length} surah)</div>
           <div style="font-size:12px;color:#5F5E5A;line-height:1.8">
-            ${murajaahSurahs.map((s) => s.nama).join(', ')}
+            ${murajaahSurahs.map((s) => escapeHtml(s.nama)).join(', ')}
           </div>
         </div>`
             : ''
@@ -304,7 +305,7 @@ export function generateIndividualReport(
           <div></div>
           <div style="text-align:right">
             <div>Dicetak pada ${nowStr()}</div>
-            <div style="margin-top:2px">(${guruName || '-'})</div>
+            <div style="margin-top:2px">(${escapeHtml(guruName || '-')})</div>
             <div style="margin-top:24px;border-top:1px solid #2C2C2A;width:160px;padding-top:4px">Tanda Tangan Guru</div>
           </div>
         </div>
