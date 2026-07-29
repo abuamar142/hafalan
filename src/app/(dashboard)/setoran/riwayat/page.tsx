@@ -8,7 +8,22 @@ import type { SetoranItem } from '@/lib/types'
 export default function RiwayatSetoranPage() {
   const { state } = useDashboard()
   const [search, setSearch] = useState('')
+  const [kelasFilter, setKelasFilter] = useState('')
+  const [kelompokFilter, setKelompokFilter] = useState('')
   const [guruFilter, setGuruFilter] = useState('')
+
+  // Map santri_id -> { group_id, group_name, class_name }
+  const studentLookup = useMemo(() => {
+    const map: Record<number, { group_id: number; group_name: string; class_name: string }> = {}
+    for (const s of state.students) {
+      map[s.id] = {
+        group_id: s.group_id,
+        group_name: s.group_name || '',
+        class_name: s.class_name || '',
+      }
+    }
+    return map
+  }, [state.students])
 
   // Unique guru_nama values from submissions
   const guruOptions = useMemo(() => {
@@ -17,6 +32,14 @@ export default function RiwayatSetoranPage() {
     )
     return Array.from(names).sort()
   }, [state.submissions])
+
+  // Kelompok options filtered by selected kelas
+  const kelompokOptions = useMemo(() => {
+    if (kelasFilter) {
+      return state.groups.filter((g) => g.class_name === kelasFilter)
+    }
+    return state.groups
+  }, [state.groups, kelasFilter])
 
   // Filtered list
   const filtered = useMemo(() => {
@@ -30,32 +53,69 @@ export default function RiwayatSetoranPage() {
           surahName.includes(q)
         if (!match) return false
       }
+      // Kelas filter
+      if (kelasFilter) {
+        const info = studentLookup[item.santri_id]
+        if (!info || info.class_name !== kelasFilter) return false
+      }
+      // Kelompok filter
+      if (kelompokFilter) {
+        const info = studentLookup[item.santri_id]
+        if (!info || info.group_name !== kelompokFilter) return false
+      }
       // Guru filter
       if (guruFilter && item.guru_nama !== guruFilter) {
         return false
       }
       return true
     })
-  }, [state.submissions, search, guruFilter])
+  }, [state.submissions, search, kelasFilter, kelompokFilter, guruFilter, studentLookup])
 
   return (
     <>
       {/* Header */}
       <div className="mb-4 text-sm font-medium text-text">Riwayat Setoran</div>
 
-      {/* Search + Filter */}
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row">
+      {/* Search + Filters */}
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cari nama santri atau surah..."
-          className="flex-1 rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
+          className="min-w-0 flex-[2] rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
         />
+        <select
+          value={kelasFilter}
+          onChange={(e) => {
+            setKelasFilter(e.target.value)
+            setKelompokFilter('') // reset kelompok when kelas changes
+          }}
+          className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-44"
+        >
+          <option value="">Semua Kelas</option>
+          {state.classes.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={kelompokFilter}
+          onChange={(e) => setKelompokFilter(e.target.value)}
+          className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-44"
+        >
+          <option value="">Semua Kelompok</option>
+          {kelompokOptions.map((g) => (
+            <option key={g.id} value={g.name}>
+              {g.name}
+            </option>
+          ))}
+        </select>
         <select
           value={guruFilter}
           onChange={(e) => setGuruFilter(e.target.value)}
-          className="rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-56"
+          className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-40"
         >
           <option value="">Semua Guru</option>
           {guruOptions.map((g) => (
