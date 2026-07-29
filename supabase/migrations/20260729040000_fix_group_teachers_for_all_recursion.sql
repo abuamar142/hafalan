@@ -1,5 +1,5 @@
 -- ============================================================
--- Quran Tracker — Migration: Fix group_teachers FOR ALL recursion
+-- Hafalan — Migration: Fix group_teachers FOR ALL recursion
 -- ============================================================
 
 -- Drop the old FOR ALL policy that caused select recursion

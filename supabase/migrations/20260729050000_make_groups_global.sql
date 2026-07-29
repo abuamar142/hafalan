@@ -1,5 +1,5 @@
 -- ============================================================
--- Quran Tracker — Migration: Make Groups Global & Re-align RLS
+-- Hafalan — Migration: Make Groups Global & Re-align RLS
 -- ============================================================
 
 -- 1. Drop existing SELECT policies that restrict viewing to assigned teachers/owners

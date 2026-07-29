@@ -1,5 +1,5 @@
 -- =============================================
--- Quran Tracker — Supabase Migration
+-- Hafalan — Supabase Migration
 -- Run this in Supabase SQL Editor
 -- =============================================
 
