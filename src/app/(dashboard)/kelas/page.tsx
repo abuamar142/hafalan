@@ -12,10 +12,12 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Modal from '@/components/Modal'
 import Pagination from '@/components/Pagination'
+import { useToast } from '@/components/ui/Toast'
 import { Plus, Eye, Edit, Trash2, Layers, Search } from 'lucide-react'
 
 export default function KelasPage() {
   const { state, refreshClasses } = useDashboard()
+  const { toast } = useToast()
 
   const ITEMS_PER_PAGE = 10
   const [searchQuery, setSearchQuery] = useState('')
@@ -104,9 +106,11 @@ export default function KelasPage() {
       await createClassAction(formData)
       setAddOpen(false)
       await refreshClasses()
+      toast('Kelas berhasil ditambahkan!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal membuat kelas: ' + msg)
+      toast('Gagal membuat kelas: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
@@ -124,9 +128,11 @@ export default function KelasPage() {
       await updateClassAction(selectedClass.id, className.trim(), selectedGroupIds)
       setEditOpen(false)
       await refreshClasses()
+      toast('Kelas berhasil diperbarui!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal memperbarui kelas: ' + msg)
+      toast('Gagal memperbarui kelas: ' + msg, 'error')
     } finally {
       setSaving(false)
     }
@@ -138,9 +144,10 @@ export default function KelasPage() {
     try {
       await deleteClassAction(id)
       await refreshClasses()
+      toast('Kelas berhasil dihapus!')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      alert('Gagal menghapus kelas: ' + msg)
+      toast('Gagal menghapus kelas: ' + msg, 'error')
     } finally {
       setSaving(false)
     }

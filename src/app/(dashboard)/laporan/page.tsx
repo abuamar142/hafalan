@@ -12,6 +12,7 @@ import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Combobox } from '@/components/ui/Combobox'
 import { FileText, Printer, Users, User } from 'lucide-react'
 
 export default function LaporanPage() {
@@ -20,6 +21,14 @@ export default function LaporanPage() {
   const [printHtml, setPrintHtml] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [currentUserName, setCurrentUserName] = useState('')
+
+  const studentOptions = useMemo(() => {
+    return state.students.map((s) => ({
+      id: s.id,
+      label: s.nama + (s.kelas ? ` (${s.kelas})` : ''),
+      searchText: s.nama + (s.kelas ? ` ${s.kelas}` : ''),
+    }))
+  }, [state.students])
 
   useEffect(() => {
     const supabase = createClient()
@@ -185,18 +194,13 @@ export default function LaporanPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="block text-[13px] font-medium text-text-secondary">Pilih Santri</label>
-                <select
+                <Combobox
+                  options={studentOptions}
                   value={selectedStudent}
-                  onChange={(e) => setSelectedStudent(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
-                >
-                  <option value="">-- Pilih Santri --</option>
-                  {state.students.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.nama} {s.kelas ? `(${s.kelas})` : ''}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSelectedStudent}
+                  placeholder="Cari dan pilih santri..."
+                  searchPlaceholder="Ketik nama santri..."
+                />
               </div>
             </div>
             <Button

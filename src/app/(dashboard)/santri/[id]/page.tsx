@@ -20,6 +20,7 @@ import {
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
+import { useToast } from '@/components/ui/Toast'
 import { ArrowLeft, Trash2, CheckCircle2, RotateCcw, Circle } from 'lucide-react'
 
 export default function ProfilPage({
@@ -31,6 +32,7 @@ export default function ProfilPage({
   const queryClient = useQueryClient()
   const { state, refreshStudents, refreshMemorization, getStudent, getStudentMemorization } =
     useDashboard()
+  const { toast } = useToast()
 
   const [studentId, setStudentId] = useState<number | null>(null)
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
@@ -108,11 +110,12 @@ export default function ProfilPage({
     try {
       await toggleMemorizationAction(studentId, surahNo, next)
       await refreshMemorization()
+      toast('Status hafalan berhasil diperbarui!')
     } catch (e: unknown) {
       // Rollback on error
       queryClient.setQueryData(QK.memorization, prev)
       const msg = e instanceof Error ? e.message : String(e)
-      alert('Gagal memperbarui status hafalan: ' + msg)
+      toast('Gagal memperbarui status hafalan: ' + msg, 'error')
     }
   }
 
@@ -122,10 +125,11 @@ export default function ProfilPage({
     try {
       await deleteStudentAction(studentId)
       await refreshStudents()
+      toast('Santri berhasil dihapus!')
       router.push('/santri')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      alert('Gagal menghapus data santri: ' + msg)
+      toast('Gagal menghapus data santri: ' + msg, 'error')
     }
   }
 
