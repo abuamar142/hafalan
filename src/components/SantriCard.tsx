@@ -37,10 +37,10 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
             
             <div className="text-xs text-text-muted font-medium mb-2.5 flex items-center gap-1.5">
               <span className="bg-card px-2 py-0.5 rounded-md border border-border/50">{student.kelas || 'Tanpa kelas'}</span>
-              {student.usia && (
+              {student.group_name && (
                 <>
                   <span className="w-1 h-1 rounded-full bg-border"></span>
-                  <span>{student.usia} thn</span>
+                  <span>{student.group_name}</span>
                 </>
               )}
               <span className="w-1 h-1 rounded-full bg-border"></span>

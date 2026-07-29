@@ -2,11 +2,11 @@
 
 export interface Student {
   id: number
-  user_id: string
+  group_id: number
   nama: string
   kelas: string
-  usia: string
   color: string
+  group_name?: string
 }
 
 export interface Memorization {
@@ -60,6 +60,19 @@ export interface SetoranItem {
   ayat_end: number | null
   guru_id: string | null
   guru_nama: string
+}
+
+export interface Group {
+  id: number
+  name: string
+  created_at: string
+  user_id: string
+}
+
+export interface GroupTeacher {
+  id: number
+  group_id: number
+  teacher_id: string
 }
 
 

@@ -13,7 +13,8 @@ import {
   Settings,
   LogOut,
   ChevronRight,
-  Menu
+  Menu,
+  FolderOpen
 } from 'lucide-react'
 
 interface NavItem {
@@ -28,6 +29,11 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Dashboard',
     href: '/',
     icon: <LayoutDashboard className="w-5 h-5" />,
+  },
+  {
+    label: 'Kelompok',
+    href: '/kelompok',
+    icon: <FolderOpen className="w-5 h-5" />,
   },
   {
     label: 'Santri',

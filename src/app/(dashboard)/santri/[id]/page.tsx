@@ -167,7 +167,7 @@ export default function ProfilPage({
               </h1>
               <div className="text-sm font-medium text-text-secondary flex items-center justify-center sm:justify-start gap-2">
                 <span className="bg-background px-2.5 py-0.5 rounded-md border border-border">{student.kelas || 'Tanpa kelas'}</span>
-                {student.usia && <span>• {student.usia} thn</span>}
+                {student.group_name && <span>• {student.group_name}</span>}
               </div>
             </div>
           </div>

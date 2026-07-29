@@ -16,7 +16,7 @@ export default function SantriPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [nama, setNama] = useState('')
   const [kelas, setKelas] = useState('')
-  const [usia, setUsia] = useState('')
+  const [groupId, setGroupId] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -25,17 +25,21 @@ export default function SantriPage() {
       setError('Nama wajib diisi')
       return
     }
+    if (!groupId) {
+      setError('Kelompok wajib dipilih')
+      return
+    }
     setSaving(true)
     setError('')
     try {
       const formData = new FormData()
       formData.append('nama', nama.trim())
       formData.append('kelas', kelas.trim())
-      formData.append('usia', usia.trim())
+      formData.append('groupId', groupId)
       await addStudentAction(formData)
       setNama('')
       setKelas('')
-      setUsia('')
+      setGroupId('')
       setAddOpen(false)
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -125,19 +129,20 @@ export default function SantriPage() {
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-text-secondary">
-                Usia
+                Kelompok <span className="text-red">*</span>
               </label>
-              <div className="relative">
-                <Input
-                  type="number"
-                  min={5}
-                  max={99}
-                  value={usia}
-                  onChange={(e) => setUsia(e.target.value)}
-                  placeholder="Misal: 10"
-                />
-                <span className="absolute right-3 top-2.5 text-sm text-text-muted">thn</span>
-              </div>
+              <select
+                value={groupId}
+                onChange={(e) => setGroupId(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm ring-offset-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors text-text"
+              >
+                <option value="">Pilih Kelompok</option>
+                {state.groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
