@@ -16,11 +16,6 @@ export async function getStudents(): Promise<Student[]> {
   return (data ?? []) as Student[]
 }
 
-export async function getStudentIds(): Promise<number[]> {
-  const students = await getStudents()
-  return students.map((s) => s.id)
-}
-
 export async function addStudent(student: {
   id: number
   user_id: string

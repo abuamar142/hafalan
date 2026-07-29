@@ -48,7 +48,7 @@ interface Submission {
 /**
  * Compute report-level aggregate statistics.
  */
-export function computeReportStats(
+function computeReportStats(
   studentsWithCount: SantriWithCount[],
 ): ReportStats {
   const totalStudents = studentsWithCount.length

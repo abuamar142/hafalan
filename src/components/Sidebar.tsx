@@ -103,9 +103,16 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
       <>
         {/* Branding */}
         <div className="px-5 pt-6 pb-6">
-          <h1 className="text-base font-semibold leading-tight text-white">
-            SMA Islam Bunga Bangsa
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <img
+              src="/images/logo.jpg"
+              alt="Logo"
+              className="w-10 h-10 rounded-lg object-cover"
+            />
+            <h1 className="text-base font-semibold leading-tight text-white">
+              SMA Islam Bunga Bangsa
+            </h1>
+          </div>
           {guru && (
             <div className="mt-1 text-xs text-white/60 leading-tight">{guru}</div>
           )}

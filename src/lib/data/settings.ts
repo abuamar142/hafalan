@@ -30,15 +30,4 @@ export async function getGuruNames(): Promise<Record<string, string>> {
   return map
 }
 
-export async function upsertSetting(
-  key: string,
-  value: string,
-  userId: string
-): Promise<void> {
-  const supabase = createClient()
-  await supabase.from('settings').upsert({
-    key,
-    value,
-    user_id: userId,
-  })
-}
+

@@ -55,7 +55,11 @@ export default function LoginPage() {
       >
         {/* Brand */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📖</div>
+          <img
+            src="/images/logo.jpg"
+            alt="Logo Hafalan"
+            style={{ width: '72px', height: '72px', borderRadius: '16px', objectFit: 'cover', margin: '0 auto 0.75rem' }}
+          />
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
             Hafalan
           </h1>
