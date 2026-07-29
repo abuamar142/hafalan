@@ -23,20 +23,4 @@ export async function getStudents(): Promise<Student[]> {
   })
 }
 
-export async function addStudent(student: {
-  id: number
-  group_id: number
-  nama: string
-  kelas: string
-  color: string
-}): Promise<void> {
-  const supabase = createClient()
-  const { error } = await supabase.from('students').insert(student)
-  if (error) throw error
-}
 
-export async function deleteStudent(id: number): Promise<void> {
-  const supabase = createClient()
-  const { error } = await supabase.from('students').delete().eq('id', id)
-  if (error) throw error
-}
