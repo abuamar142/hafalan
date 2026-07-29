@@ -1,25 +1,33 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useDashboard } from '../layout'
 import {
   createGroupAction,
   deleteGroupAction,
-  addTeacherAction,
-  removeTeacherAction,
+  updateGroupAction,
 } from '@/lib/actions/groups'
 import { getGuruNames } from '@/lib/data/settings'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Modal from '@/components/Modal'
-import { Plus, Trash2, UserPlus, X, FolderKanban, ShieldCheck, Shield } from 'lucide-react'
+import { Plus, Eye, Edit, Trash2, ShieldCheck, Shield, Users, Layers, User } from 'lucide-react'
 
 export default function KelompokPage() {
   const { state, refreshAll } = useDashboard()
+  
   const [addOpen, setAddOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [detailOpen, setDetailOpen] = useState(false)
+
+  const [selectedGroup, setSelectedGroup] = useState<typeof state.groups[number] | null>(null)
+  
   const [groupName, setGroupName] = useState('')
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(null)
+  const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([])
+  
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -36,6 +44,32 @@ export default function KelompokPage() {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null))
   }, [])
+
+  function openAddModal() {
+    setError('')
+    setGroupName('')
+    setAddOpen(true)
+  }
+
+  function openEditModal(g: typeof state.groups[number]) {
+    setError('')
+    setSelectedGroup(g)
+    setGroupName(g.name)
+    setSelectedClassId(g.class_id)
+    
+    // Fetch currently assigned teacher IDs
+    const currentTeacherIds = state.groupTeachers
+      .filter((gt) => gt.group_id === g.id)
+      .map((gt) => gt.teacher_id)
+    setSelectedTeacherIds(currentTeacherIds)
+    
+    setEditOpen(true)
+  }
+
+  function openDetailModal(g: typeof state.groups[number]) {
+    setSelectedGroup(g)
+    setDetailOpen(true)
+  }
 
   async function handleAddGroup() {
     if (!groupName.trim()) {
@@ -59,8 +93,28 @@ export default function KelompokPage() {
     }
   }
 
+  async function handleEditGroup() {
+    if (!selectedGroup) return
+    if (!groupName.trim()) {
+      setError('Nama kelompok wajib diisi')
+      return
+    }
+    setSaving(true)
+    setError('')
+    try {
+      await updateGroupAction(selectedGroup.id, groupName.trim(), selectedClassId, selectedTeacherIds)
+      setEditOpen(false)
+      await refreshAll()
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      setError('Gagal memperbarui kelompok: ' + msg)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   async function handleDeleteGroup(id: number, name: string) {
-    if (!confirm(`Hapus kelompok "${name}"? Semua santri di dalamnya akan kehilangan asosiasi kelompok.`)) return
+    if (!confirm(`Hapus kelompok "${name}"? Semua siswa di dalamnya akan kehilangan kelompok.`)) return
     setSaving(true)
     try {
       await deleteGroupAction(id)
@@ -73,31 +127,12 @@ export default function KelompokPage() {
     }
   }
 
-  async function handleAssignTeacher(groupId: number, teacherId: string) {
-    if (!teacherId) return
-    setSaving(true)
-    try {
-      await addTeacherAction(groupId, teacherId)
-      await refreshAll()
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
-      alert('Gagal menambahkan ustadz: ' + msg)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleUnassignTeacher(groupId: number, teacherId: string) {
-    setSaving(true)
-    try {
-      await removeTeacherAction(groupId, teacherId)
-      await refreshAll()
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
-      alert('Gagal menghapus ustadz: ' + msg)
-    } finally {
-      setSaving(false)
-    }
+  function toggleTeacherSelection(teacherId: string) {
+    setSelectedTeacherIds((prev) =>
+      prev.includes(teacherId)
+        ? prev.filter((id) => id !== teacherId)
+        : [...prev, teacherId]
+    )
   }
 
   return (
@@ -105,16 +140,13 @@ export default function KelompokPage() {
       {/* Top Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-text">Kelompok Halaqah</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-text">Manajemen Kelompok</h2>
           <p className="text-sm text-text-muted mt-1">
-            Kelola pembagian kelompok halaqah dan ustadz pengampu.
+            Kelola kelompok halaqah, asosiasi kelas, dan penugasan ustadz pengampu.
           </p>
         </div>
         <Button
-          onClick={() => {
-            setError('')
-            setAddOpen(true)
-          }}
+          onClick={openAddModal}
           className="gap-2 shadow-sm"
           disabled={saving}
         >
@@ -123,152 +155,114 @@ export default function KelompokPage() {
         </Button>
       </div>
 
-      {/* Empty State */}
-      {state.groups.length === 0 && (
-        <div className="py-16 text-center text-sm text-text-muted border border-border/50 rounded-xl bg-surface border-dashed">
-          Belum ada kelompok halaqah yang didaftarkan.
-        </div>
-      )}
+      {/* Main Table */}
+      <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
+        <CardContent className="p-0">
+          {state.groups.length === 0 ? (
+            <div className="py-16 text-center text-sm text-text-muted border-dashed">
+              Belum ada kelompok yang didaftarkan.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
+                    <th className="py-3.5 px-4 w-16 text-center">No</th>
+                    <th className="py-3.5 px-4">Nama Kelompok</th>
+                    <th className="py-3.5 px-4">Kelas</th>
+                    <th className="py-3.5 px-4">Ustadz Pengampu</th>
+                    <th className="py-3.5 px-4 w-44 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/30 text-sm">
+                  {state.groups.map((group, index) => {
+                    const assignedTeachers = state.groupTeachers.filter(
+                      (gt) => gt.group_id === group.id
+                    )
+                    const className = group.class_name || state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas'
 
-      {/* Groups Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {state.groups.map((group) => {
-          const isOwner = group.user_id === currentUserId
-          
-          // Get teachers assigned to this group
-          const assignedTeachers = state.groupTeachers.filter(
-            (gt) => gt.group_id === group.id
-          )
-          
-          const assignedTeacherIds = assignedTeachers.map((gt) => gt.teacher_id)
-
-          // Teachers available to assign (registered teachers not in this group)
-          const availableTeachers = Object.entries(allTeachers).filter(
-            ([teacherId]) => !assignedTeacherIds.includes(teacherId)
-          )
-
-          return (
-            <Card
-              key={group.id}
-              className="border-border/40 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow bg-surface"
-            >
-              <div>
-                <CardHeader className="pb-3 border-b border-border/30 flex flex-row items-start justify-between space-y-0 gap-4">
-                  <div className="min-w-0">
-                    <CardTitle className="text-lg font-bold text-text truncate">
-                      {group.name}
-                    </CardTitle>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      {isOwner ? (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-primary uppercase tracking-wider">
-                          <ShieldCheck className="w-3 h-3" /> Pemilik
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-card text-text-muted border border-border/50 uppercase tracking-wider">
-                          <Shield className="w-3 h-3" /> Anggota
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {isOwner && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteGroup(group.id, group.name)}
-                      className="h-8 w-8 text-text-muted hover:text-red hover:bg-red/10 rounded-lg shrink-0"
-                      disabled={saving}
-                      aria-label="Hapus kelompok"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </CardHeader>
-
-                <CardContent className="pt-4 space-y-4">
-                  {/* Ustadz/Teachers List */}
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">
-                      Ustadz Pengampu
-                    </label>
-                    {assignedTeachers.length === 0 ? (
-                      <p className="text-xs text-text-muted italic">Belum ada ustadz pengampu</p>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5">
-                        {assignedTeachers.map((gt) => {
-                          const teacherName = allTeachers[gt.teacher_id] || 'Ustadz'
-                          return (
-                            <span
-                              key={gt.id}
-                              className="inline-flex items-center gap-1.5 bg-background text-text-secondary pl-2.5 pr-1.5 py-1 rounded-lg border border-border text-xs font-medium"
-                            >
-                              {teacherName}
-                              {isOwner && (
-                                <button
-                                  onClick={() => handleUnassignTeacher(group.id, gt.teacher_id)}
-                                  className="text-text-muted hover:text-red p-0.5 rounded hover:bg-card transition-colors"
-                                  disabled={saving}
-                                  aria-label={`Hapus ${teacherName}`}
-                                >
-                                  <X className="w-3.5 h-3.5" />
-                                </button>
-                              )}
+                    return (
+                      <tr key={group.id} className="hover:bg-card/30 transition-colors">
+                        <td className="py-3.5 px-4 text-center font-medium text-text-muted">
+                          {index + 1}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-text">{group.name}</span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 text-text-secondary font-medium">
+                          {className !== 'Tanpa Kelas' ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                              {className}
                             </span>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </div>
+                          ) : (
+                            <span className="text-xs text-text-muted italic">{className}</span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          {assignedTeachers.length === 0 ? (
+                            <span className="text-xs text-text-muted italic">Belum ditugaskan</span>
+                          ) : (
+                            <div className="flex flex-wrap gap-1">
+                              {assignedTeachers.map((gt) => {
+                                const name = allTeachers[gt.teacher_id] || 'Ustadz'
+                                return (
+                                  <span
+                                    key={gt.id}
+                                    className="inline-flex items-center px-2 py-0.5 rounded bg-background border border-border/50 text-xs font-medium text-text-secondary"
+                                  >
+                                    {name}
+                                  </span>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openDetailModal(group)}
+                              className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
+                              title="Detail"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openEditModal(group)}
+                              className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                              title="Edit"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteGroup(group.id, group.name)}
+                              className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
+                              title="Hapus"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-              <div className="p-4 border-t border-border/30 bg-card/30 rounded-b-[var(--radius-lg)]">
-                {/* Assign Teacher Dropdown (Only for Owners) */}
-                {isOwner ? (
-                  availableTeachers.length > 0 ? (
-                    <div className="space-y-1.5">
-                      <label className="block text-[11px] font-semibold uppercase tracking-wider text-text-muted">
-                        Tambah Ustadz
-                      </label>
-                      <select
-                        onChange={(e) => {
-                          handleAssignTeacher(group.id, e.target.value)
-                          e.target.value = '' // Reset selection
-                        }}
-                        defaultValue=""
-                        disabled={saving}
-                        className="flex h-9 w-full rounded-md border border-border bg-surface px-3 py-1.5 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors text-text"
-                      >
-                        <option value="" disabled>-- Pilih Ustadz --</option>
-                        {availableTeachers.map(([id, name]) => (
-                          <option key={id} value={id}>
-                            {name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-text-muted italic text-center py-1">
-                      Semua ustadz sudah ditugaskan ke kelompok ini
-                    </p>
-                  )
-                ) : (
-                  <p className="text-[11px] text-text-muted italic text-center py-1">
-                    Hanya pemilik yang dapat mengelola ustadz
-                  </p>
-                )}
-              </div>
-            </Card>
-          )
-        })}
-      </div>
-
-      {/* Add Group Modal */}
-      <Modal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        title="Buat Kelompok Baru"
-      >
+      {/* Add Modal */}
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Buat Kelompok Baru">
         {error && (
           <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
             {error}
@@ -297,6 +291,154 @@ export default function KelompokPage() {
             {saving ? 'Menyimpan...' : 'Simpan Kelompok'}
           </Button>
         </div>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Kelompok">
+        {error && (
+          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+            {error}
+          </div>
+        )}
+        {selectedGroup && (
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Nama Kelompok <span className="text-red">*</span>
+              </label>
+              <Input
+                type="text"
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+                placeholder="Misal: Halaqah Abu Bakar"
+                disabled={saving}
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Kelas
+              </label>
+              <select
+                value={selectedClassId === null ? '' : selectedClassId}
+                onChange={(e) => setSelectedClassId(e.target.value === '' ? null : Number(e.target.value))}
+                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors text-text"
+              >
+                <option value="">Tanpa Kelas (Unassigned)</option>
+                {state.classes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Pilih Ustadz Pengampu
+              </label>
+              {Object.keys(allTeachers).length === 0 ? (
+                <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+                  Tidak ada guru terdaftar.
+                </p>
+              ) : (
+                <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
+                  {Object.entries(allTeachers).map(([tid, name]) => (
+                    <label
+                      key={tid}
+                      className="flex items-center gap-2.5 text-sm text-text-secondary hover:text-text cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTeacherIds.includes(tid)}
+                        onChange={() => toggleTeacherSelection(tid)}
+                        className="rounded border-border text-primary focus:ring-primary w-4 h-4"
+                      />
+                      <span>{name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6 flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
+            Batal
+          </Button>
+          <Button onClick={handleEditGroup} disabled={saving}>
+            {saving ? 'Menyimpan...' : 'Perbarui Kelompok'}
+          </Button>
+        </div>
+      </Modal>
+
+      {/* Detail Modal */}
+      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Detail Kelompok">
+        {selectedGroup && (
+          <div className="space-y-4">
+            <div className="bg-background rounded-xl p-4 border border-border space-y-3">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Nama Kelompok</label>
+                <div className="text-base font-bold text-text mt-0.5">{selectedGroup.name}</div>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Kelas</label>
+                <div className="text-sm font-semibold text-primary mt-0.5">
+                  {selectedGroup.class_name || state.classes.find(c => c.id === selectedGroup.class_id)?.name || (
+                    <span className="text-text-muted font-normal italic">Tanpa Kelas</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Tanggal Dibuat</label>
+                <div className="text-xs font-medium text-text-muted mt-0.5">
+                  {new Date(selectedGroup.created_at).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-2">
+                Ustadz Pengampu
+              </label>
+              {state.groupTeachers.filter((gt) => gt.group_id === selectedGroup.id).length === 0 ? (
+                <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+                  Belum ada ustadz ditugaskan ke kelompok ini.
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {state.groupTeachers
+                    .filter((gt) => gt.group_id === selectedGroup.id)
+                    .map((gt) => {
+                      const name = allTeachers[gt.teacher_id] || 'Ustadz'
+                      return (
+                        <div
+                          key={gt.id}
+                          className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-text-secondary"
+                        >
+                          <User className="w-4 h-4 text-primary shrink-0" />
+                          <span className="truncate">{name}</span>
+                        </div>
+                      )
+                    })}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <Button onClick={() => setDetailOpen(false)}>
+                Tutup
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )

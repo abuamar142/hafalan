@@ -4,9 +4,10 @@ export interface Student {
   id: number
   group_id: number
   nama: string
-  kelas: string
   color: string
   group_name?: string
+  class_name?: string
+  kelas: string
 }
 
 export interface Memorization {
@@ -62,11 +63,18 @@ export interface SetoranItem {
   guru_nama: string
 }
 
+export interface Class {
+  id: number
+  name: string
+  created_at: string
+}
+
 export interface Group {
   id: number
   name: string
   created_at: string
-  user_id: string
+  class_id: number | null
+  class_name?: string
 }
 
 export interface GroupTeacher {

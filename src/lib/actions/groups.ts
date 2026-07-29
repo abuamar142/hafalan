@@ -15,20 +15,11 @@ export async function createGroupAction(formData: FormData) {
 
   const { data, error } = await supabase
     .from('groups')
-    .insert({ name, user_id: user.id })
+    .insert({ name })
     .select('id')
     .single()
 
   if (error) throw error
-
-  const { error: relationError } = await supabase
-    .from('group_teachers')
-    .insert({
-      group_id: data.id,
-      teacher_id: user.id,
-    })
-
-  if (relationError) throw relationError
 
   revalidatePath('/kelompok')
 }
@@ -63,4 +54,48 @@ export async function removeTeacherAction(groupId: number, teacherId: string) {
 
   if (error) throw error
   revalidatePath('/kelompok')
+}
+
+export async function updateGroupAction(
+  groupId: number,
+  name: string,
+  classId: number | null,
+  teacherIds: string[]
+) {
+  if (!name.trim()) throw new Error('Nama kelompok wajib diisi')
+
+  const supabase = await createClient()
+
+  // 1. Update name and class_id
+  const { error: groupError } = await supabase
+    .from('groups')
+    .update({ name: name.trim(), class_id: classId })
+    .eq('id', groupId)
+
+  if (groupError) throw groupError
+
+  // 2. Update teachers (delete existing, insert new list)
+  const { error: deleteTeachersError } = await supabase
+    .from('group_teachers')
+    .delete()
+    .eq('group_id', groupId)
+
+  if (deleteTeachersError) throw deleteTeachersError
+
+  if (teacherIds.length > 0) {
+    const { error: insertTeachersError } = await supabase
+      .from('group_teachers')
+      .insert(
+        teacherIds.map((tid) => ({
+          group_id: groupId,
+          teacher_id: tid,
+        }))
+      )
+
+    if (insertTeachersError) throw insertTeachersError
+  }
+
+  revalidatePath('/kelompok')
+  revalidatePath('/kelas')
+  revalidatePath('/santri')
 }
