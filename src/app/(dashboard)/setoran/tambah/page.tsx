@@ -19,7 +19,7 @@ export default function TambahSetoranPage() {
 
   const [santriId, setSantriId] = useState('')
   const [surahNo, setSurahNo] = useState('')
-  const [nilai, setNilai] = useState(NILAI_OPTIONS[0])
+  const [nilai, setNilai] = useState(NILAI_OPTIONS[0] || '')
   const [catatan, setCatatan] = useState('')
   const [waktu, setWaktu] = useState('')
   const [saving, setSaving] = useState(false)
@@ -87,7 +87,7 @@ export default function TambahSetoranPage() {
       // Reset form
       setSantriId('')
       setSurahNo('')
-      setNilai(NILAI_OPTIONS[0])
+      setNilai(NILAI_OPTIONS[0] || '')
       setCatatan('')
       setAyatStart(1)
       setAyatEnd('')

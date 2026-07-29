@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Modal from '@/components/Modal'
 import Pagination from '@/components/Pagination'
-import { Plus, Eye, Edit, Trash2, ShieldCheck, Shield, Users, Layers, User, Search } from 'lucide-react'
+import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
 
 export default function KelompokPage() {
   const { state, refreshClasses } = useDashboard()
@@ -54,7 +54,6 @@ export default function KelompokPage() {
   const [error, setError] = useState('')
 
   const [allTeachers, setAllTeachers] = useState<Record<string, string>>({})
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
   // Load all teachers/gurus
   useEffect(() => {
@@ -66,12 +65,6 @@ export default function KelompokPage() {
       }
       setAllTeachers(map)
     })
-  }, [])
-
-  // Load current logged-in user
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null))
   }, [])
 
   function openAddModal() {

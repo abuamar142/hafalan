@@ -47,8 +47,12 @@ export async function getAllMemorizationMap(): Promise<Record<number, Memorizati
   const rows = (data ?? []) as Memorization[]
   const map: Record<number, Memorization[]> = {}
   for (const m of rows) {
-    if (!map[m.student_id]) map[m.student_id] = []
-    map[m.student_id].push(m)
+    let arr = map[m.student_id]
+    if (!arr) {
+      arr = []
+      map[m.student_id] = arr
+    }
+    arr.push(m)
   }
   return map
 }
