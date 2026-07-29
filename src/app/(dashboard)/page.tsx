@@ -74,7 +74,7 @@ export default function DashboardPage() {
 
           {/* Student list */}
           <div className="divide-y divide-border/30">
-            {sorted.map((s, i) => {
+            {sorted.slice(0, 10).map((s, i) => {
               const pct = getPct(s)
               const hafal = getTotalHafal(s)
 
