@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useDashboard } from '../layout'
 import { addStudentAction, deleteStudentAction, updateStudentAction } from '@/lib/actions/students'
 import { toggleMemorizationAction } from '@/lib/actions/memorization'
@@ -18,6 +18,7 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Modal from '@/components/Modal'
+import Pagination from '@/components/Pagination'
 import {
   Plus,
   Eye,
@@ -30,10 +31,33 @@ import {
   RotateCcw,
   Circle,
   FileText,
+  Search,
 } from 'lucide-react'
 
 export default function SantriPage() {
-  const { state, refreshAll, getStudentMemorization } = useDashboard()
+  const { state, refreshStudents, getStudentMemorization } = useDashboard()
+
+  const ITEMS_PER_PAGE = 10
+  const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+
+  const filtered = useMemo(() => {
+    let items = state.students
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      items = items.filter((s) => s.nama?.toLowerCase().includes(q))
+    }
+    return items
+  }, [state.students, searchQuery])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * ITEMS_PER_PAGE
+    return filtered.slice(start, start + ITEMS_PER_PAGE)
+  }, [filtered, page])
+
+  useEffect(() => setPage(1), [searchQuery])
 
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -125,7 +149,7 @@ export default function SantriPage() {
       setNama('')
       setGroupId('')
       setAddOpen(false)
-      await refreshAll()
+      await refreshStudents()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal menyimpan: ' + msg)
@@ -149,7 +173,7 @@ export default function SantriPage() {
     try {
       await updateStudentAction(selectedStudent.id, nama.trim(), Number(groupId))
       setEditOpen(false)
-      await refreshAll()
+      await refreshStudents()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal memperbarui: ' + msg)
@@ -163,7 +187,7 @@ export default function SantriPage() {
     setSaving(true)
     try {
       await deleteStudentAction(id)
-      await refreshAll()
+      await refreshStudents()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       alert('Gagal menghapus siswa: ' + msg)
@@ -179,7 +203,7 @@ export default function SantriPage() {
       const current = hafalan[surahNo] || 0
       const next = toggleSurahCycle(current)
       await toggleMemorizationAction(selectedStudent.id, surahNo, next)
-      await refreshAll()
+      await refreshStudents()
     } catch {
       // silently ignore
     } finally {
@@ -214,12 +238,28 @@ export default function SantriPage() {
         </Button>
       </div>
 
+      {/* Search */}
+      <div className="relative mb-4 max-w-xs">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        <Input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Cari siswa..."
+          className="pl-9 h-9 text-sm"
+        />
+      </div>
+
       {/* Main Table */}
       <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
         <CardContent className="p-0">
           {state.students.length === 0 ? (
             <div className="py-16 text-center text-sm text-text-muted border-dashed">
               Belum ada siswa yang didaftarkan.
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-16 text-center text-sm text-text-muted border-dashed">
+              Tidak ada siswa yang sesuai dengan pencarian.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -235,7 +275,7 @@ export default function SantriPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30 text-sm">
-                  {state.students.map((s, index) => {
+                  {paginated.map((s, index) => {
                     const group = state.groups.find((g) => g.id === s.group_id)
                     const groupName = group?.name || 'Tanpa Kelompok'
                     const className = group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
@@ -244,7 +284,7 @@ export default function SantriPage() {
                     return (
                       <tr key={s.id} className="hover:bg-card/30 transition-colors">
                         <td className="py-3.5 px-4 text-center font-medium text-text-muted">
-                          {index + 1}
+                          {(page - 1) * ITEMS_PER_PAGE + index + 1}
                         </td>
                         <td className="py-3.5 px-4 font-semibold text-text">
                           {s.nama}
@@ -317,6 +357,11 @@ export default function SantriPage() {
               </table>
             </div>
           )}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </CardContent>
       </Card>
 

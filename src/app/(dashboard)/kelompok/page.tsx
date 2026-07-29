@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useDashboard } from '../layout'
 import {
   createGroupAction,
@@ -13,10 +13,33 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Modal from '@/components/Modal'
-import { Plus, Eye, Edit, Trash2, ShieldCheck, Shield, Users, Layers, User } from 'lucide-react'
+import Pagination from '@/components/Pagination'
+import { Plus, Eye, Edit, Trash2, ShieldCheck, Shield, Users, Layers, User, Search } from 'lucide-react'
 
 export default function KelompokPage() {
-  const { state, refreshAll } = useDashboard()
+  const { state, refreshClasses } = useDashboard()
+
+  const ITEMS_PER_PAGE = 10
+  const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+
+  const filtered = useMemo(() => {
+    let items = state.groups
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      items = items.filter((group) => group.name?.toLowerCase().includes(q))
+    }
+    return items
+  }, [state.groups, searchQuery])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * ITEMS_PER_PAGE
+    return filtered.slice(start, start + ITEMS_PER_PAGE)
+  }, [filtered, page])
+
+  useEffect(() => setPage(1), [searchQuery])
   
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -84,7 +107,7 @@ export default function KelompokPage() {
       await createGroupAction(formData)
       setGroupName('')
       setAddOpen(false)
-      await refreshAll()
+      await refreshClasses()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal membuat kelompok: ' + msg)
@@ -104,7 +127,7 @@ export default function KelompokPage() {
     try {
       await updateGroupAction(selectedGroup.id, groupName.trim(), selectedClassId, selectedTeacherIds)
       setEditOpen(false)
-      await refreshAll()
+      await refreshClasses()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal memperbarui kelompok: ' + msg)
@@ -118,7 +141,7 @@ export default function KelompokPage() {
     setSaving(true)
     try {
       await deleteGroupAction(id)
-      await refreshAll()
+      await refreshClasses()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       alert('Gagal menghapus kelompok: ' + msg)
@@ -155,12 +178,28 @@ export default function KelompokPage() {
         </Button>
       </div>
 
+      {/* Search */}
+      <div className="relative mb-4 max-w-xs">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        <Input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Cari kelompok..."
+          className="pl-9 h-9 text-sm"
+        />
+      </div>
+
       {/* Main Table */}
       <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
         <CardContent className="p-0">
           {state.groups.length === 0 ? (
             <div className="py-16 text-center text-sm text-text-muted border-dashed">
               Belum ada kelompok yang didaftarkan.
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-16 text-center text-sm text-text-muted border-dashed">
+              Tidak ada kelompok yang sesuai dengan pencarian.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -175,7 +214,7 @@ export default function KelompokPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30 text-sm">
-                  {state.groups.map((group, index) => {
+                  {paginated.map((group, index) => {
                     const assignedTeachers = state.groupTeachers.filter(
                       (gt) => gt.group_id === group.id
                     )
@@ -184,7 +223,7 @@ export default function KelompokPage() {
                     return (
                       <tr key={group.id} className="hover:bg-card/30 transition-colors">
                         <td className="py-3.5 px-4 text-center font-medium text-text-muted">
-                          {index + 1}
+                          {(page - 1) * ITEMS_PER_PAGE + index + 1}
                         </td>
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-2">
@@ -258,6 +297,11 @@ export default function KelompokPage() {
               </table>
             </div>
           )}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </CardContent>
       </Card>
 

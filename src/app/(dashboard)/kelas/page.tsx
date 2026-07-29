@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useDashboard } from '../layout'
 import {
   createClassAction,
@@ -11,10 +11,33 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Modal from '@/components/Modal'
-import { Plus, Eye, Edit, Trash2, Layers } from 'lucide-react'
+import Pagination from '@/components/Pagination'
+import { Plus, Eye, Edit, Trash2, Layers, Search } from 'lucide-react'
 
 export default function KelasPage() {
-  const { state, refreshAll } = useDashboard()
+  const { state, refreshClasses } = useDashboard()
+
+  const ITEMS_PER_PAGE = 10
+  const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+
+  const filtered = useMemo(() => {
+    let items = state.classes
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      items = items.filter((c) => c.name?.toLowerCase().includes(q))
+    }
+    return items
+  }, [state.classes, searchQuery])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * ITEMS_PER_PAGE
+    return filtered.slice(start, start + ITEMS_PER_PAGE)
+  }, [filtered, page])
+
+  useEffect(() => setPage(1), [searchQuery])
   
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -80,7 +103,7 @@ export default function KelasPage() {
       formData.append('groupIds', selectedGroupIds.join(','))
       await createClassAction(formData)
       setAddOpen(false)
-      await refreshAll()
+      await refreshClasses()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal membuat kelas: ' + msg)
@@ -100,7 +123,7 @@ export default function KelasPage() {
     try {
       await updateClassAction(selectedClass.id, className.trim(), selectedGroupIds)
       setEditOpen(false)
-      await refreshAll()
+      await refreshClasses()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal memperbarui kelas: ' + msg)
@@ -114,7 +137,7 @@ export default function KelasPage() {
     setSaving(true)
     try {
       await deleteClassAction(id)
-      await refreshAll()
+      await refreshClasses()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       alert('Gagal menghapus kelas: ' + msg)
@@ -151,12 +174,28 @@ export default function KelasPage() {
         </Button>
       </div>
 
+      {/* Search */}
+      <div className="relative mb-4 max-w-xs">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        <Input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Cari kelas..."
+          className="pl-9 h-9 text-sm"
+        />
+      </div>
+
       {/* Main Table */}
       <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
         <CardContent className="p-0">
           {state.classes.length === 0 ? (
             <div className="py-16 text-center text-sm text-text-muted border-dashed">
               Belum ada kelas yang didaftarkan.
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-16 text-center text-sm text-text-muted border-dashed">
+              Tidak ada kelas yang sesuai dengan pencarian.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -170,12 +209,12 @@ export default function KelasPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30 text-sm">
-                  {state.classes.map((c, index) => {
+                  {paginated.map((c, index) => {
                     const groups = state.groups.filter((g) => g.class_id === c.id)
                     return (
                       <tr key={c.id} className="hover:bg-card/30 transition-colors">
                         <td className="py-3.5 px-4 text-center font-medium text-text-muted">
-                          {index + 1}
+                          {(page - 1) * ITEMS_PER_PAGE + index + 1}
                         </td>
                         <td className="py-3.5 px-4 font-semibold text-text">
                           {c.name}
@@ -234,6 +273,11 @@ export default function KelasPage() {
               </table>
             </div>
           )}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </CardContent>
       </Card>
 
