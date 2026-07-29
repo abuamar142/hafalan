@@ -17,9 +17,9 @@ export async function getPublicGroupsAction(kelasId: number) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('groups')
-    .select('id, nama')
-    .eq('kelas_id', kelasId)
-    .order('nama', { ascending: true })
+    .select('id, nama:name')
+    .eq('class_id', kelasId)
+    .order('name', { ascending: true })
 
   if (error) throw error
   return data || []
@@ -49,7 +49,7 @@ export async function getPublicStudentReportAction(studentId: number) {
       color,
       group:groups (
         id,
-        nama,
+        nama:name,
         class:classes (
           id,
           nama:name
