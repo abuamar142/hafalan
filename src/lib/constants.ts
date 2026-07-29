@@ -1,4 +1,4 @@
-import type { Surah, DemoState } from './types'
+import type { Surah } from './types'
 
 export const AVATAR_COLORS = [
   '#1D9E75', '#534AB7', '#BA7517', '#A32D2D',
@@ -83,44 +83,3 @@ export const ALL_SURAHS: Surah[] = [
   { no: 67, nama: 'Al-Falaq', arab: 'الفلق', ayat: 5, juz: 30 },
   { no: 68, nama: 'An-Nas', arab: 'الناس', ayat: 6, juz: 30 },
 ]
-
-export const DEMO_STATE: DemoState = {
-  lembaga: 'TPQ Al-Ikhlas Depok',
-  guru: 'Ustadz Hasan Basri',
-  santri: [
-    {
-      id: 1001, nama: 'Ahmad Fauzi', kelas: 'Halaqah A', usia: '13', color: '#1D9E75',
-      hafalan: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1 },
-    },
-    {
-      id: 1002, nama: 'Siti Nurhaliza', kelas: 'Halaqah A', usia: '12', color: '#534AB7',
-      hafalan: { 1: 1, 2: 1, 3: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 4: 2, 5: 2 },
-    },
-    {
-      id: 1003, nama: 'Muhammad Ridwan', kelas: 'Halaqah B', usia: '11', color: '#BA7517',
-      hafalan: { 1: 1, 2: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1 },
-    },
-    {
-      id: 1004, nama: 'Fatimah Zahra', kelas: 'Halaqah B', usia: '10', color: '#0F6E56',
-      hafalan: { 1: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1, 2: 2 },
-    },
-    {
-      id: 1005, nama: 'Umar Abdullah', kelas: 'Halaqah C', usia: '9', color: '#3C3489',
-      hafalan: { 1: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1, 59: 1, 60: 1, 61: 1, 62: 1, 63: 1, 64: 1, 65: 1, 66: 1, 67: 1, 68: 1 },
-    },
-    {
-      id: 1006, nama: 'Aisyah Putri', kelas: 'Halaqah C', usia: '8', color: '#A32D2D',
-      hafalan: { 1: 1, 40: 1, 41: 1, 42: 1, 43: 1, 44: 1, 45: 1, 46: 1, 47: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 2, 55: 2 },
-    },
-  ],
-  setoran: [
-    { id: 2001, santri_id: 1001, surah_no: 7, nilai: 'Mumtaz', catatan: 'Tajwid sangat baik', waktu: '2026-04-14T01:15:00Z', ayat_start: 1, ayat_end: 30 },
-    { id: 2002, santri_id: 1002, surah_no: 5, nilai: 'Jayyid Jiddan', catatan: 'Perbaiki panjang mad', waktu: '2026-04-14T01:45:00Z', ayat_start: 1, ayat_end: 20 },
-    { id: 2003, santri_id: 1003, surah_no: 3, nilai: 'Jayyid', catatan: 'Waqaf perlu diperhatikan', waktu: '2026-04-13T02:00:00Z', ayat_start: 1, ayat_end: 15 },
-    { id: 2004, santri_id: 1004, surah_no: 68, nilai: 'Mumtaz', catatan: 'Hafalan kuat dan fasih', waktu: '2026-04-13T02:30:00Z', ayat_start: 1, ayat_end: 6 },
-    { id: 2005, santri_id: 1005, surah_no: 66, nilai: 'Jayyid Jiddan', catatan: '', waktu: '2026-04-12T03:00:00Z', ayat_start: 1, ayat_end: 4 },
-    { id: 2006, santri_id: 1006, surah_no: 53, nilai: 'Maqbul', catatan: 'Masih perlu latihan', waktu: '2026-04-12T03:30:00Z', ayat_start: 1, ayat_end: 8 },
-    { id: 2007, santri_id: 1001, surah_no: 6, nilai: 'Jayyid Jiddan', catatan: '', waktu: '2026-04-10T01:00:00Z', ayat_start: 1, ayat_end: 15 },
-    { id: 2008, santri_id: 1002, surah_no: 4, nilai: 'Mumtaz', catatan: 'Sangat memuaskan', waktu: '2026-04-10T01:30:00Z', ayat_start: 1, ayat_end: 17 },
-  ],
-}

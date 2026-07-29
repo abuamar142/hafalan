@@ -7,7 +7,6 @@ import {
   getPct,
   getPctFromCount,
   getTotalHafal,
-  getJuzSurahs,
   getJuzSurahsFromHafalan,
   getJuzSelesaiFromHafalan,
   getSurahNama,
@@ -17,7 +16,6 @@ import {
   formatWaktu,
 } from '@/lib/helpers'
 import { ALL_SURAHS } from '@/lib/constants'
-import type { SantriWithCount } from '@/lib/types'
 
 export default function LaporanPage() {
   const { state } = useDashboard()

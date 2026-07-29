@@ -139,11 +139,6 @@ export function useAppState() {
     [state.memorization],
   )
 
-  const getStudentSubmissionCount = useCallback(
-    (studentId: number) => state.submissions.filter((s) => s.santri_id === studentId).length,
-    [state.submissions],
-  )
-
   // ── Mutations ──
 
   const addStudent = useCallback(
@@ -170,19 +165,6 @@ export function useAppState() {
     [supabase, state.students.length, fetchAll],
   )
 
-  const deleteStudent = useCallback(
-    async (id: number) => {
-      // Delete related memorization and submissions first
-      await Promise.all([
-        supabase.from('memorization').delete().eq('student_id', id),
-        supabase.from('submissions').delete().eq('student_id', id),
-        supabase.from('students').delete().eq('id', id),
-      ])
-      await fetchAll()
-    },
-    [supabase, fetchAll],
-  )
-
   const updateGuru = useCallback(
     async (guruName: string) => {
       const {
@@ -207,9 +189,7 @@ export function useAppState() {
     refreshAll: fetchAll,
     getStudent,
     getStudentMemorization,
-    getStudentSubmissionCount,
     addStudent,
-    deleteStudent,
     updateGuru,
   }
 }

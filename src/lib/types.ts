@@ -62,49 +62,4 @@ export interface SetoranItem {
   guru_nama: string
 }
 
-export interface ProfileSantri extends Student {
-  hafalan: Record<number, number>
-  setoran: {
-    id: number
-    surah_no: number
-    nilai: string
-    catatan: string
-    waktu: string
-    ayat_start: number | null
-    ayat_end: number | null
-  }[]
-}
 
-export interface AppState {
-  lembaga: string
-  guru: string
-  santri: SantriWithCount[]
-  setoran: SetoranItem[]
-}
-
-export interface DemoSantri {
-  id: number
-  nama: string
-  kelas: string
-  usia: string
-  color: string
-  hafalan: Record<number, number>
-}
-
-export interface DemoSetoran {
-  id: number
-  santri_id: number
-  surah_no: number
-  nilai: string
-  catatan: string
-  waktu: string
-  ayat_start: number
-  ayat_end: number
-}
-
-export interface DemoState {
-  lembaga: string
-  guru: string
-  santri: DemoSantri[]
-  setoran: DemoSetoran[]
-}

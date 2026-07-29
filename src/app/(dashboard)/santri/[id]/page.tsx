@@ -14,7 +14,6 @@ import {
   initials,
   formatWaktu,
 } from '@/lib/helpers'
-import { ALL_SURAHS } from '@/lib/constants'
 import type { Memorization, SetoranItem } from '@/lib/types'
 
 export default function ProfilPage({

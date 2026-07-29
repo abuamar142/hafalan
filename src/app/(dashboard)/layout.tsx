@@ -12,12 +12,10 @@ interface DashboardContextValue {
   refreshAll: () => Promise<void>
   getStudent: (id: number) => SantriWithCount | undefined
   getStudentMemorization: (id: number) => Memorization[]
-  getStudentSubmissionCount: (id: number) => number
   addStudent: (nama: string, kelas: string, usia: string) => Promise<void>
-  deleteStudent: (id: number) => Promise<void>
 }
 
-export const DashboardContext = createContext<DashboardContextValue | null>(null)
+const DashboardContext = createContext<DashboardContextValue | null>(null)
 
 export function useDashboard() {
   const ctx = useContext(DashboardContext)
@@ -52,9 +50,7 @@ export default function DashboardLayout({
         refreshAll: app.refreshAll,
         getStudent: app.getStudent,
         getStudentMemorization: app.getStudentMemorization,
-        getStudentSubmissionCount: app.getStudentSubmissionCount,
         addStudent: app.addStudent,
-        deleteStudent: app.deleteStudent,
       }}
     >
       <div className="flex min-h-screen bg-surface text-text">
