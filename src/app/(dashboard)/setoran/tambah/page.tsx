@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useDashboard } from '../../layout'
 import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
-import { createClient } from '@/lib/supabase/client'
+import { addSubmissionAction } from '@/lib/actions/submissions'
 
 function toLocalDatetimeString(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -69,24 +69,16 @@ export default function TambahSetoranPage() {
     setSuccess(false)
 
     try {
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const formData = new FormData()
+      formData.append('student_id', santriId)
+      formData.append('surah_no', surahNo)
+      formData.append('nilai', nilai)
+      formData.append('catatan', catatan.trim())
+      formData.append('waktu', new Date(waktu).toISOString())
+      formData.append('ayat_start', String(ayatStart))
+      formData.append('ayat_end', String(ayatEnd === '' ? ayatStart : ayatEnd))
 
-      const wDate = new Date(waktu)
-
-      await supabase.from('submissions').insert({
-        id: Date.now(),
-        student_id: Number(santriId),
-        surah_no: Number(surahNo),
-        nilai,
-        catatan: catatan.trim(),
-        waktu: wDate.toISOString(),
-        guru_id: user?.id || null,
-        ayat_start: ayatStart,
-        ayat_end: ayatEnd === '' ? ayatStart : ayatEnd,
-      })
+      await addSubmissionAction(formData)
 
       // Reset form
       setSantriId('')

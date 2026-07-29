@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useDashboard } from '../layout'
+import { addStudentAction } from '@/lib/actions/students'
 import SantriCard from '@/components/SantriCard'
 import Modal from '@/components/Modal'
 
 export default function SantriPage() {
-  const { state, addStudent } = useDashboard()
+  const { state } = useDashboard()
   const router = useRouter()
   const [addOpen, setAddOpen] = useState(false)
   const [nama, setNama] = useState('')
@@ -24,7 +25,11 @@ export default function SantriPage() {
     setSaving(true)
     setError('')
     try {
-      await addStudent(nama.trim(), kelas.trim(), usia.trim())
+      const formData = new FormData()
+      formData.append('nama', nama.trim())
+      formData.append('kelas', kelas.trim())
+      formData.append('usia', usia.trim())
+      await addStudentAction(formData)
       setNama('')
       setKelas('')
       setUsia('')

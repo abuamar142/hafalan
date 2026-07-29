@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useDashboard } from '../../layout'
-import { createClient } from '@/lib/supabase/client'
+import { toggleMemorizationAction } from '@/lib/actions/memorization'
+import { deleteStudentAction } from '@/lib/actions/students'
 import {
   getSurahNama,
   getJuzSurahs,
@@ -14,7 +15,7 @@ import {
   initials,
   formatWaktu,
 } from '@/lib/helpers'
-import type { Memorization, SetoranItem } from '@/lib/types'
+import { toggleSurahCycle } from '@/lib/domain/hafalan'
 
 export default function ProfilPage({
   params,
@@ -83,29 +84,10 @@ export default function ProfilPage({
     if (toggling || studentId == null) return
     setToggling(true)
     try {
-      const supabase = createClient()
       const current = hafalan[surahNo] || 0
-      const next = (current + 1) % 3
+      const next = toggleSurahCycle(current)
 
-      const { data: existing } = await supabase
-        .from('memorization')
-        .select('id')
-        .eq('student_id', studentId)
-        .eq('surah_no', surahNo)
-        .maybeSingle()
-
-      if (existing) {
-        await supabase
-          .from('memorization')
-          .update({ status: next })
-          .eq('id', existing.id)
-      } else {
-        await supabase.from('memorization').insert({
-          student_id: studentId,
-          surah_no: surahNo,
-          status: next,
-        })
-      }
+      await toggleMemorizationAction(studentId, surahNo, next)
 
       await refreshAll()
     } catch {
@@ -119,10 +101,7 @@ export default function ProfilPage({
     if (!student || studentId == null) return
     if (!confirm(`Hapus santri "${student.nama}"? Semua data terkait akan dihapus.`)) return
     try {
-      await (await import('@/lib/supabase/client')).createClient()
-        .from('students')
-        .delete()
-        .eq('id', studentId)
+      await deleteStudentAction(studentId)
       await refreshAll()
       router.push('/santri')
     } catch {

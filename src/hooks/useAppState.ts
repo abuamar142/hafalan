@@ -2,8 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { AVATAR_COLORS } from '@/lib/constants'
-import type { Student, Memorization, Submission, Settings, SantriWithCount, SetoranItem } from '@/lib/types'
+import { getStudents } from '@/lib/data/students'
+import { getMemorizationByStudentIds } from '@/lib/data/memorization'
+import { getSubmissions } from '@/lib/data/submissions'
+import { getSettings, getGuruNames } from '@/lib/data/settings'
+import type { Memorization, Settings, SantriWithCount, SetoranItem } from '@/lib/types'
+import { computeHafalCounts, computeStudentsWithCount } from '@/lib/domain/hafalan'
 
 interface AppState {
   students: SantriWithCount[]
@@ -14,8 +18,6 @@ interface AppState {
 }
 
 export function useAppState() {
-  const supabase = createClient()
-
   const [state, setState] = useState<AppState>({
     students: [],
     memorization: [],
@@ -29,6 +31,7 @@ export function useAppState() {
   const fetchAll = useCallback(async () => {
     setLoading(true)
     try {
+      const supabase = createClient()
       const {
         data: { user },
       } = await supabase.auth.getUser()
@@ -38,63 +41,25 @@ export function useAppState() {
         return
       }
 
-      const [studentsRes, settingsRes, submissionsRes] = await Promise.all([
-        supabase.from('students').select('*').eq('user_id', user.id),
-        supabase.from('settings').select('key, value, user_id').eq('user_id', user.id),
-        supabase
-          .from('submissions')
-          .select('*, students(nama)')
-          .order('id', { ascending: false })
-          .limit(999),
+      // 1. Fetch students, settings, submissions in parallel
+      const [students, settings, subsRaw] = await Promise.all([
+        getStudents(),
+        getSettings(),
+        getSubmissions(),
       ])
 
-      const students = (studentsRes.data ?? []) as Student[]
-      const settings = (settingsRes.data ?? []) as Settings[]
-
-      // Fetch memorization for all students
+      // 2. Fetch memorization for all students to compute hafal counts
       const studentIds = students.map((s) => s.id)
-      let memorization: Memorization[] = []
-      if (studentIds.length > 0) {
-        const { data: memos } = await supabase
-          .from('memorization')
-          .select('student_id, surah_no, status')
-          .in('student_id', studentIds)
-        memorization = (memos ?? []) as Memorization[]
-      }
+      const memorization = await getMemorizationByStudentIds(studentIds)
 
       // Compute hafal_count per student
-      const hafalCounts: Record<number, number> = {}
-      for (const m of memorization) {
-        if (m.status === 1) {
-          hafalCounts[m.student_id] = (hafalCounts[m.student_id] || 0) + 1
-        }
-      }
+      const hafalCounts = computeHafalCounts(memorization)
+      const studentsWithCount = computeStudentsWithCount(students, hafalCounts)
 
-      const studentsWithCount: SantriWithCount[] = students.map((s) => ({
-        ...s,
-        hafal_count: hafalCounts[s.id] || 0,
-      }))
+      // 3. Resolve guru names from settings
+      const guruNamesMap = await getGuruNames()
 
-      // Parse submissions
-      const subsRaw = (submissionsRes.data ?? []) as Array<
-        Submission & { students?: { nama: string } | null }
-      >
-
-      // Build guru names map from settings (user_id -> guru name)
-      // We need to fetch all guru settings for all users to resolve guru_names
-      const guruIds = [...new Set(subsRaw.map((s) => s.guru_id).filter(Boolean))] as string[]
-      const guruNamesMap: Record<string, string> = {}
-      if (guruIds.length > 0) {
-        const { data: guruSettings } = await supabase
-          .from('settings')
-          .select('value, user_id')
-          .eq('key', 'guru')
-          .in('user_id', guruIds)
-        for (const gs of guruSettings ?? []) {
-          guruNamesMap[gs.user_id] = gs.value
-        }
-      }
-
+      // 4. Build submissions
       const submissions: SetoranItem[] = subsRaw.map((s) => ({
         id: s.id,
         santri_id: s.student_id,
@@ -109,7 +74,7 @@ export function useAppState() {
         guru_nama: s.guru_id ? (guruNamesMap[s.guru_id] || 'Ustadz') : 'Ustadz',
       }))
 
-      // Parse settings
+      // 5. Parse current user's guru setting
       let guru = ''
       for (const r of settings) {
         if (r.key === 'guru') guru = r.value
@@ -121,7 +86,7 @@ export function useAppState() {
     } finally {
       setLoading(false)
     }
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     fetchAll()
@@ -139,57 +104,11 @@ export function useAppState() {
     [state.memorization],
   )
 
-  // ── Mutations ──
-
-  const addStudent = useCallback(
-    async (nama: string, kelas: string, usia: string) => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const newId = Date.now()
-      const colorIndex = state.students.length % AVATAR_COLORS.length
-
-      await supabase.from('students').insert({
-        id: newId,
-        user_id: user.id,
-        nama,
-        kelas,
-        usia,
-        color: AVATAR_COLORS[colorIndex],
-      })
-
-      await fetchAll()
-    },
-    [supabase, state.students.length, fetchAll],
-  )
-
-  const updateGuru = useCallback(
-    async (guruName: string) => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      await supabase.from('settings').upsert({
-        key: 'guru',
-        value: guruName,
-        user_id: user.id,
-      })
-
-      setState((prev) => ({ ...prev, guru: guruName }))
-    },
-    [supabase],
-  )
-
   return {
     state,
     loading,
     refreshAll: fetchAll,
     getStudent,
     getStudentMemorization,
-    addStudent,
-    updateGuru,
   }
 }

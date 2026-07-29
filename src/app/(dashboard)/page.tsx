@@ -2,34 +2,24 @@
 
 import { useDashboard } from './layout'
 import { getPct, getTotalHafal } from '@/lib/helpers'
+import { computeRanking, computeDashboardStats } from '@/lib/domain/statistics'
 
 export default function DashboardPage() {
   const { state } = useDashboard()
 
-  const sorted = [...state.students].sort(
-    (a, b) => getPct(b) - getPct(a)
-  )
-
-  const totalHafal = state.students.reduce(
-    (sum, s) => sum + getTotalHafal(s),
-    0
-  )
-
-  const avgHafal =
-    state.students.length > 0
-      ? Math.round(totalHafal / state.students.length)
-      : 0
+  const sorted = computeRanking(state.students)
+  const stats = computeDashboardStats(state.students)
 
   return (
     <>
       {/* Stats Row */}
       <div className="mb-4 grid grid-cols-3 gap-3">
         <div className="rounded-xl bg-card p-3 border border-border text-center">
-          <div className="text-xl font-bold text-text">{state.students.length}</div>
+          <div className="text-xl font-bold text-text">{stats.totalStudents}</div>
           <div className="mt-0.5 text-[11px] text-text-secondary">Total Santri</div>
         </div>
         <div className="rounded-xl bg-card p-3 border border-border text-center">
-          <div className="text-xl font-bold text-text">{avgHafal}</div>
+          <div className="text-xl font-bold text-text">{stats.averageHafal}</div>
           <div className="mt-0.5 text-[11px] text-text-secondary">Rata-rata Hafal</div>
         </div>
         <div className="rounded-xl bg-card p-3 border border-border text-center">

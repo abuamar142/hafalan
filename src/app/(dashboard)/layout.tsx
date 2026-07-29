@@ -4,6 +4,7 @@ import { createContext, useContext, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
 import Modal from '@/components/Modal'
 import { useAppState } from '@/hooks/useAppState'
+import { updateGuruAction } from '@/lib/actions/settings'
 import type { SantriWithCount, Memorization } from '@/lib/types'
 
 interface DashboardContextValue {
@@ -12,7 +13,6 @@ interface DashboardContextValue {
   refreshAll: () => Promise<void>
   getStudent: (id: number) => SantriWithCount | undefined
   getStudentMemorization: (id: number) => Memorization[]
-  addStudent: (nama: string, kelas: string, usia: string) => Promise<void>
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null)
@@ -38,7 +38,7 @@ export default function DashboardLayout({
   }
 
   async function handleSaveGuru() {
-    await app.updateGuru(guruInput.trim())
+    await updateGuruAction(guruInput.trim())
     setSettingsOpen(false)
   }
 
@@ -50,7 +50,6 @@ export default function DashboardLayout({
         refreshAll: app.refreshAll,
         getStudent: app.getStudent,
         getStudentMemorization: app.getStudentMemorization,
-        addStudent: app.addStudent,
       }}
     >
       <div className="flex min-h-screen bg-surface text-text">
