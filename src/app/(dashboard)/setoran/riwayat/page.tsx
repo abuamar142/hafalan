@@ -139,53 +139,56 @@ export default function RiwayatSetoranPage() {
         </div>
       )}
 
-      {pageItems.map((item) => (
-        <div
-          key={item.id}
-          className="rounded-md bg-card p-3.5 border border-border mb-2"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-            {/* Kiri: nama, hafalan, catatan */}
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-medium text-text truncate">
-                {item.santri_nama}
-              </div>
-              <div className="text-[13px] text-text-secondary">
-                {getSurahNama(item.surah_no)}
-                {item.ayat_start != null && item.ayat_end != null && (
-                  <span className="text-text-muted">
-                    {' '}
-                    : {item.ayat_start}
-                    {item.ayat_end !== item.ayat_start
-                      ? `\u2013${item.ayat_end}`
-                      : ''}
-                  </span>
+      {pageItems.map((item) => {
+        const { tanggal, jam } = formatWaktu(item.waktu)
+        return (
+          <div
+            key={item.id}
+            className="rounded-md bg-card p-3.5 border border-border mb-2"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              {/* Kiri: nama, hafalan, catatan */}
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-medium text-text truncate">
+                  {item.santri_nama}
+                </div>
+                <div className="text-[13px] text-text-secondary">
+                  {getSurahNama(item.surah_no)}
+                  {item.ayat_start != null && item.ayat_end != null && (
+                    <span className="text-text-muted">
+                      {' '}
+                      : {item.ayat_start}
+                      {item.ayat_end !== item.ayat_start
+                        ? `\u2013${item.ayat_end}`
+                        : ''}
+                    </span>
+                  )}
+                </div>
+                {item.catatan && (
+                  <div className="mt-1.5 text-[12px] text-text-muted leading-relaxed">
+                    {item.catatan}
+                  </div>
                 )}
               </div>
-              {item.catatan && (
-                <div className="mt-1.5 text-[12px] text-text-muted leading-relaxed">
-                  {item.catatan}
-                </div>
-              )}
-            </div>
 
-            {/* Kanan: nilai, ustadz, tanggal */}
-            <div className="mt-2 flex flex-row items-center gap-3 sm:mt-0 sm:flex-col sm:items-end sm:gap-1">
-              <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-[12px] font-medium text-primary">
-                {item.nilai}
-              </span>
-              {item.guru_nama && (
-                <div className="text-[12px] text-text-secondary whitespace-nowrap">
-                  {item.guru_nama}
+              {/* Kanan: nilai, ustadz, tanggal */}
+              <div className="mt-2 flex flex-row items-center gap-3 sm:mt-0 sm:flex-col sm:items-end sm:gap-1">
+                <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-[12px] font-medium text-primary">
+                  {item.nilai}
+                </span>
+                {item.guru_nama && (
+                  <div className="text-[12px] text-text-secondary whitespace-nowrap">
+                    {item.guru_nama}
+                  </div>
+                )}
+                <div className="text-[12px] text-text-muted whitespace-nowrap">
+                  {tanggal} &middot; {jam}
                 </div>
-              )}
-              <div className="text-[12px] text-text-muted whitespace-nowrap">
-                {formatWaktu(item.waktu).tanggal} &middot; {formatWaktu(item.waktu).jam}
               </div>
             </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
 
       {/* Pagination */}
       {totalPages > 1 && (
