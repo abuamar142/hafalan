@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quran Tracker — Database Migration Runner
+# Hafalan — Database Migration Runner
 # Usage: ./supabase/migrate.sh
 #
 # Runs all unapplied migrations from supabase/migrations/ in order.

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: 'Hafalan — SMA Islam Bunga Bangsa',
     description: 'Catat hafalan & setoran santri',
     url: 'https://hafalan.abuamar.online',
-    siteName: 'Quran Tracker',
+    siteName: 'Hafalan',
     locale: 'id_ID',
     type: 'website',
   },

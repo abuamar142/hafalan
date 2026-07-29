@@ -53,7 +53,7 @@ export default function LoginPage() {
             className="w-20 h-20 rounded-lg object-cover mx-auto mb-4 shadow-sm ring-1 ring-border"
           />
           <h1 className="text-2xl font-bold text-text mb-1 tracking-tight">
-            Quran Tracker
+            Hafalan
           </h1>
           <p className="text-sm font-medium text-text-secondary">
             SMA Islam Bunga Bangsa

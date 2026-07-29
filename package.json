@@ -1,7 +1,7 @@
 {
   "name": "hafalan",
   "version": "4.0.0",
-  "description": "Hafalan Quran Tracker — catat hafalan & setoran santri",
+  "description": "Hafalan Hafalan — catat hafalan & setoran santri",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

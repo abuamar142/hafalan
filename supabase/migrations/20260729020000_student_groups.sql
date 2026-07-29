@@ -1,5 +1,5 @@
 -- ============================================================
--- Quran Tracker — Migration: Student Groups (Kelompok) Management
+-- Hafalan — Migration: Student Groups (Kelompok) Management
 -- Run this in Supabase SQL Editor
 -- ============================================================
 

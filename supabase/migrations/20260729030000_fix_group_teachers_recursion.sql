@@ -1,5 +1,5 @@
 -- ============================================================
--- Quran Tracker — Migration: Fix group_teachers RLS recursion
+-- Hafalan — Migration: Fix group_teachers RLS recursion
 -- ============================================================
 
 -- Drop the recursive select policy

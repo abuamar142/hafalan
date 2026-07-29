@@ -71,7 +71,7 @@ export default function RegisterPage() {
             Daftar Akun
           </h1>
           <p className="text-sm font-medium text-text-secondary">
-            Quran Tracker SMA Islam Bunga Bangsa
+            Hafalan SMA Islam Bunga Bangsa
           </p>
         </div>
 
