@@ -50,7 +50,7 @@ export default function LoginPage() {
             alt="Logo Hafalan"
             width={80}
             height={80}
-            className="w-20 h-20 rounded-2xl object-cover mx-auto mb-4 shadow-sm ring-1 ring-border"
+            className="w-20 h-20 rounded-lg object-cover mx-auto mb-4 shadow-sm ring-1 ring-border"
           />
           <h1 className="text-2xl font-bold text-text mb-1 tracking-tight">
             Quran Tracker

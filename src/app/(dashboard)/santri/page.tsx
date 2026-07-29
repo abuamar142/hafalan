@@ -433,7 +433,7 @@ export default function SantriPage() {
         {selectedStudent && (
           <div className="space-y-6">
             {/* Header info */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-background p-4 rounded-xl border border-border/50">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-background p-4 rounded-lg border border-border/50">
               <div className="min-w-0 text-center sm:text-left">
                 <h4 className="text-lg font-bold text-text">{selectedStudent.nama}</h4>
                 <div className="text-xs text-text-muted mt-1 font-medium flex flex-wrap justify-center sm:justify-start items-center gap-1.5">

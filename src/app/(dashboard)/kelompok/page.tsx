@@ -377,7 +377,7 @@ export default function KelompokPage() {
       <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Detail Kelompok">
         {selectedGroup && (
           <div className="space-y-4">
-            <div className="bg-background rounded-xl p-4 border border-border space-y-3">
+            <div className="bg-background rounded-lg p-4 border border-border space-y-3">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Nama Kelompok</label>
                 <div className="text-base font-bold text-text mt-0.5">{selectedGroup.name}</div>

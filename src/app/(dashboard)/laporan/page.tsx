@@ -132,7 +132,7 @@ export default function LaporanPage() {
         <Card className="border-border/40 shadow-sm flex flex-col">
           <CardHeader className="pb-4 border-b border-border/30">
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
+              <div className="bg-primary/10 p-2.5 rounded-lg text-primary">
                 <Users className="w-5 h-5" />
               </div>
               <div>
@@ -160,7 +160,7 @@ export default function LaporanPage() {
         <Card className="border-border/40 shadow-sm flex flex-col">
           <CardHeader className="pb-4 border-b border-border/30">
             <div className="flex items-center gap-3">
-              <div className="bg-accent/10 p-2.5 rounded-xl text-accent">
+              <div className="bg-accent/10 p-2.5 rounded-lg text-accent">
                 <User className="w-5 h-5" />
               </div>
               <div>

@@ -23,7 +23,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-border/30 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Users className="w-6 h-6" />
             </div>
             <div>
@@ -35,7 +35,7 @@ export default function DashboardPage() {
 
         <Card className="border-border/30 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
               <TrendingUp className="w-6 h-6" />
             </div>
             <div>
@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
         <Card className="border-border/30 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-purple/10 text-purple">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-purple/10 text-purple">
               <BookOpen className="w-6 h-6" />
             </div>
             <div>

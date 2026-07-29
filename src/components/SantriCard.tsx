@@ -22,7 +22,7 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
         <CardContent className="p-4 flex items-center gap-4">
           {/* Avatar */}
           <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-sm font-semibold text-white shadow-sm ring-1 ring-black/5"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-sm font-semibold text-white shadow-sm ring-1 ring-black/5"
             style={{ backgroundColor: color }}
           >
             {initials(student.nama)}

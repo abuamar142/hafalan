@@ -115,7 +115,7 @@ export default function ProfilPage({
   // Not found
   if (studentId != null && !student) {
     return (
-      <div className="py-16 text-center text-sm text-text-muted border border-border/50 rounded-xl bg-surface border-dashed">
+      <div className="py-16 text-center text-sm text-text-muted border border-border/50 rounded-lg bg-surface border-dashed">
         Santri tidak ditemukan
       </div>
     )
@@ -156,7 +156,7 @@ export default function ProfilPage({
         <CardContent className="p-6 pt-0 sm:flex sm:items-end sm:justify-between">
           <div className="flex flex-col sm:flex-row gap-5 -mt-8 sm:-mt-10 mb-6 sm:mb-0 items-center sm:items-end">
             <div
-              className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl text-3xl font-semibold text-white shadow-md ring-4 ring-surface"
+              className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl text-3xl font-semibold text-white shadow-md ring-4 ring-surface"
               style={{ backgroundColor: avatarColor }}
             >
               {initials(student.nama)}
@@ -174,15 +174,15 @@ export default function ProfilPage({
 
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3 w-full sm:w-auto">
-            <div className="rounded-xl bg-background p-3 text-center border border-border/50 shadow-sm">
+            <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
               <div className="text-xl font-bold text-text">{hafalCount}</div>
               <div className="text-[11px] font-medium text-text-muted uppercase tracking-wider mt-0.5">Surah</div>
             </div>
-            <div className="rounded-xl bg-background p-3 text-center border border-border/50 shadow-sm">
+            <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
               <div className="text-xl font-bold text-text">{juzSelesai}</div>
               <div className="text-[11px] font-medium text-text-muted uppercase tracking-wider mt-0.5">Juz Selesai</div>
             </div>
-            <div className="rounded-xl bg-background p-3 text-center border border-border/50 shadow-sm">
+            <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
               <div className="text-xl font-bold text-primary">{pct}%</div>
               <div className="text-[11px] font-medium text-text-muted uppercase tracking-wider mt-0.5">Progress</div>
             </div>
@@ -224,10 +224,10 @@ export default function ProfilPage({
                     key={s.no}
                     onClick={() => toggleSurah(s.no)}
                     disabled={toggling}
-                    className="group flex w-full items-center gap-4 rounded-xl p-3 text-left transition-all hover:bg-card border border-transparent hover:border-border/50 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    className="group flex w-full items-center gap-4 rounded-md p-3 text-left transition-all hover:bg-card border border-transparent hover:border-border/50 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
                     {/* Status Toggle */}
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
                       status === 1 ? 'bg-primary/10 text-primary border border-primary/20' : 
                       status === 2 ? 'bg-accent/10 text-accent border border-accent/20' : 
                       'bg-background text-text-muted border border-border group-hover:border-border-hover'
@@ -301,7 +301,7 @@ export default function ProfilPage({
             <h3 className="text-lg font-bold text-text mb-4">Riwayat Setoran</h3>
             
             {studentSubmissions.length === 0 ? (
-              <div className="py-10 text-center text-sm text-text-muted border border-border/50 rounded-xl bg-surface border-dashed">
+              <div className="py-10 text-center text-sm text-text-muted border border-border/50 rounded-lg bg-surface border-dashed">
                 Belum ada setoran
               </div>
             ) : (

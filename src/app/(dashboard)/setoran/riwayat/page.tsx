@@ -136,7 +136,7 @@ export default function RiwayatSetoranPage() {
       {filtered.map((item) => (
         <div
           key={item.id}
-          className="rounded-xl bg-card p-3.5 border border-border mb-2"
+          className="rounded-md bg-card p-3.5 border border-border mb-2"
         >
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             {/* Kiri: nama, hafalan, catatan */}
