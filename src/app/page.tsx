@@ -71,7 +71,7 @@ export default async function LandingPage() {
         </div>
 
         {/* Wizard Card Wrapper */}
-        <div className="w-full max-w-md mx-auto">
+        <div className="w-full max-w-4xl mx-auto">
           <ParentSearchWizard classes={classes} />
         </div>
 
