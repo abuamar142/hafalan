@@ -5,12 +5,21 @@ import { useDashboard } from '../../layout'
 import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
 
+const PAGE_SIZE = 20
+
 export default function RiwayatSetoranPage() {
   const { state } = useDashboard()
   const [search, setSearch] = useState('')
   const [kelasFilter, setKelasFilter] = useState('')
   const [kelompokFilter, setKelompokFilter] = useState('')
   const [guruFilter, setGuruFilter] = useState('')
+  const [page, setPage] = useState(1)
+
+  // Reset to page 1 when filters change
+  function applyKelasFilter(val: string) { setKelasFilter(val); setKelompokFilter(''); setPage(1) }
+  function applyKelompokFilter(val: string) { setKelompokFilter(val); setPage(1) }
+  function applyGuruFilter(val: string) { setGuruFilter(val); setPage(1) }
+  function applySearch(val: string) { setSearch(val); setPage(1) }
 
   // Map santri_id -> { group_id, group_name, class_name }
   const studentLookup = useMemo(() => {
@@ -45,7 +54,6 @@ export default function RiwayatSetoranPage() {
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim()
     return state.submissions.filter((item: SetoranItem) => {
-      // Search filter
       if (q) {
         const surahName = getSurahNama(item.surah_no).toLowerCase()
         const match =
@@ -53,23 +61,23 @@ export default function RiwayatSetoranPage() {
           surahName.includes(q)
         if (!match) return false
       }
-      // Kelas filter
       if (kelasFilter) {
         const info = studentLookup[item.santri_id]
         if (!info || info.class_name !== kelasFilter) return false
       }
-      // Kelompok filter
       if (kelompokFilter) {
         const info = studentLookup[item.santri_id]
         if (!info || info.group_name !== kelompokFilter) return false
       }
-      // Guru filter
-      if (guruFilter && item.guru_nama !== guruFilter) {
-        return false
-      }
+      if (guruFilter && item.guru_nama !== guruFilter) return false
       return true
     })
   }, [state.submissions, search, kelasFilter, kelompokFilter, guruFilter, studentLookup])
+
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const safePage = Math.min(page, Math.max(totalPages, 1))
+  const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
   return (
     <>
@@ -81,16 +89,13 @@ export default function RiwayatSetoranPage() {
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => applySearch(e.target.value)}
           placeholder="Cari nama santri atau surah..."
           className="min-w-0 flex-[2] rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
         />
         <select
           value={kelasFilter}
-          onChange={(e) => {
-            setKelasFilter(e.target.value)
-            setKelompokFilter('') // reset kelompok when kelas changes
-          }}
+          onChange={(e) => applyKelasFilter(e.target.value)}
           className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-44"
         >
           <option value="">Semua Kelas</option>
@@ -102,7 +107,7 @@ export default function RiwayatSetoranPage() {
         </select>
         <select
           value={kelompokFilter}
-          onChange={(e) => setKelompokFilter(e.target.value)}
+          onChange={(e) => applyKelompokFilter(e.target.value)}
           className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-44"
         >
           <option value="">Semua Kelompok</option>
@@ -114,7 +119,7 @@ export default function RiwayatSetoranPage() {
         </select>
         <select
           value={guruFilter}
-          onChange={(e) => setGuruFilter(e.target.value)}
+          onChange={(e) => applyGuruFilter(e.target.value)}
           className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary sm:w-40"
         >
           <option value="">Semua Guru</option>
@@ -133,7 +138,7 @@ export default function RiwayatSetoranPage() {
         </div>
       )}
 
-      {filtered.map((item) => (
+      {pageItems.map((item) => (
         <div
           key={item.id}
           className="rounded-md bg-card p-3.5 border border-border mb-2"
@@ -180,6 +185,39 @@ export default function RiwayatSetoranPage() {
           </div>
         </div>
       ))}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-2">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={safePage <= 1}
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-border disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Sebelumnya
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`min-w-[32px] rounded-md px-2 py-1.5 text-[13px] transition-colors ${
+                p === safePage
+                  ? 'bg-primary text-white'
+                  : 'text-text-secondary hover:bg-border'
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={safePage >= totalPages}
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-border disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Selanjutnya
+          </button>
+        </div>
+      )}
     </>
   )
 }

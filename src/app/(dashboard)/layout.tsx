@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Sidebar from '@/components/Sidebar'
 import Modal from '@/components/Modal'
 import { useAppState } from '@/hooks/useAppState'
@@ -23,6 +24,10 @@ export function useDashboard() {
   return ctx
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
+})
+
 export default function DashboardLayout({
   children,
 }: {
@@ -43,6 +48,7 @@ export default function DashboardLayout({
   }
 
   return (
+    <QueryClientProvider client={queryClient}>
     <DashboardContext.Provider
       value={{
         state: app.state,
@@ -103,5 +109,6 @@ export default function DashboardLayout({
         </div>
       </Modal>
     </DashboardContext.Provider>
+    </QueryClientProvider>
   )
 }
