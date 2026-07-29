@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 import {
   LayoutDashboard,
-  Users,
   CheckSquare,
   FileBarChart,
   Settings,
@@ -134,7 +133,8 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
                           next.delete(item.label)
                           return next
                         })
-                        navigateTo(item.children![0].href)
+                        const firstChild = item.children?.[0]
+                        if (firstChild) navigateTo(firstChild.href)
                       }
                       setExpandedMenu(isExpanded ? null : item.label)
                     } else {

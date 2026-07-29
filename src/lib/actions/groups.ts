@@ -13,7 +13,7 @@ export async function createGroupAction(formData: FormData) {
   } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('groups')
     .insert({ name })
     .select('id')

@@ -15,7 +15,6 @@ import {
 } from '@/lib/domain/reports'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
 import { FileText, Printer, Users, User } from 'lucide-react'
 
 export default function LaporanPage() {

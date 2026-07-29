@@ -6,7 +6,6 @@ import { addStudentAction, deleteStudentAction, updateStudentAction } from '@/li
 import { toggleMemorizationAction } from '@/lib/actions/memorization'
 import {
   getPct,
-  getTotalHafal,
   getJuzSurahs,
   getJuzSurahsFromHafalan,
   getJuzSelesaiFromHafalan,
@@ -575,7 +574,7 @@ export default function SantriPage() {
                     <div className="grid grid-cols-5 gap-2">
                       {[...Array(30)].map((_, i) => {
                         const j = i + 1
-                        const p = juzPcts[i]
+                         const p = juzPcts[i] ?? 0
                         return (
                           <button
                             key={j}

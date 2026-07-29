@@ -34,7 +34,7 @@ export default function ProfilPage({
 
   const [studentId, setStudentId] = useState<number | null>(null)
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
-  const [toggling, setToggling] = useState(false)
+  const [toggling] = useState(false)
 
   // Unwrap async params
   useEffect(() => {
@@ -96,9 +96,10 @@ export default function ProfilPage({
     queryClient.setQueryData<Memorization[]>(QK.memorization, (old) => {
       if (!old) return old
       const idx = old.findIndex((m) => m.student_id === studentId && m.surah_no === surahNo)
-      if (idx >= 0) {
+      const existing = old[idx]
+      if (idx >= 0 && existing) {
         const updated = [...old]
-        updated[idx] = { ...updated[idx], status: next }
+        updated[idx] = { ...existing, status: next }
         return updated
       }
       return [...old, { student_id: studentId, surah_no: surahNo, status: next } as Memorization]
@@ -282,7 +283,7 @@ export default function ProfilPage({
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
               {[...Array(30)].map((_, i) => {
                 const j = i + 1
-                const p = juzPcts[i]
+                const p = juzPcts[i] ?? 0
                 return (
                   <button
                     key={j}
