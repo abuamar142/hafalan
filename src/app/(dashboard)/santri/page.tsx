@@ -203,8 +203,9 @@ export default function SantriPage() {
       const next = toggleSurahCycle(current)
       await toggleMemorizationAction(selectedStudent.id, surahNo, next)
       await refreshStudents()
-    } catch {
-      // silently ignore
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      alert('Gagal memperbarui status hafalan: ' + msg)
     } finally {
       setToggling(false)
     }

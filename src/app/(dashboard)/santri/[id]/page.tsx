@@ -108,9 +108,11 @@ export default function ProfilPage({
     try {
       await toggleMemorizationAction(studentId, surahNo, next)
       await refreshMemorization()
-    } catch {
+    } catch (e: unknown) {
       // Rollback on error
       queryClient.setQueryData(QK.memorization, prev)
+      const msg = e instanceof Error ? e.message : String(e)
+      alert('Gagal memperbarui status hafalan: ' + msg)
     }
   }
 
@@ -121,8 +123,9 @@ export default function ProfilPage({
       await deleteStudentAction(studentId)
       await refreshStudents()
       router.push('/santri')
-    } catch {
-      // silently ignore
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      alert('Gagal menghapus data santri: ' + msg)
     }
   }
 
