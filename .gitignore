@@ -7,3 +7,4 @@ data/
 .serena/
 .next/
 out/
+*.tsbuildinfo
