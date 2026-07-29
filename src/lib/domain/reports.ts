@@ -2,7 +2,6 @@ import { ALL_SURAHS } from '../constants'
 import {
   getPct,
   getPctFromCount,
-  getTotalHafal,
   getJuzSurahsFromHafalan,
   getJuzSelesaiFromHafalan,
   getSurahNama,
@@ -12,15 +11,9 @@ import {
   formatWaktu,
 } from '../helpers'
 import type { SantriWithCount, SetoranItem } from '../types'
+import { computeReportStats } from './statistics'
 
 // ── Types ──
-
-export interface ReportStats {
-  totalStudents: number
-  totalHafal: number
-  averageHafal: number
-  averagePct: number
-}
 
 interface ReportStudent {
   id: number
@@ -29,44 +22,6 @@ interface ReportStudent {
   usia?: string
   color?: string
   hafal_count: number
-}
-
-interface Submission {
-  id: number
-  santri_id: number
-  santri_nama: string
-  surah_no: number
-  nilai: string
-  catatan: string
-  waktu: string
-  ayat_start: number | null
-  ayat_end: number | null
-}
-
-// ── Statistics ──
-
-/**
- * Compute report-level aggregate statistics.
- */
-function computeReportStats(
-  studentsWithCount: SantriWithCount[],
-): ReportStats {
-  const totalStudents = studentsWithCount.length
-  const totalHafal = studentsWithCount.reduce(
-    (sum, s) => sum + getTotalHafal(s),
-    0,
-  )
-  const averageHafal =
-    totalStudents > 0 ? Math.round(totalHafal / totalStudents) : 0
-  const averagePct =
-    totalStudents > 0
-      ? Math.round(
-          studentsWithCount.reduce((sum, s) => sum + getPct(s), 0) /
-            totalStudents,
-        )
-      : 0
-
-  return { totalStudents, totalHafal, averageHafal, averagePct }
 }
 
 // ── Collective Report ──
@@ -212,7 +167,7 @@ export interface IndividualReportInput {
   student: ReportStudent
   /** surah_no → status */
   hafalan: Record<number, number>
-  submissions: Submission[]
+  submissions: SetoranItem[]
   guruName: string
 }
 

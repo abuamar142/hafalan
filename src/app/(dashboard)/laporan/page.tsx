@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useDashboard } from '../layout'
 import { createClient } from '@/lib/supabase/client'
+import type { SetoranItem } from '@/lib/types'
 import {
   getStudentMemorization,
   getAllMemorizationMap,
@@ -100,7 +101,7 @@ export default function LaporanPage() {
 
       const { hafalan, submissions } = await fetchStudentData(sId)
 
-      const mappedSubmissions = submissions.map((s) => ({
+      const mappedSubmissions: SetoranItem[] = submissions.map((s) => ({
         id: s.id,
         santri_id: s.student_id,
         santri_nama: s.students?.nama || '',
@@ -110,6 +111,8 @@ export default function LaporanPage() {
         waktu: s.waktu,
         ayat_start: s.ayat_start ?? null,
         ayat_end: s.ayat_end ?? null,
+        guru_id: s.guru_id ?? null,
+        guru_nama: s.guru_name || '',
       }))
 
       const html = generateIndividualReport({
