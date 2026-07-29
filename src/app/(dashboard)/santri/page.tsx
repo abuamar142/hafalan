@@ -386,10 +386,11 @@ export default function SantriPage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Kelompok Halaqah <span className="text-red">*</span>
             </label>
             <select
+              id="add-group-select"
               value={groupId}
               onChange={(e) => setGroupId(e.target.value)}
               className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors text-text"
@@ -440,10 +441,11 @@ export default function SantriPage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Kelompok Halaqah <span className="text-red">*</span>
             </label>
             <select
+              id="edit-group-select"
               value={groupId}
               onChange={(e) => setGroupId(e.target.value)}
               className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors text-text"

@@ -41,15 +41,19 @@ export default function Modal({ open, onClose, title, children, className }: Mod
       }}
     >
       <div 
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
         className={cn(
           "relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[var(--radius-lg)] bg-surface p-6 shadow-xl border border-border/50 animate-in zoom-in-95 duration-200",
           className
         )}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold tracking-tight text-text">{title}</h2>
+          <h2 id="modal-title" className="text-lg font-semibold tracking-tight text-text">{title}</h2>
           <button 
             onClick={onClose}
+            aria-label="Tutup"
             className="rounded-full p-1.5 text-text-muted hover:bg-card hover:text-text transition-colors"
           >
             <X className="w-5 h-5" />
