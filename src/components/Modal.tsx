@@ -53,8 +53,8 @@ export default function Modal({ open, onClose, title, children, className }: Mod
           <h2 id="modal-title" className="text-lg font-semibold tracking-tight text-text">{title}</h2>
           <button 
             onClick={onClose}
+            className="rounded-full p-2.5 text-text-muted hover:bg-card hover:text-text transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Tutup"
-            className="rounded-full p-1.5 text-text-muted hover:bg-card hover:text-text transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
