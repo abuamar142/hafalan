@@ -179,7 +179,7 @@ export default function ParentSearchWizard({ classes }: { classes: ClassData[] }
   }
 
   return (
-    <Card className="max-w-md w-full mx-auto border-border/40 shadow-2xl bg-surface/85 backdrop-blur-md overflow-hidden relative group">
+    <Card className="max-w-md w-full mx-auto border-border/40 shadow-2xl bg-surface/85 backdrop-blur-md overflow-hidden relative group hover:border-primary/30 hover:shadow-primary/5 transition-all duration-300">
       {/* Decorative Glow inside Card */}
       <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/15 transition-colors duration-500" />
       <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-accent/10 rounded-full blur-3xl pointer-events-none group-hover:bg-accent/15 transition-colors duration-500" />
@@ -211,7 +211,7 @@ export default function ParentSearchWizard({ classes }: { classes: ClassData[] }
         )}
 
         {/* Wizard Forms */}
-        <div className="min-h-[90px] flex items-center">
+        <div className="min-h-[90px] flex items-center" key={step}>
           {step === 1 && (
             <div className="w-full space-y-2 animate-in fade-in slide-in-from-right-3 duration-300">
               <label htmlFor="class-wizard-select" className="block text-xs font-semibold text-text-secondary uppercase tracking-wider">
