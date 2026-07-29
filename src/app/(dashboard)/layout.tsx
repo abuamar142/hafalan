@@ -52,14 +52,14 @@ export default function DashboardLayout({
         getStudentMemorization: app.getStudentMemorization,
       }}
     >
-      <div className="flex min-h-screen bg-surface text-text">
+      <div className="flex min-h-screen bg-background text-text">
         {/* Sidebar */}
         <Sidebar guru={app.state.guru} onOpenSettings={openSettings} />
 
         {/* Main content area */}
         <div className="flex min-h-screen flex-1 flex-col">
           {/* Spacer for mobile hamburger — content starts below it on small screens */}
-          <div className="h-12 md:hidden" />
+          <div className="h-14 md:hidden" />
 
           {/* Loading */}
           {app.loading && (
@@ -70,7 +70,7 @@ export default function DashboardLayout({
 
           {/* Content */}
           {!app.loading && (
-            <main className="flex-1 p-4 md:p-6">{children}</main>
+            <main className="flex-1 p-4 md:p-8 w-full max-w-6xl mx-auto">{children}</main>
           )}
         </div>
       </div>

@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/ui/Button'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -57,64 +60,41 @@ export default function RegisterPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1rem',
-        background: 'var(--color-surface)',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          background: 'var(--color-surface)',
-          borderRadius: 'var(--radius)',
-          border: '1px solid var(--color-border)',
-          padding: '2.5rem 2rem',
-        }}
-      >
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
+      {/* Decorative background blur */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-50"></div>
+      
+      <div className="w-full max-w-md bg-surface/80 backdrop-blur-xl rounded-[var(--radius-lg)] border border-border/50 p-10 shadow-xl bento-shadow relative z-10">
+        
         {/* Brand */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📖</div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
-            Hafalan
+        <div className="text-center mb-8">
+          <img
+            src="/images/logo.jpg"
+            alt="Logo Hafalan"
+            className="w-20 h-20 rounded-2xl object-cover mx-auto mb-4 shadow-sm ring-1 ring-border"
+          />
+          <h1 className="text-2xl font-bold text-text mb-1 tracking-tight">
+            Daftar Akun
           </h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', margin: '0.25rem 0 0' }}>
-            SMA Islam Bunga Bangsa
+          <p className="text-sm font-medium text-text-secondary">
+            Quran Tracker SMA Islam Bunga Bangsa
           </p>
         </div>
 
         {/* Error */}
         {error && (
-          <div
-            style={{
-              background: 'var(--color-red-light)',
-              color: 'var(--color-red)',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius)',
-              fontSize: '0.875rem',
-              marginBottom: '1.5rem',
-            }}
-          >
+          <div className="mb-6 rounded-md border-l-[3px] border-red bg-red/10 px-4 py-3 text-sm text-red font-medium">
             {error}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit}>
-          {/* Name */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label
-              htmlFor="name"
-              style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)', marginBottom: '0.375rem' }}
-            >
-              Nama Lengkap
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <label htmlFor="name" className="block text-sm font-medium text-text">
+              Nama Lengkap (Ustadz / Ustadzah)
             </label>
-            <input
+            <Input
               id="name"
               type="text"
               required
@@ -122,29 +102,15 @@ export default function RegisterPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nama lengkap"
-              style={{
-                width: '100%',
-                padding: '0.625rem 0.75rem',
-                borderRadius: 'var(--radius)',
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                color: 'var(--color-text)',
-                fontSize: '0.9375rem',
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
+              className="h-11"
             />
           </div>
 
-          {/* Email */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label
-              htmlFor="email"
-              style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)', marginBottom: '0.375rem' }}
-            >
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="block text-sm font-medium text-text">
               Email
             </label>
-            <input
+            <Input
               id="email"
               type="email"
               required
@@ -152,30 +118,16 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@contoh.com"
-              style={{
-                width: '100%',
-                padding: '0.625rem 0.75rem',
-                borderRadius: 'var(--radius)',
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                color: 'var(--color-text)',
-                fontSize: '0.9375rem',
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
+              className="h-11"
             />
           </div>
 
-          {/* Password */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label
-              htmlFor="password"
-              style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)', marginBottom: '0.375rem' }}
-            >
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="block text-sm font-medium text-text">
               Password
             </label>
-            <div style={{ position: 'relative' }}>
-              <input
+            <div className="relative">
+              <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 required
@@ -183,74 +135,39 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Minimal 6 karakter"
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 2.5rem 0.625rem 0.75rem',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--color-border)',
-                  background: 'var(--color-surface)',
-                  color: 'var(--color-text)',
-                  fontSize: '0.9375rem',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
+                className="h-11 pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                style={{
-                  position: 'absolute',
-                  right: '0.5rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.25rem',
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '1rem',
-                  lineHeight: 1,
-                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded transition-colors"
               >
-                {showPassword ? '🙈' : '👁'}
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          {/* Submit */}
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              borderRadius: 'var(--radius)',
-              border: 'none',
-              background: loading ? 'var(--color-primary-medium)' : 'var(--color-primary)',
-              color: '#fff',
-              fontSize: '1rem',
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              marginBottom: '0.75rem',
-            }}
+            className="w-full h-11 text-base shadow-sm mt-4"
           >
-            {loading ? 'Mendaftar...' : 'Daftar'}
-          </button>
+            {loading ? 'Mendaftar...' : 'Daftar Akun'}
+          </Button>
         </form>
 
         {/* Login link */}
-        <div style={{ textAlign: 'center' }}>
-          <Link
-            href="/login"
-            style={{
-              color: 'var(--color-text-secondary)',
-              fontSize: '0.875rem',
-              textDecoration: 'none',
-            }}
-          >
-            Masuk
-          </Link>
+        <div className="mt-8 text-center">
+          <p className="text-sm text-text-muted">
+            Sudah punya akun?{' '}
+            <Link
+              href="/login"
+              className="font-semibold text-primary hover:text-primary-dark hover:underline transition-colors"
+            >
+              Masuk di sini
+            </Link>
+          </p>
         </div>
       </div>
     </div>

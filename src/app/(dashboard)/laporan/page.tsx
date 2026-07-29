@@ -12,11 +12,16 @@ import {
   generateCollectiveReport,
   generateIndividualReport,
 } from '@/lib/domain/reports'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { FileText, Printer, Users, User } from 'lucide-react'
 
 export default function LaporanPage() {
   const { state } = useDashboard()
   const [selectedStudent, setSelectedStudent] = useState<string>('')
   const [printHtml, setPrintHtml] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const sorted = useMemo(
     () => computeRanking(state.students),
@@ -57,109 +62,151 @@ export default function LaporanPage() {
 
   // ── Collective Report ──
   async function cetakKolektif() {
-    const fullSantri = await fetchAllMemorization()
+    setIsGenerating(true)
+    try {
+      const fullSantri = await fetchAllMemorization()
 
-    const html = generateCollectiveReport({
-      students: sorted,
-      submissions: state.submissions,
-      guruName: state.guru,
-      fullMemorization: fullSantri,
-    })
+      const html = generateCollectiveReport({
+        students: sorted,
+        submissions: state.submissions,
+        guruName: state.guru,
+        fullMemorization: fullSantri,
+      })
 
-    setPrintHtml(html)
-    setTimeout(() => window.print(), 400)
+      setPrintHtml(html)
+      setTimeout(() => window.print(), 400)
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   // ── Individual Report ──
   async function cetakIndividu() {
     if (!selectedStudent) return
+    setIsGenerating(true)
+    
+    try {
+      const sId = Number(selectedStudent)
+      const student = sorted.find((s) => s.id === sId)
+      if (!student) return
 
-    const sId = Number(selectedStudent)
-    const student = sorted.find((s) => s.id === sId)
-    if (!student) return
+      const { hafalan, submissions } = await fetchStudentData(sId)
 
-    const { hafalan, submissions } = await fetchStudentData(sId)
+      const mappedSubmissions = submissions.map((s) => ({
+        id: s.id,
+        santri_id: s.student_id,
+        santri_nama: s.students?.nama || '',
+        surah_no: s.surah_no,
+        nilai: s.nilai,
+        catatan: s.catatan,
+        waktu: s.waktu,
+        ayat_start: s.ayat_start ?? null,
+        ayat_end: s.ayat_end ?? null,
+      }))
 
-    const mappedSubmissions = submissions.map((s) => ({
-      id: s.id,
-      santri_id: s.student_id,
-      santri_nama: s.students?.nama || '',
-      surah_no: s.surah_no,
-      nilai: s.nilai,
-      catatan: s.catatan,
-      waktu: s.waktu,
-      ayat_start: s.ayat_start ?? null,
-      ayat_end: s.ayat_end ?? null,
-    }))
+      const html = generateIndividualReport({
+        student,
+        hafalan,
+        submissions: mappedSubmissions,
+        guruName: state.guru,
+      })
 
-    const html = generateIndividualReport({
-      student,
-      hafalan,
-      submissions: mappedSubmissions,
-      guruName: state.guru,
-    })
-
-    setPrintHtml(html)
-    setTimeout(() => window.print(), 400)
+      setPrintHtml(html)
+      setTimeout(() => window.print(), 400)
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   return (
-    <>
+    <div className="max-w-5xl">
       {/* Title */}
-      <div className="mb-4 text-sm font-medium text-text">Laporan</div>
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold tracking-tight text-text">Laporan</h2>
+        <p className="text-sm text-text-muted mt-1">Cetak rekapitulasi hafalan santri.</p>
+      </div>
 
       {/* Report options */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Collective */}
-        <div className="bg-card rounded-xl p-4 border border-border">
-          <div className="text-sm font-medium text-text mb-1">
-            Laporan Kolektif
-          </div>
-          <div className="text-[12px] text-text-muted mb-3">
-            Ranking seluruh santri dengan statistik ringkasan
-          </div>
-          <button
-            onClick={cetakKolektif}
-            className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity"
-          >
-            Cetak
-          </button>
-        </div>
+        <Card className="border-border/40 shadow-sm flex flex-col">
+          <CardHeader className="pb-4 border-b border-border/30">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
+                <Users className="w-5 h-5" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Kolektif</CardTitle>
+                <CardDescription className="text-[13px] mt-0.5">Ranking & rekap seluruh santri</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6 flex-1 flex flex-col justify-between gap-6">
+            <div className="text-sm text-text-secondary leading-relaxed bg-surface border border-border/50 rounded-lg p-4">
+              Laporan ini mencakup daftar seluruh santri yang diurutkan berdasarkan pencapaian hafalan terbanyak. Berguna untuk evaluasi kelas bulanan atau semester.
+            </div>
+            <Button 
+              onClick={cetakKolektif}
+              disabled={isGenerating}
+              className="w-full gap-2 shadow-sm"
+            >
+              <Printer className="w-4 h-4" />
+              {isGenerating ? 'Menyiapkan...' : 'Cetak Rekap Kelas'}
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Individual */}
-        <div className="bg-card rounded-xl p-4 border border-border">
-          <div className="text-sm font-medium text-text mb-1">
-            Laporan Individu
-          </div>
-          <div className="text-[12px] text-text-muted mb-3">
-            Detail progres dan riwayat per santri
-          </div>
-          <select
-            value={selectedStudent}
-            onChange={(e) => setSelectedStudent(e.target.value)}
-            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary mb-2"
-          >
-            <option value="">Pilih Santri</option>
-            {state.students.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.nama} ({s.kelas || '-'})
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={cetakIndividu}
-            disabled={!selectedStudent}
-            className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity disabled:opacity-50"
-          >
-            Cetak
-          </button>
-        </div>
+        <Card className="border-border/40 shadow-sm flex flex-col">
+          <CardHeader className="pb-4 border-b border-border/30">
+            <div className="flex items-center gap-3">
+              <div className="bg-accent/10 p-2.5 rounded-xl text-accent">
+                <User className="w-5 h-5" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Individu</CardTitle>
+                <CardDescription className="text-[13px] mt-0.5">Rapor progres per santri</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6 flex-1 flex flex-col justify-between gap-6">
+            <div className="space-y-4">
+              <div className="text-sm text-text-secondary leading-relaxed bg-surface border border-border/50 rounded-lg p-4">
+                Laporan ini berisi detail pencapaian juz, progres hafalan, dan riwayat setoran lengkap untuk satu santri secara spesifik.
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-[13px] font-medium text-text-secondary">Pilih Santri</label>
+                <select
+                  value={selectedStudent}
+                  onChange={(e) => setSelectedStudent(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
+                >
+                  <option value="">-- Pilih Santri --</option>
+                  {state.students.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.nama} {s.kelas ? `(${s.kelas})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <Button
+              onClick={cetakIndividu}
+              disabled={!selectedStudent || isGenerating}
+              variant={selectedStudent ? 'default' : 'secondary'}
+              className="w-full gap-2 shadow-sm"
+            >
+              <FileText className="w-4 h-4" />
+              {isGenerating ? 'Menyiapkan...' : 'Cetak Rapor Santri'}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Print area */}
       {printHtml && (
         <div id="print-area" dangerouslySetInnerHTML={{ __html: printHtml }} />
       )}
-    </>
+    </div>
   )
 }

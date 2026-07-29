@@ -4,6 +4,10 @@ import { useEffect, useState, useCallback } from 'react'
 import { useDashboard } from '../../layout'
 import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { addSubmissionAction } from '@/lib/actions/submissions'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Card, CardContent } from '@/components/ui/Card'
+import { CheckCircle2, Save } from 'lucide-react'
 
 function toLocalDatetimeString(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -103,151 +107,133 @@ export default function TambahSetoranPage() {
   }
 
   return (
-    <>
-      {/* Header */}
-      <h1 className="mb-4 text-lg font-semibold text-text">Tambah Setoran</h1>
+    <div className="max-w-2xl">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold tracking-tight text-text">Tambah Setoran</h2>
+        <p className="text-sm text-text-muted mt-1">
+          Catat setoran hafalan harian santri.
+        </p>
+      </div>
 
-      {/* Success toast */}
       {success && (
-        <div className="mb-3 rounded-lg border-l-[3px] border-primary bg-primary/10 px-3 py-2.5 text-xs text-primary leading-relaxed transition-all">
+        <div className="mb-6 flex items-center gap-2 rounded-md border-l-[3px] border-primary bg-primary/10 px-4 py-3 text-sm text-primary">
+          <CheckCircle2 className="w-4 h-4" />
           Setoran berhasil disimpan!
         </div>
       )}
 
-      {/* Form */}
-      <div className="rounded-xl bg-card p-4 border border-border mb-4">
-        {error && (
-          <div className="mb-3 rounded-lg border-l-[3px] border-red bg-red-light px-3 py-2.5 text-xs text-red leading-relaxed">
-            {error}
-          </div>
-        )}
+      <Card className="border-border/40 shadow-sm">
+        <CardContent className="p-6 space-y-5">
+          {error && (
+            <div className="rounded-md border-l-[3px] border-red bg-red-light px-3 py-2.5 text-sm text-red">
+              {error}
+            </div>
+          )}
 
-        {/* Pilih Santri */}
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs text-text-secondary">
-            Santri
-          </label>
-          <select
-            value={santriId}
-            onChange={(e) => setSantriId(e.target.value)}
-            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
-          >
-            <option value="">Pilih Santri</option>
-            {state.students.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.nama} ({s.kelas})
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="block text-sm font-medium text-text-secondary">Santri</label>
+              <select
+                value={santriId}
+                onChange={(e) => setSantriId(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
+              >
+                <option value="">Pilih Santri</option>
+                {state.students.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.nama} {s.kelas ? `(${s.kelas})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Pilih Surah */}
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs text-text-secondary">
-            Surah
-          </label>
-          <select
-            value={surahNo}
-            onChange={(e) => setSurahNo(e.target.value)}
-            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
-          >
-            <option value="">Pilih Surah</option>
-            {ALL_SURAHS.map((s) => (
-              <option key={s.no} value={s.no}>
-                {s.nama} (Juz {s.juz})
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="block text-sm font-medium text-text-secondary">Surah</label>
+              <select
+                value={surahNo}
+                onChange={(e) => setSurahNo(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
+              >
+                <option value="">Pilih Surah</option>
+                {ALL_SURAHS.map((s) => (
+                  <option key={s.no} value={s.no}>
+                    {s.no}. {s.nama} (Juz {s.juz})
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Ayat Range */}
-        {surahNo && (
-          <div className="mb-3">
-            <label className="mb-1.5 block text-xs text-text-secondary">
-              Ayat (dari — sampai)
-            </label>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min={1}
-                max={maxAyat}
-                value={ayatStart}
-                onChange={(e) => setAyatStart(Math.max(1, Number(e.target.value) || 1))}
-                className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
-              />
-              <span className="text-sm text-text-muted">—</span>
-              <input
-                type="number"
-                min={1}
-                max={maxAyat}
-                value={ayatEnd}
-                onChange={(e) => setAyatEnd(e.target.value === '' ? '' : Math.max(1, Math.min(maxAyat || 999, Number(e.target.value) || 1)))}
-                placeholder={String(maxAyat)}
-                className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
+            {surahNo && (
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="block text-sm font-medium text-text-secondary">
+                  Rentang Ayat
+                </label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={maxAyat}
+                    value={ayatStart}
+                    onChange={(e) => setAyatStart(Math.max(1, Number(e.target.value) || 1))}
+                  />
+                  <span className="text-text-muted">hingga</span>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={maxAyat}
+                    value={ayatEnd}
+                    onChange={(e) => setAyatEnd(e.target.value === '' ? '' : Math.max(1, Math.min(maxAyat || 999, Number(e.target.value) || 1)))}
+                    placeholder={String(maxAyat)}
+                  />
+                </div>
+                <div className="text-xs text-text-muted mt-1">
+                  Total: <span className="font-medium">{ayatEnd === '' ? '1' : ayatEnd - ayatStart + 1}</span> ayat
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-text-secondary">Predikat / Nilai</label>
+              <select
+                value={nilai}
+                onChange={(e) => setNilai(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
+              >
+                {NILAI_OPTIONS.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-text-secondary">Waktu Setoran</label>
+              <Input
+                type="datetime-local"
+                value={waktu}
+                onChange={(e) => setWaktu(e.target.value)}
               />
             </div>
-            <div className="mt-1 text-[11px] text-text-muted">
-              {ayatEnd === '' ? '1 ayat saja' : `${ayatEnd - ayatStart + 1} ayat`}
+
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="block text-sm font-medium text-text-secondary">Catatan (Opsional)</label>
+              <textarea
+                value={catatan}
+                onChange={(e) => setCatatan(e.target.value)}
+                placeholder="Tuliskan evaluasi tajwid atau kelancaran..."
+                rows={3}
+                className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors resize-none"
+              />
             </div>
           </div>
-        )}
+        </CardContent>
+      </Card>
 
-        {/* Nilai */}
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs text-text-secondary">
-            Nilai
-          </label>
-          <select
-            value={nilai}
-            onChange={(e) => setNilai(e.target.value)}
-            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
-          >
-            {NILAI_OPTIONS.map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Waktu */}
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs text-text-secondary">
-            Waktu
-          </label>
-          <input
-            type="datetime-local"
-            value={waktu}
-            onChange={(e) => setWaktu(e.target.value)}
-            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
-          />
-        </div>
-
-        {/* Catatan */}
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs text-text-secondary">
-            Catatan (opsional)
-          </label>
-          <textarea
-            value={catatan}
-            onChange={(e) => setCatatan(e.target.value)}
-            placeholder="Catatan tambahan..."
-            rows={2}
-            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary resize-none"
-          />
-        </div>
-
-        {/* Submit */}
-        <div className="flex justify-end">
-          <button
-            onClick={handleSubmit}
-            disabled={saving}
-            className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity disabled:opacity-60"
-          >
-            {saving ? 'Menyimpan...' : 'Simpan Setoran'}
-          </button>
-        </div>
+      <div className="mt-6 flex justify-end">
+        <Button onClick={handleSubmit} disabled={saving} className="gap-2 px-6">
+          <Save className="w-4 h-4" />
+          {saving ? 'Menyimpan...' : 'Simpan Setoran'}
+        </Button>
       </div>
-    </>
+    </div>
   )
 }

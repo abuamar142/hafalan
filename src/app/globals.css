@@ -1,53 +1,81 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #1D9E75;
-  --color-primary-light: #E1F5EE;
-  --color-primary-medium: #5DCAA5;
-  --color-primary-dark: #085041;
-  --color-sidebar: #0e6b50;
-  --color-accent: #BA7517;
-  --color-accent-light: #FAEEDA;
-  --color-purple: #534AB7;
-  --color-purple-light: #EEEDFE;
-  --color-red: #A32D2D;
-  --color-red-light: #FCEBEB;
-  --color-text: #2C2C2A;
-  --color-text-secondary: #5F5E5A;
-  --color-text-muted: #888780;
-  --color-border: #D3D1C7;
-  --color-surface: #fff;
-  --color-card: #F1EFE8;
-  --radius: 10px;
+  --color-primary: #0D9488;
+  --color-primary-light: #CCFBF1;
+  --color-primary-medium: #14B8A6;
+  --color-primary-dark: #0F766E;
+  
+  --color-accent: #D97706;
+  --color-accent-light: #FEF3C7;
+  
+  --color-purple: #6366F1;
+  --color-purple-light: #E0E7FF;
+  
+  --color-red: #EF4444;
+  --color-red-light: #FEE2E2;
+  
+  --color-text: #1C1917;
+  --color-text-secondary: #57534E;
+  --color-text-muted: #A8A29E;
+  
+  --color-border: #E7E5E4;
+  --color-surface: #FFFFFF;
+  --color-card: #FAFAF9;
+  
+  --color-background: #F5F5F7;
+  
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
 }
 
 /* ── Dark mode ── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primary: #5DCAA5;
-    --color-primary-light: #04342C;
-    --color-primary-medium: #1D9E75;
-    --color-accent: #EF9F27;
-    --color-accent-light: #412402;
-    --color-purple: #AFA9EC;
-    --color-purple-light: #26215C;
-    --color-red: #F09595;
-    --color-red-light: #501313;
-    --color-text: #D3D1C7;
-    --color-text-secondary: #B4B2A9;
-    --color-text-muted: #888780;
-    --color-border: #444441;
-    --color-surface: #2C2C2A;
-    --color-card: #3d3d3a;
+    --color-primary: #14B8A6;
+    --color-primary-light: #042F2E;
+    --color-primary-medium: #0D9488;
+    
+    --color-accent: #F59E0B;
+    --color-accent-light: #451A03;
+    
+    --color-purple: #818CF8;
+    --color-purple-light: #312E81;
+    
+    --color-red: #F87171;
+    --color-red-light: #7F1D1D;
+    
+    --color-text: #F5F5F4;
+    --color-text-secondary: #A8A29E;
+    --color-text-muted: #78716C;
+    
+    --color-border: #44403C;
+    --color-surface: #1C1917;
+    --color-card: #292524;
+    
+    --color-background: #0C0A09;
   }
 }
 
 /* ── Base ── */
 body {
-  font-family: system-ui, sans-serif;
-  background: var(--color-surface);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--color-background);
   color: var(--color-text);
   min-height: 100vh;
+}
+
+/* ── Utilities ── */
+.bento-shadow {
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.05), 0 2px 8px -2px rgba(0, 0, 0, 0.02);
+}
+
+@media (prefers-color-scheme: dark) {
+  .bento-shadow {
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.2), 0 2px 8px -2px rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* ── Print ── */
