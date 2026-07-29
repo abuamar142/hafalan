@@ -1,6 +1,6 @@
 'use client'
 
-import { useDashboard } from './layout'
+import { useDashboard } from '../layout'
 import { getPct, getTotalHafal } from '@/lib/helpers'
 import { computeRanking, computeDashboardStats } from '@/lib/domain/statistics'
 import { Card, CardContent } from '@/components/ui/Card'
