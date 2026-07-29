@@ -10,10 +10,13 @@ import {
   ArrowLeft,
   Printer,
   Calendar,
-  BookOpen,
   Award,
-  TrendingUp,
-  FileText
+  FileText,
+  Star,
+  Check,
+  CheckSquare,
+  User,
+  GraduationCap
 } from 'lucide-react'
 import { initials, getColor, getSurahNama, formatWaktu } from '@/lib/helpers'
 
@@ -74,6 +77,16 @@ export default function ReportDetailClient({
     return Math.round((totalHafal / ALL_SURAHS.length) * 100)
   }, [totalHafal])
 
+  // Selesai Juz (all surahs in that Juz are status = 1)
+  const juzSelesai = useMemo(() => {
+    return [...Array(30)].filter((_, i) => {
+      const juzNo = i + 1
+      const juzSurahs = ALL_SURAHS.filter((s) => s.juz === juzNo)
+      if (juzSurahs.length === 0) return false
+      return juzSurahs.every((s) => memorizationMap[s.no] === 1)
+    }).length
+  }, [memorizationMap])
+
   // Total verses setoran
   const totalVerses = useMemo(() => {
     return submissions.reduce((sum, s) => {
@@ -116,7 +129,7 @@ export default function ReportDetailClient({
   }, [memorizationMap])
 
   // Radial Ring Circle Parameters
-  const radius = 40
+  const radius = 42
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference - (pct / 100) * circumference
 
@@ -124,19 +137,72 @@ export default function ReportDetailClient({
     window.print()
   }
 
+  // Get dynamic grading properties
+  const getGradeBadge = (nilai: string) => {
+    const norm = nilai.toLowerCase()
+    if (norm.includes('mumtaz')) {
+      return {
+        bg: 'bg-teal-500/10 border-teal-500/30 text-teal-600 dark:text-teal-400',
+        label: 'Mumtaz',
+        icon: <Star className="w-3.5 h-3.5 fill-teal-500 text-teal-500 inline-block mr-1" />
+      }
+    }
+    if (norm.includes('jiddan')) {
+      return {
+        bg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
+        label: 'Jayyid Jiddan',
+        icon: <CheckSquare className="w-3.5 h-3.5 text-emerald-500 inline-block mr-1" />
+      }
+    }
+    if (norm.includes('jayyid')) {
+      return {
+        bg: 'bg-primary/10 border-primary/30 text-primary',
+        label: 'Jayyid',
+        icon: <Check className="w-3.5 h-3.5 text-primary inline-block mr-1" />
+      }
+    }
+    if (norm.includes('maqbul')) {
+      return {
+        bg: 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400',
+        label: 'Maqbul',
+        icon: null
+      }
+    }
+    return {
+      bg: 'bg-red/10 border-red/30 text-red',
+      label: 'Perlu Ulang',
+      icon: null
+    }
+  }
+
   return (
     <div className="relative min-h-screen bg-background text-text pb-16 print:bg-white print:text-black print:pb-0">
-      {/* Background elements */}
+      {/* Repeating Islamic Geometric Pattern (Print Hidden) */}
+      <div className="absolute inset-0 text-primary/10 opacity-[0.03] pointer-events-none print:hidden">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="islamic-pattern" width="80" height="80" patternUnits="userSpaceOnUse">
+              <path d="M40 0 L80 40 L40 80 L0 40 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+              <path d="M40 12 L68 40 L40 68 L12 40 Z" fill="none" stroke="currentColor" strokeWidth="0.75" />
+              <path d="M40 24 L56 40 L40 56 L24 40 Z" fill="none" stroke="currentColor" strokeWidth="0.5" />
+              <circle cx="40" cy="40" r="3" fill="currentColor" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#islamic-pattern)" />
+        </svg>
+      </div>
+
+      {/* Decorative Glow elements (Print Hidden) */}
       <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-primary/5 blur-3xl pointer-events-none print:hidden" />
       <div className="absolute bottom-[-15%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-accent/5 blur-3xl pointer-events-none print:hidden" />
 
       {/* Top Navbar (Print hidden) */}
-      <header className="relative w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 flex items-center justify-between border-b border-border/20 mb-8 print:hidden">
+      <header className="relative w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 flex items-center justify-between border-b border-border/20 mb-8 print:hidden z-10">
         <Button
           variant="outline"
           size="sm"
           onClick={() => router.push('/')}
-          className="gap-2 cursor-pointer text-xs font-semibold"
+          className="gap-2 cursor-pointer text-xs font-semibold hover:bg-card"
         >
           <ArrowLeft className="w-4 h-4" />
           Kembali ke Pencarian
@@ -153,10 +219,10 @@ export default function ReportDetailClient({
       </header>
 
       {/* Main Printable Area */}
-      <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 space-y-8 print:p-0 print:max-w-full">
+      <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 space-y-8 print:p-0 print:max-w-full relative z-10">
         
         {/* Printable Header (Visible only in print) */}
-        <div className="hidden print:flex items-center justify-between border-b-2 border-black/85 pb-4 mb-6">
+        <div className="hidden print:flex items-center justify-between border-b-2 border-black/80 pb-4 mb-6">
           <div className="flex items-center gap-4">
             <Image
               src="/images/logo.jpg"
@@ -176,7 +242,7 @@ export default function ReportDetailClient({
         </div>
 
         {/* Student Identity Card */}
-        <Card className="border-border/40 shadow-md bg-surface print:shadow-none print:border-black/35 overflow-hidden">
+        <Card className="border-border/40 shadow-md bg-surface print:shadow-none print:border-black/30 overflow-hidden print:break-inside-avoid">
           <div className="h-16 bg-gradient-to-r from-primary/15 via-accent/5 to-transparent print:hidden"></div>
           <CardContent className="p-6 pt-6 sm:flex sm:items-center sm:justify-between print:p-4">
             <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-center -mt-0">
@@ -191,17 +257,17 @@ export default function ReportDetailClient({
                   {student.nama}
                 </h1>
                 <div className="text-sm font-semibold text-text-secondary flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                  <span className="bg-background print:bg-white px-2.5 py-0.5 rounded-md border border-border print:border-black/35 font-bold">
+                  <span className="bg-background print:bg-white px-2.5 py-0.5 rounded-md border border-border print:border-black/30 font-bold text-text-secondary print:text-black">
                     Kelas {student.group?.class?.nama || 'Tanpa kelas'}
                   </span>
-                  <span>•</span>
-                  <span>Kelompok {student.group?.nama || 'Tanpa kelompok'}</span>
+                  <span className="print:text-black/55">•</span>
+                  <span className="print:text-black">Kelompok {student.group?.nama || 'Tanpa kelompok'}</span>
                 </div>
               </div>
             </div>
 
             <div className="hidden print:block text-right">
-              <div className="inline-flex flex-col gap-1 text-xs">
+              <div className="inline-flex flex-col gap-1 text-xs text-black">
                 <p className="font-semibold">Nama Lembaga: <span className="font-bold">SMA Islam Bunga Bangsa</span></p>
                 <p className="font-semibold">Evaluator: <span className="font-bold">Ustadz Pembina Halaqah</span></p>
               </div>
@@ -213,109 +279,114 @@ export default function ReportDetailClient({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 print:grid-cols-1">
           
           {/* Progress Overview Card */}
-          <Card className="border-border/40 shadow-sm bg-surface flex flex-col justify-between p-6 print:border-black/35 print:p-4">
-            <div className="flex items-center gap-2 mb-4 border-b border-border/40 pb-3">
-              <Award className="w-5 h-5 text-accent shrink-0" />
-              <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider">Ringkasan Progres</h3>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-6 justify-center my-2">
-              {/* Radial Progress Ring */}
-              <div className="relative flex items-center justify-center">
-                <svg className="w-28 h-28 transform -rotate-90">
-                  <circle
-                    cx="56"
-                    cy="56"
-                    r={radius}
-                    className="stroke-border/40 print:stroke-black/10 fill-none"
-                    strokeWidth="8"
-                  />
-                  <circle
-                    cx="56"
-                    cy="56"
-                    r={radius}
-                    className="stroke-primary fill-none transition-all duration-1000 ease-out"
-                    strokeWidth="8"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute text-center">
-                  <span className="text-2xl font-black text-text print:text-black leading-none">{pct}%</span>
-                  <span className="text-[10px] text-text-muted font-bold block uppercase tracking-wide">Dihafal</span>
-                </div>
+          <Card className="border-border/40 shadow-sm bg-surface flex flex-col justify-between p-6 print:border-black/30 print:p-4 print:break-inside-avoid">
+            <div>
+              <div className="flex items-center gap-2 mb-4 border-b border-border/40 pb-3">
+                <Award className="w-5 h-5 text-accent shrink-0" />
+                <h3 className="text-sm font-bold text-text-secondary print:text-black uppercase tracking-wider">Ringkasan Progres</h3>
               </div>
 
-              {/* Quick statistics */}
-              <div className="space-y-3 flex-1 min-w-[120px] w-full text-sm">
-                <div className="bg-card print:bg-white p-2.5 rounded-lg border border-border/50 print:border-black/35 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-primary shrink-0" />
-                  <div>
-                    <p className="text-[10px] font-bold text-text-muted uppercase leading-none">Total Surah</p>
-                    <p className="font-bold text-text mt-0.5">{totalHafal} Surah</p>
+              <div className="flex flex-col sm:flex-row items-center gap-6 justify-center my-4">
+                {/* Radial Progress Ring with Circle Animation */}
+                <div className="relative flex items-center justify-center">
+                  <svg className="w-28 h-28 transform -rotate-90">
+                    <circle
+                      cx="56"
+                      cy="56"
+                      r={radius}
+                      className="stroke-border/40 print:stroke-black/10 fill-none"
+                      strokeWidth="8"
+                    />
+                    <circle
+                      cx="56"
+                      cy="56"
+                      r={radius}
+                      className="stroke-primary fill-none transition-all duration-1000 ease-out"
+                      strokeWidth="8"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={strokeDashoffset}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute text-center">
+                    <span className="text-2xl font-black text-text print:text-black leading-none">{pct}%</span>
+                    <span className="text-[10px] text-text-muted print:text-black/60 font-bold block uppercase tracking-wide">Dihafal</span>
                   </div>
                 </div>
 
-                <div className="bg-card print:bg-white p-2.5 rounded-lg border border-border/50 print:border-black/35 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-accent shrink-0" />
-                  <div>
-                    <p className="text-[10px] font-bold text-text-muted uppercase leading-none">Total Ayat</p>
-                    <p className="font-bold text-text mt-0.5">{totalVerses} Ayat</p>
+                {/* Legend & Target metrics */}
+                <div className="space-y-2 flex-1 w-full text-xs text-text-secondary print:text-black font-semibold">
+                  <div className="flex justify-between py-1 border-b border-border/20">
+                    <span>Target Akhir</span>
+                    <span className="font-bold text-text print:text-black">30 Juz</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-border/20">
+                    <span>Juz Selesai</span>
+                    <span className="font-bold text-primary">{juzSelesai} Juz</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-border/20">
+                    <span>Surah Hafal</span>
+                    <span className="font-bold text-text print:text-black">{totalHafal} / {ALL_SURAHS.length}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Last active info */}
-            <div className="mt-4 pt-3 border-t border-border/30 text-xs text-text-muted flex items-center justify-between">
-              <span>Keaktifan Terakhir:</span>
-              <span className="font-semibold text-text-secondary">
-                {lastActive ? formatWaktu(lastActive).tanggal : 'Belum aktif'}
-              </span>
+            {/* Total verses setoran & keaktifan */}
+            <div className="space-y-2 pt-3 border-t border-border/30 text-xs text-text-muted print:text-black">
+              <div className="flex justify-between">
+                <span>Total Ayat Setoran:</span>
+                <span className="font-bold text-text print:text-black">{totalVerses} Ayat</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Keaktifan Terakhir:</span>
+                <span className="font-bold text-text print:text-black">
+                  {lastActive ? formatWaktu(lastActive).tanggal : 'Belum aktif'}
+                </span>
+              </div>
             </div>
           </Card>
 
           {/* Juz Grid Card */}
-          <Card className="lg:col-span-2 border-border/40 shadow-sm bg-surface p-6 print:border-black/35 print:p-4 print:col-span-1">
+          <Card className="lg:col-span-2 border-border/40 shadow-sm bg-surface p-6 print:border-black/30 print:p-4 print:col-span-1 print:break-inside-avoid">
             <div className="flex items-center justify-between mb-4 border-b border-border/40 pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-primary shrink-0" />
-                <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider">Pemetaan Juz</h3>
+                <h3 className="text-sm font-bold text-text-secondary print:text-black uppercase tracking-wider">Pemetaan Juz</h3>
               </div>
               
               {/* Legend (Print hidden) */}
-              <div className="flex items-center gap-3 text-[10px] font-semibold text-text-muted print:hidden">
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded bg-primary"></div>
+              <div className="flex items-center gap-3 text-[10px] font-bold text-text-muted print:hidden">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-sm bg-primary shadow-sm"></div>
                   <span>Lengkap</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded bg-accent/25 border border-accent/20"></div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-sm bg-accent/20 border border-accent/30"></div>
                   <span>Progres</span>
                 </div>
               </div>
             </div>
 
             {/* Grid 1 - 30 */}
-            <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-2.5">
+            <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-2">
               {juzStatuses.map((j) => {
                 return (
                   <div
                     key={j.number}
-                    className={`relative flex flex-col items-center justify-center rounded-md py-2.5 text-center transition-all ${
+                    className={`relative flex flex-col items-center justify-center rounded-lg py-2.5 text-center transition-all border ${
                       j.status === 'full'
-                        ? 'bg-primary text-white font-bold shadow-sm'
+                        ? 'bg-primary border-primary text-white font-bold shadow-md shadow-primary/5 hover:bg-primary/95 hover:scale-[1.03]'
                         : j.status === 'partial'
-                          ? 'bg-accent/10 text-accent border border-accent/20 font-bold'
-                          : 'bg-card border border-border text-text-muted'
+                          ? 'bg-accent/10 border-accent/25 text-accent font-bold hover:bg-accent/15 hover:scale-[1.03]'
+                          : 'bg-card/40 border-border text-text-muted hover:border-text-muted/40 hover:scale-[1.03]'
                     }`}
                     title={`${j.pct}% Hafal`}
                   >
-                    <span className="text-xs">Juz</span>
-                    <span className="text-sm font-bold leading-none mt-0.5">{j.number}</span>
+                    <span className="text-[9px] uppercase tracking-wide opacity-80 leading-none">Juz</span>
+                    <span className="text-sm font-extrabold leading-none mt-1">{j.number}</span>
                     {j.status === 'partial' && (
-                      <span className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-accent"></span>
+                      <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
                     )}
                   </div>
                 )
@@ -325,10 +396,10 @@ export default function ReportDetailClient({
         </div>
 
         {/* Timeline of Submissions */}
-        <div className="space-y-4">
+        <div className="space-y-5 print:break-inside-avoid">
           <div className="flex items-center gap-2 border-b border-border/40 pb-2">
-            <Calendar className="w-5 h-5 text-text-secondary shrink-0" />
-            <h3 className="text-base font-bold text-text">Riwayat Setoran Hafalan</h3>
+            <Calendar className="w-5 h-5 text-text-secondary print:text-black shrink-0" />
+            <h3 className="text-base font-bold text-text print:text-black">Riwayat Setoran Hafalan</h3>
           </div>
 
           {submissions.length === 0 ? (
@@ -336,57 +407,68 @@ export default function ReportDetailClient({
               Belum ada riwayat setoran hafalan.
             </div>
           ) : (
-            <div className="relative border-l border-border/70 print:border-black/35 pl-5 ml-3 space-y-6">
+            <div className="relative pl-6 ml-3 space-y-6">
+              {/* Premium Gradient Line Connector */}
+              <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-primary-medium/50 to-border/30 print:bg-black/25" />
+
               {submissions.map((sub) => {
                 const surah = ALL_SURAHS.find((s) => s.no === sub.surah_no)
+                const gradeInfo = getGradeBadge(sub.nilai)
                 return (
-                  <div key={sub.id} className="relative group">
+                  <div key={sub.id} className="relative group print:break-inside-avoid">
                     
-                    {/* Circle Indicator on line */}
-                    <div className="absolute -left-[26px] top-1.5 h-3 w-3 rounded-full bg-surface border-2 border-primary group-hover:scale-110 transition-transform print:border-black" />
+                    {/* Pulsing indicator on timeline line */}
+                    <div className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-surface border-2 border-primary group-hover:scale-125 transition-transform duration-300 print:bg-black print:border-black" />
 
-                    <div className="rounded-lg border border-border/40 bg-surface p-4 shadow-sm hover:shadow transition-shadow print:shadow-none print:border-black/30 print:p-3">
+                    <div className="rounded-xl border border-border/40 bg-surface p-4 shadow-sm hover:shadow-md hover:border-primary/25 transition-all duration-300 print:shadow-none print:border-black/20 print:p-3">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2.5">
                         
                         {/* Surah Name & Details */}
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-center flex-wrap gap-2.5">
-                            <h4 className="text-[15px] font-bold text-text print:text-black">
+                            <h4 className="text-base font-bold text-text print:text-black">
                               {getSurahNama(sub.surah_no)}
                             </h4>
                             {surah?.arab && (
-                              <span className="text-sm font-semibold text-primary/70 font-arabic print:text-black/60">
+                              <span className="text-sm font-semibold text-primary/75 font-arabic print:text-black/60">
                                 ({surah.arab})
                               </span>
                             )}
                           </div>
                           
-                          <div className="text-xs text-text-muted mt-1 flex flex-wrap items-center gap-2">
-                            <span>
+                          <div className="text-xs text-text-muted print:text-black/60 flex flex-wrap items-center gap-2 font-medium">
+                            <span className="bg-card print:bg-white border border-border/50 print:border-black/20 px-2 py-0.5 rounded text-[11px] font-bold text-text-secondary print:text-black">
                               Ayat {sub.ayat_start}{sub.ayat_end && sub.ayat_end !== sub.ayat_start ? ` \u2013 ${sub.ayat_end}` : ''}
                             </span>
                             <span>•</span>
                             <span>Juz {surah?.juz || '?'}</span>
                             <span>•</span>
-                            <span className="font-semibold text-text-secondary">Ustadz {sub.guru_nama || 'Pembina'}</span>
+                            <span className="flex items-center gap-1">
+                              <User className="w-3.5 h-3.5 opacity-60" />
+                              Ustadz {sub.guru_nama || 'Pembina'}
+                            </span>
                           </div>
                         </div>
 
-                        {/* Badge for Score */}
-                        <div className="flex items-center gap-2 self-start sm:self-center">
-                          <span className="inline-flex items-center justify-center rounded-md bg-primary/10 border border-primary/20 text-primary px-2.5 py-0.5 text-xs font-bold leading-normal">
-                            {sub.nilai}
+                        {/* Grade Badge & Date */}
+                        <div className="flex items-center gap-3 self-start sm:self-center">
+                          <span className={`inline-flex items-center justify-center rounded-md border px-2.5 py-1 text-xs font-bold leading-normal shadow-sm ${gradeInfo.bg}`}>
+                            {gradeInfo.icon}
+                            {gradeInfo.label}
                           </span>
-                          <span className="text-[10px] text-text-muted whitespace-nowrap">
+                          <span className="text-[11px] text-text-muted print:text-black/75 whitespace-nowrap font-medium">
                             {formatWaktu(sub.waktu).tanggal}
                           </span>
                         </div>
                       </div>
 
-                      {/* Catatan Evaluasi */}
+                      {/* Evaluator Notes */}
                       {sub.catatan && (
-                        <div className="mt-2 text-xs text-text-secondary bg-card/60 p-2.5 rounded border border-border/40 leading-relaxed font-sans print:bg-white print:border-black/20">
-                          <p className="font-semibold text-[10px] uppercase text-text-muted tracking-wide mb-1 leading-none">Catatan Pembina:</p>
+                        <div className="mt-2.5 text-xs text-text-secondary bg-card/40 p-3 rounded-lg border border-border/30 leading-relaxed font-sans print:bg-white print:border-black/15">
+                          <p className="font-bold text-[10px] uppercase text-text-muted print:text-black/60 tracking-wider mb-1 flex items-center gap-1.5">
+                            <GraduationCap className="w-3.5 h-3.5" />
+                            Catatan Pembina
+                          </p>
                           {sub.catatan}
                         </div>
                       )}
@@ -398,15 +480,15 @@ export default function ReportDetailClient({
           )}
         </div>
 
-        {/* Signature Box (Visible only in print) */}
-        <div className="hidden print:grid grid-cols-2 gap-10 mt-16 text-center text-xs">
+        {/* Signature Box (Visible only in print - Optimized layout) */}
+        <div className="hidden print:grid grid-cols-2 gap-10 mt-20 text-center text-xs text-black print:break-inside-avoid">
           <div className="space-y-16">
-            <p className="font-semibold">Mengetahui,<br/>Orang Tua / Wali Murid</p>
-            <div className="border-t border-black/40 w-44 mx-auto pt-1 font-bold">....................................</div>
+            <p className="font-bold">Mengetahui,<br/>Orang Tua / Wali Murid</p>
+            <div className="border-t border-black/40 w-44 mx-auto pt-1.5 font-bold">....................................</div>
           </div>
           <div className="space-y-16">
-            <p className="font-semibold">Samarinda, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>Pembina Halaqah</p>
-            <div className="border-t border-black/40 w-44 mx-auto pt-1 font-bold">Ustadz {submissions[0]?.guru_nama || 'Pembina'}</div>
+            <p className="font-bold">Samarinda, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>Pembina Halaqah</p>
+            <div className="border-t border-black/40 w-44 mx-auto pt-1.5 font-bold">Ustadz {submissions[0]?.guru_nama || 'Pembina'}</div>
           </div>
         </div>
       </main>
