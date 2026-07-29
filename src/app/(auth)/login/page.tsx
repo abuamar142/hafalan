@@ -1,5 +1,6 @@
 'use client'
 
+import Image from "next/image";
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -36,7 +37,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
+    <main className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
       {/* Decorative background blur */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-50"></div>
       
@@ -44,9 +45,11 @@ export default function LoginPage() {
         
         {/* Brand */}
         <div className="text-center mb-10">
-          <img
+          <Image
             src="/images/logo.jpg"
             alt="Logo Hafalan"
+            width={80}
+            height={80}
             className="w-20 h-20 rounded-2xl object-cover mx-auto mb-4 shadow-sm ring-1 ring-border"
           />
           <h1 className="text-2xl font-bold text-text mb-1 tracking-tight">
@@ -130,6 +133,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

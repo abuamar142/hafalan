@@ -1,5 +1,7 @@
 'use client'
 
+import Image from "next/image";
+
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
@@ -86,9 +88,11 @@ export default function Sidebar({ guru, onOpenSettings }: SidebarProps) {
         {/* Branding */}
         <div className="px-5 pt-6 pb-8">
           <div className="flex items-center gap-3 mb-2">
-            <img
+            <Image
               src="/images/logo.jpg"
               alt="Logo"
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-lg object-cover shadow-sm"
             />
             <h1 className="text-base font-semibold leading-tight text-text">
