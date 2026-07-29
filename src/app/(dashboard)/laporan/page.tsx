@@ -10,10 +10,6 @@ import {
 } from '@/lib/data/memorization'
 import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
-import {
-  generateCollectiveReport,
-  generateIndividualReport,
-} from '@/lib/domain/reports'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { FileText, Printer, Users, User } from 'lucide-react'
@@ -75,6 +71,7 @@ export default function LaporanPage() {
     try {
       const fullSantri = await fetchAllMemorization()
 
+      const { generateCollectiveReport } = await import('@/lib/domain/reports')
       const html = generateCollectiveReport({
         students: sorted,
         submissions: state.submissions,
@@ -115,6 +112,7 @@ export default function LaporanPage() {
         guru_nama: s.guru_name || '',
       }))
 
+      const { generateIndividualReport } = await import('@/lib/domain/reports')
       const html = generateIndividualReport({
         student,
         hafalan,
