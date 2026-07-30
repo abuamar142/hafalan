@@ -16,7 +16,8 @@ import {
   Check,
   CheckSquare,
   User,
-  GraduationCap
+  GraduationCap,
+  BookOpen
 } from 'lucide-react'
 import { initials, getColor, getSurahNama, formatWaktu } from '@/lib/helpers'
 
@@ -176,7 +177,7 @@ export default function ReportDetailClient({
   }
 
   return (
-    <div className="relative min-h-screen bg-background text-text pb-16 print:bg-white print:text-black print:pb-0">
+    <div className="relative min-h-screen bg-background text-text pb-16 print:bg-white print:text-black print:pb-0 overflow-x-hidden">
       {/* Repeating Islamic Geometric Pattern (Print Hidden) */}
       <div className="absolute inset-0 text-primary/10 opacity-[0.03] pointer-events-none print:hidden">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -422,6 +423,11 @@ export default function ReportDetailClient({
                   )
                 })}
               </div>
+              {submissions.length === 0 && (
+                <div className="mt-4 p-3 rounded-lg border border-dashed border-border/40 bg-card/25 text-center text-xs text-text-muted">
+                  Belum ada progres hafalan yang tercatat untuk Juz 1-30.
+                </div>
+              )}
             </Card>
 
             {/* Timeline of Submissions */}
@@ -432,8 +438,20 @@ export default function ReportDetailClient({
               </div>
 
               {submissions.length === 0 ? (
-                <div className="py-16 text-center text-sm text-text-muted border border-border/50 border-dashed rounded-lg bg-surface">
-                  Belum ada riwayat setoran hafalan.
+                <div className="py-12 px-6 text-center border border-border/40 border-dashed rounded-xl bg-surface/50 backdrop-blur-sm space-y-4 max-w-lg mx-auto print:border-black/20">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                    <BookOpen className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-bold text-text">Belum Ada Setoran Hafalan</h4>
+                    <p className="text-xs text-text-muted leading-relaxed max-w-xs mx-auto">
+                      Ananda belum memulai penyetoran hafalan Quran untuk periode rapor ini.
+                    </p>
+                  </div>
+                  <div className="bg-card p-3 rounded-lg border border-border/30 text-[11px] text-text-secondary leading-relaxed text-left print:bg-white print:border-black/15">
+                    <span className="font-bold text-text block mb-1">Langkah Selanjutnya:</span>
+                    Silakan berkoordinasi dengan Ustadz Pembina Halaqah untuk menjadwalkan setoran harian ananda di kelas tahfidz.
+                  </div>
                 </div>
               ) : (
                 <div className="relative pl-6 ml-3 space-y-6">
