@@ -5,16 +5,13 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ALL_SURAHS } from '@/lib/constants'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button } from '@cloudflare/kumo'
+import { Button, Badge } from '@cloudflare/kumo'
 import {
   ArrowLeft,
   Printer,
   Calendar,
   Award,
   FileText,
-  Star,
-  Check,
-  CheckSquare,
   User,
   GraduationCap,
   BookOpen
@@ -140,42 +137,14 @@ export default function ReportDetailClient({
     window.print()
   }
 
-  // Get dynamic grading properties
-  const getGradeBadge = (nilai: string) => {
+  // Get Badge variant for nilai
+  function nilaiBadgeVariant(nilai: string) {
     const norm = nilai.toLowerCase()
-    if (norm.includes('mumtaz')) {
-      return {
-        bg: 'bg-teal-500/10 border-teal-500/30 text-teal-600 dark:text-teal-400',
-        label: 'Mumtaz',
-        icon: <Star className="w-3.5 h-3.5 fill-teal-500 text-teal-500 inline-block mr-1" />
-      }
-    }
-    if (norm.includes('jiddan')) {
-      return {
-        bg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
-        label: 'Jayyid Jiddan',
-        icon: <CheckSquare className="w-3.5 h-3.5 text-emerald-500 inline-block mr-1" />
-      }
-    }
-    if (norm.includes('jayyid')) {
-      return {
-        bg: 'bg-primary/10 border-primary/30 text-primary',
-        label: 'Jayyid',
-        icon: <Check className="w-3.5 h-3.5 text-primary inline-block mr-1" />
-      }
-    }
-    if (norm.includes('maqbul')) {
-      return {
-        bg: 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400',
-        label: 'Maqbul',
-        icon: null
-      }
-    }
-    return {
-      bg: 'bg-red/10 border-red/30 text-red',
-      label: 'Perlu Ulang',
-      icon: null
-    }
+    if (norm.includes('mumtaz')) return 'success' as const
+    if (norm.includes('jiddan')) return 'primary' as const
+    if (norm.includes('jayyid')) return 'info' as const
+    if (norm.includes('maqbul')) return 'warning' as const
+    return 'error' as const
   }
 
   return (
@@ -462,7 +431,7 @@ export default function ReportDetailClient({
 
                   {submissions.map((sub) => {
                     const surah = ALL_SURAHS.find((s) => s.no === sub.surah_no)
-                    const gradeInfo = getGradeBadge(sub.nilai)
+                    const variant = nilaiBadgeVariant(sub.nilai)
                     return (
                       <div key={sub.id} className="relative group print:break-inside-avoid">
                         
@@ -509,10 +478,7 @@ export default function ReportDetailClient({
 
                             {/* Grade Badge & Date */}
                             <div className="flex items-center gap-3 self-start sm:self-center">
-                              <span className={`inline-flex items-center justify-center rounded-md border px-2.5 py-1 text-xs font-bold leading-normal shadow-sm ${gradeInfo.bg}`}>
-                                {gradeInfo.icon}
-                                {gradeInfo.label}
-                              </span>
+                              <Badge variant={variant}>{sub.nilai}</Badge>
                               <span className="text-[11px] text-text-muted print:text-black/75 whitespace-nowrap font-medium">
                                 {formatWaktu(sub.waktu).tanggal}
                               </span>

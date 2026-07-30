@@ -14,8 +14,7 @@ import {
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox } from '@cloudflare/kumo'
-import Pagination from '@/components/Pagination'
+import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox, Table, Pagination } from '@cloudflare/kumo'
 import {
   Plus,
   Eye,
@@ -54,8 +53,6 @@ export default function SantriPage() {
     }
     return items
   }, [state.students, searchQuery])
-
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
 
   const paginated = useMemo(() => {
     const start = (page - 1) * ITEMS_PER_PAGE
@@ -275,106 +272,102 @@ export default function SantriPage() {
               Tidak ada siswa yang sesuai dengan pencarian.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
-                    <th className="py-3.5 px-4 w-16 text-center">No</th>
-                    <th className="py-3.5 px-4">Nama Siswa</th>
-                    <th className="py-3.5 px-4">Kelompok</th>
-                    <th className="py-3.5 px-4">Kelas</th>
-                    <th className="py-3.5 px-4 text-center">Progress</th>
-                    <th className="py-3.5 px-4 w-44 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/30 text-sm">
-                  {paginated.map((s, index) => {
-                    const group = state.groups.find((g) => g.id === s.group_id)
-                    const groupName = group?.name || 'Tanpa Kelompok'
-                    const className = group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
-                    const p = getPct(s)
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head className="w-16 text-center">No</Table.Head>
+                  <Table.Head>Nama Siswa</Table.Head>
+                  <Table.Head>Kelompok</Table.Head>
+                  <Table.Head>Kelas</Table.Head>
+                  <Table.Head className="text-center">Progress</Table.Head>
+                  <Table.Head className="w-44 text-center">Aksi</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {paginated.map((s, index) => {
+                  const group = state.groups.find((g) => g.id === s.group_id)
+                  const groupName = group?.name || 'Tanpa Kelompok'
+                  const className = group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
+                  const p = getPct(s)
 
-                    return (
-                      <tr key={s.id} className="hover:bg-card/30 transition-colors">
-                        <td className="py-3.5 px-4 text-center font-medium text-text-muted">
-                          {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                        </td>
-                        <td className="py-3.5 px-4 font-semibold text-text">
-                          {s.nama}
-                        </td>
-                        <td className="py-3.5 px-4 text-text-secondary font-medium">
-                          {groupName !== 'Tanpa Kelompok' ? (
-                            <span className="inline-flex items-center gap-1.5">
-                              <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
-                              {groupName}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-text-muted italic">{groupName}</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-text-secondary font-medium">
-                          {className !== 'Tanpa Kelas' ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                              {className}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-text-muted italic">{className}</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center justify-center gap-3 max-w-[120px] mx-auto">
-                            <span className="text-xs font-bold text-text-secondary w-9 text-right">{p}%</span>
-                            <div className="flex-1 h-2 bg-border/40 rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full bg-primary transition-all duration-500"
-                                style={{ width: `${p}%` }}
-                              />
-                            </div>
+                  return (
+                    <Table.Row key={s.id}>
+                      <Table.Cell className="text-center font-medium text-text-muted">
+                        {(page - 1) * ITEMS_PER_PAGE + index + 1}
+                      </Table.Cell>
+                      <Table.Cell className="font-semibold text-text">
+                        {s.nama}
+                      </Table.Cell>
+                      <Table.Cell className="text-text-secondary font-medium">
+                        {groupName !== 'Tanpa Kelompok' ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
+                            {groupName}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-text-muted italic">{groupName}</span>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell className="text-text-secondary font-medium">
+                        {className !== 'Tanpa Kelas' ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                            {className}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-text-muted italic">{className}</span>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <div className="flex items-center justify-center gap-3 max-w-[120px] mx-auto">
+                          <span className="text-xs font-bold text-text-secondary w-9 text-right">{p}%</span>
+                          <div className="flex-1 h-2 bg-border/40 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-primary transition-all duration-500"
+                              style={{ width: `${p}%` }}
+                            />
                           </div>
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => openDetailModal(s)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
-                              title="Progres Hafalan"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => openEditModal(s)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
-                              title="Edit"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => handleDelete(s.id, s.nama)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
-                              title="Hapus"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                      </Table.Cell>
+                      <Table.Cell className="text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => openDetailModal(s)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
+                            title="Progres Hafalan"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => openEditModal(s)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => handleDelete(s.id, s.nama)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
+                            title="Hapus"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                })}
+              </Table.Body>
+            </Table>
           )}
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
+          <Pagination page={page} setPage={setPage} totalCount={filtered.length} perPage={ITEMS_PER_PAGE}>
+            <Pagination.Controls />
+          </Pagination>
         </CardContent>
       </Card>
 

@@ -8,8 +8,7 @@ import {
   updateClassAction,
 } from '@/lib/actions/classes'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button, Dialog as KumoDialog, useKumoToastManager } from '@cloudflare/kumo'
-import { Input } from '@cloudflare/kumo'
+import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Table } from '@cloudflare/kumo'
 import Pagination from '@/components/Pagination'
 import { Plus, Eye, Edit, Trash2, Layers, Search } from 'lucide-react'
 
@@ -203,80 +202,78 @@ export default function KelasPage() {
               Tidak ada kelas yang sesuai dengan pencarian.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
-                    <th className="py-3.5 px-4 w-16 text-center">No</th>
-                    <th className="py-3.5 px-4">Nama Kelas</th>
-                    <th className="py-3.5 px-4">Kelompok di Dalamnya</th>
-                    <th className="py-3.5 px-4 w-40 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/30 text-sm">
-                  {paginated.map((c, index) => {
-                    const groups = state.groups.filter((g) => g.class_id === c.id)
-                    return (
-                      <tr key={c.id} className="hover:bg-card/30 transition-colors">
-                        <td className="py-3.5 px-4 text-center font-medium text-text-muted">
-                          {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                        </td>
-                        <td className="py-3.5 px-4 font-semibold text-text">
-                          {c.name}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          {groups.length === 0 ? (
-                            <span className="text-xs text-text-muted italic">Tidak ada kelompok</span>
-                          ) : (
-                            <div className="flex flex-wrap gap-1.5">
-                              {groups.map((g) => (
-                                <span
-                                  key={g.id}
-                                  className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20"
-                                >
-                                  {g.name}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => openDetailModal(c)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
-                              title="Detail"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => openEditModal(c)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
-                              title="Edit"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => handleDeleteClass(c.id, c.name)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
-                              title="Hapus"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head className="w-16 text-center">No</Table.Head>
+                  <Table.Head>Nama Kelas</Table.Head>
+                  <Table.Head>Kelompok di Dalamnya</Table.Head>
+                  <Table.Head className="w-40 text-center">Aksi</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {paginated.map((c, index) => {
+                  const groups = state.groups.filter((g) => g.class_id === c.id)
+                  return (
+                    <Table.Row key={c.id}>
+                      <Table.Cell className="text-center font-medium text-text-muted">
+                        {(page - 1) * ITEMS_PER_PAGE + index + 1}
+                      </Table.Cell>
+                      <Table.Cell className="font-semibold text-text">
+                        {c.name}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {groups.length === 0 ? (
+                          <span className="text-xs text-text-muted italic">Tidak ada kelompok</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1.5">
+                            {groups.map((g) => (
+                              <span
+                                key={g.id}
+                                className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+                              >
+                                {g.name}
+                              </span>
+                            ))}
                           </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell className="text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => openDetailModal(c)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
+                            title="Detail"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => openEditModal(c)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => handleDeleteClass(c.id, c.name)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
+                            title="Hapus"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                })}
+              </Table.Body>
+            </Table>
           )}
           <Pagination
             currentPage={page}

@@ -18,9 +18,18 @@ import {
   formatWaktu,
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
-import { Button, useKumoToastManager } from '@cloudflare/kumo'
+import { Button, useKumoToastManager, Badge } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
 import { ArrowLeft, Trash2, CheckCircle2, RotateCcw, Circle } from 'lucide-react'
+
+function nilaiBadgeVariant(nilai: string) {
+  const norm = nilai.toLowerCase()
+  if (norm.includes('mumtaz')) return 'success' as const
+  if (norm.includes('jiddan')) return 'primary' as const
+  if (norm.includes('jayyid')) return 'info' as const
+  if (norm.includes('maqbul')) return 'warning' as const
+  return 'error' as const
+}
 
 export default function ProfilPage({
   params,
@@ -340,9 +349,7 @@ export default function ProfilPage({
                               </span>
                             ) : null}
                           </div>
-                          <span className="inline-flex shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary px-2 py-0.5 text-[11px] font-bold border border-primary/20">
-                            {sub.nilai}
-                          </span>
+                          <Badge variant={nilaiBadgeVariant(sub.nilai)}>{sub.nilai}</Badge>
                         </div>
                         <div className="text-[12px] font-medium text-text-muted mb-2">
                           {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}

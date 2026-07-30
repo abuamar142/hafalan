@@ -9,7 +9,7 @@ import {
 } from '@/lib/actions/groups'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox } from '@cloudflare/kumo'
+import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox, Table } from '@cloudflare/kumo'
 import Pagination from '@/components/Pagination'
 import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
 
@@ -219,100 +219,95 @@ export default function KelompokPage() {
               Tidak ada kelompok yang sesuai dengan pencarian.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
-                    <th className="py-3.5 px-4 w-16 text-center">No</th>
-                    <th className="py-3.5 px-4">Nama Kelompok</th>
-                    <th className="py-3.5 px-4">Kelas</th>
-                    <th className="py-3.5 px-4">Ustadz Pengampu</th>
-                    <th className="py-3.5 px-4 w-44 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/30 text-sm">
-                  {paginated.map((group, index) => {
-                    const assignedTeachers = state.groupTeachers.filter(
-                      (gt) => gt.group_id === group.id
-                    )
-                    const className = group.class_name || state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas'
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head className="w-16 text-center">No</Table.Head>
+                  <Table.Head>Nama Kelompok</Table.Head>
+                  <Table.Head>Kelas</Table.Head>
+                  <Table.Head>Ustadz Pengampu</Table.Head>
+                  <Table.Head className="w-44 text-center">Aksi</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {paginated.map((group, index) => {
+                  const assignedTeachers = state.groupTeachers.filter(
+                    (gt) => gt.group_id === group.id
+                  )
+                  const className = group.class_name || state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas'
 
-                    return (
-                      <tr key={group.id} className="hover:bg-card/30 transition-colors">
-                        <td className="py-3.5 px-4 text-center font-medium text-text-muted">
-                          {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-text">{group.name}</span>
+                  return (
+                    <Table.Row key={group.id}>
+                      <Table.Cell className="text-center font-medium text-text-muted">
+                        {(page - 1) * ITEMS_PER_PAGE + index + 1}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <span className="font-semibold text-text">{group.name}</span>
+                      </Table.Cell>
+                      <Table.Cell className="text-text-secondary font-medium">
+                        {className !== 'Tanpa Kelas' ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                            {className}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-text-muted italic">{className}</span>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {assignedTeachers.length === 0 ? (
+                          <span className="text-xs text-text-muted italic">Belum ditugaskan</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {assignedTeachers.map((gt) => {
+                              const name = allTeachers[gt.teacher_id] || 'Ustadz'
+                              return (
+                                <span
+                                  key={gt.id}
+                                  className="inline-flex items-center px-2 py-0.5 rounded bg-background border border-border/50 text-xs font-medium text-text-secondary"
+                                >
+                                  {name}
+                                </span>
+                              )
+                            })}
                           </div>
-                        </td>
-                        <td className="py-3.5 px-4 text-text-secondary font-medium">
-                          {className !== 'Tanpa Kelas' ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                              {className}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-text-muted italic">{className}</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          {assignedTeachers.length === 0 ? (
-                            <span className="text-xs text-text-muted italic">Belum ditugaskan</span>
-                          ) : (
-                            <div className="flex flex-wrap gap-1">
-                              {assignedTeachers.map((gt) => {
-                                const name = allTeachers[gt.teacher_id] || 'Ustadz'
-                                return (
-                                  <span
-                                    key={gt.id}
-                                    className="inline-flex items-center px-2 py-0.5 rounded bg-background border border-border/50 text-xs font-medium text-text-secondary"
-                                  >
-                                    {name}
-                                  </span>
-                                )
-                              })}
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => openDetailModal(group)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
-                              title="Detail"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => openEditModal(group)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
-                              title="Edit"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              shape="square"
-                              onClick={() => handleDeleteGroup(group.id, group.name)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
-                              title="Hapus"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell className="text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => openDetailModal(group)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
+                            title="Detail"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => openEditModal(group)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            shape="square"
+                            onClick={() => handleDeleteGroup(group.id, group.name)}
+                            className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
+                            title="Hapus"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                })}
+              </Table.Body>
+            </Table>
           )}
           <Pagination
             currentPage={page}

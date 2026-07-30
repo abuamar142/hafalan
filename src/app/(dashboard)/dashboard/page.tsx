@@ -4,6 +4,7 @@ import { useDashboard } from '../layout'
 import { getPct, getTotalHafal } from '@/lib/helpers'
 import { computeRanking, computeDashboardStats } from '@/lib/domain/statistics'
 import { Card, CardContent } from '@/components/ui/Card'
+import { Table, Badge } from '@cloudflare/kumo'
 import { Users, TrendingUp, BookOpen, Trophy } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -72,56 +73,59 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Student list */}
-          <div className="divide-y divide-border/30">
-            {sorted.slice(0, 10).map((s, i) => {
-              const pct = getPct(s)
-              const hafal = getTotalHafal(s)
+          {/* Student list table */}
+          <Table layout="fixed">
+            <Table.Header>
+              <Table.Row>
+                <Table.Head className="w-12 text-center">#</Table.Head>
+                <Table.Head>Nama Santri</Table.Head>
+                <Table.Head className="w-20 text-center">Progress</Table.Head>
+                <Table.Head className="w-20 text-center">Hafal</Table.Head>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {sorted.slice(0, 10).map((s, i) => {
+                const pct = getPct(s)
+                const hafal = getTotalHafal(s)
 
-              return (
-                <div
-                  key={s.id}
-                  className="flex items-center gap-4 p-4 hover:bg-card/50 transition-colors"
-                >
-                  {/* Rank */}
-                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                    i === 0 ? 'bg-accent/15 text-accent ring-1 ring-accent/30' :
-                    i === 1 ? 'bg-zinc-200 text-zinc-600 ring-1 ring-zinc-300' :
-                    i === 2 ? 'bg-amber-700/10 text-amber-800 ring-1 ring-amber-700/20' :
-                    'bg-surface border border-border text-text-secondary'
-                  }`}>
-                    {i + 1}
-                  </div>
-
-                  {/* Info */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <div className="truncate text-[15px] font-semibold text-text">
+                return (
+                  <Table.Row key={s.id}>
+                    <Table.Cell className="text-center">
+                      {i === 0 ? (
+                        <Badge variant="success" className="!rounded-full !px-2">{i + 1}</Badge>
+                      ) : i === 1 ? (
+                        <Badge variant="secondary" className="!rounded-full !px-2">{i + 1}</Badge>
+                      ) : i === 2 ? (
+                        <Badge variant="warning" className="!rounded-full !px-2">{i + 1}</Badge>
+                      ) : (
+                        <span className="text-sm font-medium text-text-muted">{i + 1}</span>
+                      )}
+                    </Table.Cell>
+                    <Table.Cell>
+                      <div className="font-semibold text-text">
                         {s.nama}
                         {s.kelas && (
-                          <span className="ml-2 text-[13px] font-normal text-text-muted">({s.kelas})</span>
+                          <span className="ml-2 text-sm font-normal text-text-muted">({s.kelas})</span>
                         )}
                       </div>
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="flex-1 h-2 mt-2 bg-border/40 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
-                        style={{ width: pct + '%' }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Hafal count */}
-                  <div className="shrink-0 text-right">
-                    <div className="text-sm font-bold text-primary">{hafal}</div>
-                    <div className="text-[11px] font-medium text-text-muted uppercase tracking-wider">Surah</div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <div className="w-full h-2 bg-border/40 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+                          style={{ width: pct + '%' }}
+                        />
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell className="text-center">
+                      <span className="text-sm font-bold text-primary">{hafal}</span>
+                      <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider ml-1">Surah</span>
+                    </Table.Cell>
+                  </Table.Row>
+                )
+              })}
+            </Table.Body>
+          </Table>
         </CardContent>
       </Card>
     </div>

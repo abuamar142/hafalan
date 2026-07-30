@@ -4,11 +4,20 @@ import { useState, useMemo } from 'react'
 import { useDashboard } from '../../layout'
 import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
-import { Combobox, Input } from '@cloudflare/kumo'
+import { Combobox, Input, Badge, Pagination } from '@cloudflare/kumo'
 import { Edit } from 'lucide-react'
 import EditSubmissionModal from '@/components/EditSubmissionModal'
 
 const PAGE_SIZE = 20
+
+function nilaiBadgeVariant(nilai: string) {
+  const norm = nilai.toLowerCase()
+  if (norm.includes('mumtaz')) return 'success' as const
+  if (norm.includes('jiddan')) return 'primary' as const
+  if (norm.includes('jayyid')) return 'info' as const
+  if (norm.includes('maqbul')) return 'warning' as const
+  return 'error' as const
+}
 
 export default function RiwayatSetoranPage() {
   const { state, refreshSubmissions } = useDashboard()
@@ -231,9 +240,7 @@ export default function RiwayatSetoranPage() {
                   >
                     <Edit className="w-3.5 h-3.5" />
                   </button>
-                  <span className="shrink-0 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[11px] font-bold text-primary animate-in fade-in">
-                    {item.nilai}
-                  </span>
+                  <Badge variant={nilaiBadgeVariant(item.nilai)}>{item.nilai}</Badge>
                 </div>
                 {item.guru_nama && (
                   <div className="text-xs font-medium text-text-secondary whitespace-nowrap">
@@ -250,37 +257,9 @@ export default function RiwayatSetoranPage() {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex items-center justify-center gap-2">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={safePage <= 1}
-            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
-          >
-            Sebelumnya
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`min-w-[32px] rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors cursor-pointer ${
-                p === safePage
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-text-secondary hover:bg-card border border-transparent hover:border-border/50'
-              }`}
-            >
-              {p}
-            </button>
-          ))}
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={safePage >= totalPages}
-            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
-          >
-            Selanjutnya
-          </button>
-        </div>
-      )}
+      <Pagination page={safePage} setPage={setPage} totalCount={filtered.length} perPage={PAGE_SIZE}>
+        <Pagination.Controls />
+      </Pagination>
 
       {/* Edit Submission Modal */}
       <EditSubmissionModal

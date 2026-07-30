@@ -1,19 +1,20 @@
+import { SkeletonLine } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
 
 export default function SantriLoading() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6">
       {/* Header Skeleton */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-2">
-          <div className="h-8 w-28 rounded-md bg-border/60" />
-          <div className="h-4 w-48 rounded-md bg-border/40" />
+          <SkeletonLine maxWidth={120} blockHeight="32px" />
+          <SkeletonLine maxWidth={200} blockHeight="16px" />
         </div>
-        <div className="h-10 w-36 rounded-md bg-border/50 shrink-0" />
+        <SkeletonLine maxWidth={150} blockHeight="40px" className="shrink-0" />
       </div>
 
       {/* Search Input Skeleton */}
-      <div className="h-9 w-64 rounded-md bg-border/40" />
+      <SkeletonLine maxWidth={260} blockHeight="36px" />
 
       {/* Table Skeleton */}
       <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
@@ -22,31 +23,31 @@ export default function SantriLoading() {
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-border/50 bg-card/50">
-                  <th className="py-3.5 px-4 w-16"><div className="h-4 w-8 rounded bg-border/60 mx-auto" /></th>
-                  <th className="py-3.5 px-4"><div className="h-4 w-28 rounded bg-border/60" /></th>
-                  <th className="py-3.5 px-4"><div className="h-4 w-24 rounded bg-border/60" /></th>
-                  <th className="py-3.5 px-4"><div className="h-4 w-16 rounded bg-border/60" /></th>
-                  <th className="py-3.5 px-4 text-center"><div className="h-4 w-20 rounded bg-border/60 mx-auto" /></th>
-                  <th className="py-3.5 px-4 w-44 text-center"><div className="h-4 w-16 rounded bg-border/60 mx-auto" /></th>
+                  <th className="py-3.5 px-4 w-16"><SkeletonLine maxWidth={32} blockHeight="16px" className="mx-auto" /></th>
+                  <th className="py-3.5 px-4"><SkeletonLine maxWidth={120} blockHeight="16px" /></th>
+                  <th className="py-3.5 px-4"><SkeletonLine maxWidth={100} blockHeight="16px" /></th>
+                  <th className="py-3.5 px-4"><SkeletonLine maxWidth={70} blockHeight="16px" /></th>
+                  <th className="py-3.5 px-4 text-center"><SkeletonLine maxWidth={90} blockHeight="16px" className="mx-auto" /></th>
+                  <th className="py-3.5 px-4 w-44 text-center"><SkeletonLine maxWidth={70} blockHeight="16px" className="mx-auto" /></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/30">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                  <tr key={i} className="hover:bg-card/30">
-                    <td className="py-3.5 px-4"><div className="h-4 w-4 rounded bg-border/40 mx-auto" /></td>
-                    <td className="py-3.5 px-4"><div className="h-4 w-40 rounded bg-border/55" /></td>
-                    <td className="py-3.5 px-4"><div className="h-4 w-32 rounded bg-border/40" /></td>
-                    <td className="py-3.5 px-4"><div className="h-4 w-20 rounded bg-border/40" /></td>
+                  <tr key={i}>
+                    <td className="py-3.5 px-4"><SkeletonLine maxWidth={20} blockHeight="16px" className="mx-auto" /></td>
+                    <td className="py-3.5 px-4"><SkeletonLine minWidth={100} maxWidth={180} blockHeight="16px" /></td>
+                    <td className="py-3.5 px-4"><SkeletonLine minWidth={80} maxWidth={150} blockHeight="16px" /></td>
+                    <td className="py-3.5 px-4"><SkeletonLine minWidth={60} maxWidth={100} blockHeight="16px" /></td>
                     <td className="py-3.5 px-4">
                       <div className="max-w-[120px] mx-auto space-y-1.5">
-                        <div className="h-2 w-full rounded bg-border/40" />
-                        <div className="h-3 w-8 rounded bg-border/50 mx-auto" />
+                        <SkeletonLine blockHeight="8px" />
+                        <SkeletonLine maxWidth={40} blockHeight="12px" className="mx-auto" />
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center justify-center gap-2">
-                        <div className="h-8 w-16 rounded bg-border/50" />
-                        <div className="h-8 w-16 rounded bg-border/50" />
+                        <SkeletonLine maxWidth={70} blockHeight="32px" />
+                        <SkeletonLine maxWidth={70} blockHeight="32px" />
                       </div>
                     </td>
                   </tr>
