@@ -9,8 +9,7 @@ import {
 } from '@/lib/actions/groups'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox, Table } from '@cloudflare/kumo'
-import Pagination from '@/components/Pagination'
+import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox, Table, Pagination } from '@cloudflare/kumo'
 import { Plus, Eye, PencilSimple, Trash, User, MagnifyingGlass } from '@phosphor-icons/react'
 
 export default function KelompokPage() {
@@ -39,8 +38,6 @@ export default function KelompokPage() {
     }
     return items
   }, [state.groups, searchQuery])
-
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
 
   const paginated = useMemo(() => {
     const start = (page - 1) * ITEMS_PER_PAGE
@@ -309,11 +306,9 @@ export default function KelompokPage() {
               </Table.Body>
             </Table>
           )}
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
+          <Pagination page={page} setPage={setPage} totalCount={filtered.length} perPage={ITEMS_PER_PAGE}>
+            <Pagination.Controls />
+          </Pagination>
         </CardContent>
       </Card>
 
