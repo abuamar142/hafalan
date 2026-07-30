@@ -9,17 +9,15 @@ import {
 } from '@/lib/actions/groups'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button, Dialog as KumoDialog, useKumoToastManager } from '@cloudflare/kumo'
 import { Input } from '@/components/ui/Input'
-import Modal from '@/components/Modal'
 import Pagination from '@/components/Pagination'
 import { Combobox } from '@/components/ui/Combobox'
-import { useToast } from '@/components/ui/Toast'
 import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
 
 export default function KelompokPage() {
   const { state, refreshClasses } = useDashboard()
-  const { toast } = useToast()
+  const toastManager = useKumoToastManager()
 
   const classOptions = useMemo(() => {
     return [
@@ -121,11 +119,11 @@ export default function KelompokPage() {
       setGroupName('')
       setAddOpen(false)
       await refreshClasses()
-      toast('Kelompok berhasil ditambahkan!')
+      toastManager.add({ title: 'Kelompok berhasil ditambahkan!', variant: 'success' })
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal membuat kelompok: ' + msg)
-      toast('Gagal membuat kelompok: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal membuat kelompok: ' + msg, variant: 'error' })
     } finally {
       setSaving(false)
     }
@@ -143,11 +141,11 @@ export default function KelompokPage() {
       await updateGroupAction(selectedGroup.id, groupName.trim(), selectedClassId, selectedTeacherIds)
       setEditOpen(false)
       await refreshClasses()
-      toast('Kelompok berhasil diperbarui!')
+      toastManager.add({ title: 'Kelompok berhasil diperbarui!', variant: 'success' })
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal memperbarui kelompok: ' + msg)
-      toast('Gagal memperbarui kelompok: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal memperbarui kelompok: ' + msg, variant: 'error' })
     } finally {
       setSaving(false)
     }
@@ -159,10 +157,10 @@ export default function KelompokPage() {
     try {
       await deleteGroupAction(id)
       await refreshClasses()
-      toast('Kelompok berhasil dihapus!')
+      toastManager.add({ title: 'Kelompok berhasil dihapus!', variant: 'success' })
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      toast('Gagal menghapus kelompok: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal menghapus kelompok: ' + msg, variant: 'error' })
     } finally {
       setSaving(false)
     }
@@ -280,7 +278,7 @@ export default function KelompokPage() {
                           <div className="flex items-center justify-center gap-1.5">
                             <Button
                               variant="ghost"
-                              size="icon"
+                              shape="square"
                               onClick={() => openDetailModal(group)}
                               className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
                               title="Detail"
@@ -290,7 +288,7 @@ export default function KelompokPage() {
                             
                             <Button
                               variant="ghost"
-                              size="icon"
+                              shape="square"
                               onClick={() => openEditModal(group)}
                               className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
                               title="Edit"
@@ -299,7 +297,7 @@ export default function KelompokPage() {
                             </Button>
                             <Button
                               variant="ghost"
-                              size="icon"
+                              shape="square"
                               onClick={() => handleDeleteGroup(group.id, group.name)}
                               className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
                               title="Hapus"
@@ -324,180 +322,183 @@ export default function KelompokPage() {
       </Card>
 
       {/* Add Modal */}
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Buat Kelompok Baru">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Nama Kelompok / Halaqah <span className="text-red">*</span>
-            </label>
-            <Input
-              type="text"
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-              placeholder="Misal: Halaqah Abu Bakar, Kelompok A"
-              disabled={saving}
-            />
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleAddGroup} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan Kelompok'}
-          </Button>
-        </div>
-      </Modal>
-
-      {/* Edit Modal */}
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Kelompok">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
-            {error}
-          </div>
-        )}
-        {selectedGroup && (
+      <KumoDialog.Root open={addOpen} onOpenChange={(open) => { if (!open) setAddOpen(false) }}>
+        <KumoDialog.Title>Buat Kelompok Baru</KumoDialog.Title>
+        <KumoDialog>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+              {error}
+            </div>
+          )}
           <div className="space-y-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                Nama Kelompok <span className="text-red">*</span>
+                Nama Kelompok / Halaqah <span className="text-red">*</span>
               </label>
               <Input
                 type="text"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                placeholder="Misal: Halaqah Abu Bakar"
+                placeholder="Misal: Halaqah Abu Bakar, Kelompok A"
                 disabled={saving}
               />
             </div>
-
-            <div>
-              <label htmlFor="edit-class-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                Kelas
-              </label>
-              <Combobox
-                id="edit-class-select"
-                options={classOptions}
-                value={selectedClassId === null ? '' : selectedClassId}
-                onChange={(val) => setSelectedClassId(val === '' ? null : Number(val))}
-                placeholder="Pilih Kelas..."
-                searchPlaceholder="Cari kelas..."
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                Pilih Ustadz Pengampu
-              </label>
-              {Object.keys(allTeachers).length === 0 ? (
-                <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
-                  Tidak ada guru terdaftar.
-                </p>
-              ) : (
-                <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
-                  {Object.entries(allTeachers).map(([tid, name]) => (
-                    <label
-                      key={tid}
-                      className="flex items-center gap-2.5 text-sm text-text-secondary hover:text-text cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedTeacherIds.includes(tid)}
-                        onChange={() => toggleTeacherSelection(tid)}
-                        className="rounded border-border text-primary focus:ring-primary w-4 h-4"
-                      />
-                      <span>{name}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
-        )}
 
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleEditGroup} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Perbarui Kelompok'}
-          </Button>
-        </div>
-      </Modal>
+          <div className="mt-6 flex justify-end gap-2">
+            <KumoDialog.Close render={(props) => <Button variant="secondary" {...props}>Batal</Button>} />
+            <Button onClick={handleAddGroup} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Simpan Kelompok'}
+            </Button>
+          </div>
+        </KumoDialog>
+      </KumoDialog.Root>
+
+      {/* Edit Modal */}
+      <KumoDialog.Root open={editOpen} onOpenChange={(open) => { if (!open) setEditOpen(false) }}>
+        <KumoDialog.Title>Edit Kelompok</KumoDialog.Title>
+        <KumoDialog>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+              {error}
+            </div>
+          )}
+          {selectedGroup && (
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                  Nama Kelompok <span className="text-red">*</span>
+                </label>
+                <Input
+                  type="text"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  placeholder="Misal: Halaqah Abu Bakar"
+                  disabled={saving}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="edit-class-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                  Kelas
+                </label>
+                <Combobox
+                  id="edit-class-select"
+                  options={classOptions}
+                  value={selectedClassId === null ? '' : selectedClassId}
+                  onChange={(val) => setSelectedClassId(val === '' ? null : Number(val))}
+                  placeholder="Pilih Kelas..."
+                  searchPlaceholder="Cari kelas..."
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                  Pilih Ustadz Pengampu
+                </label>
+                {Object.keys(allTeachers).length === 0 ? (
+                  <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+                    Tidak ada guru terdaftar.
+                  </p>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
+                    {Object.entries(allTeachers).map(([tid, name]) => (
+                      <label
+                        key={tid}
+                        className="flex items-center gap-2.5 text-sm text-text-secondary hover:text-text cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedTeacherIds.includes(tid)}
+                          onChange={() => toggleTeacherSelection(tid)}
+                          className="rounded border-border text-primary focus:ring-primary w-4 h-4"
+                        />
+                        <span>{name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 flex justify-end gap-2">
+            <KumoDialog.Close render={(props) => <Button variant="secondary" {...props}>Batal</Button>} />
+            <Button onClick={handleEditGroup} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Perbarui Kelompok'}
+            </Button>
+          </div>
+        </KumoDialog>
+      </KumoDialog.Root>
 
       {/* Detail Modal */}
-      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Detail Kelompok">
-        {selectedGroup && (
-          <div className="space-y-4">
-            <div className="bg-background rounded-lg p-4 border border-border space-y-3">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Nama Kelompok</label>
-                <div className="text-base font-bold text-text mt-0.5">{selectedGroup.name}</div>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Kelas</label>
-                <div className="text-sm font-semibold text-primary mt-0.5">
-                  {selectedGroup.class_name || state.classes.find(c => c.id === selectedGroup.class_id)?.name || (
-                    <span className="text-text-muted font-normal italic">Tanpa Kelas</span>
-                  )}
+      <KumoDialog.Root open={detailOpen} onOpenChange={(open) => { if (!open) setDetailOpen(false) }}>
+        <KumoDialog.Title>Detail Kelompok</KumoDialog.Title>
+        <KumoDialog>
+          {selectedGroup && (
+            <div className="space-y-4">
+              <div className="bg-background rounded-lg p-4 border border-border space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Nama Kelompok</label>
+                  <div className="text-base font-bold text-text mt-0.5">{selectedGroup.name}</div>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Tanggal Dibuat</label>
-                <div className="text-xs font-medium text-text-muted mt-0.5">
-                  {new Date(selectedGroup.created_at).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
+                
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Kelas</label>
+                  <div className="text-sm font-semibold text-primary mt-0.5">
+                    {selectedGroup.class_name || state.classes.find(c => c.id === selectedGroup.class_id)?.name || (
+                      <span className="text-text-muted font-normal italic">Tanpa Kelas</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-2">
-                Ustadz Pengampu
-              </label>
-              {state.groupTeachers.filter((gt) => gt.group_id === selectedGroup.id).length === 0 ? (
-                <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
-                  Belum ada ustadz ditugaskan ke kelompok ini.
-                </p>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  {state.groupTeachers
-                    .filter((gt) => gt.group_id === selectedGroup.id)
-                    .map((gt) => {
-                      const name = allTeachers[gt.teacher_id] || 'Ustadz'
-                      return (
-                        <div
-                          key={gt.id}
-                          className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-text-secondary"
-                        >
-                          <User className="w-4 h-4 text-primary shrink-0" />
-                          <span className="truncate">{name}</span>
-                        </div>
-                      )
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Tanggal Dibuat</label>
+                  <div className="text-xs font-medium text-text-muted mt-0.5">
+                    {new Date(selectedGroup.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
                     })}
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            <div className="mt-6 flex justify-end">
-              <Button onClick={() => setDetailOpen(false)}>
-                Tutup
-              </Button>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-2">
+                  Ustadz Pengampu
+                </label>
+                {state.groupTeachers.filter((gt) => gt.group_id === selectedGroup.id).length === 0 ? (
+                  <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+                    Belum ada ustadz ditugaskan ke kelompok ini.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {state.groupTeachers
+                      .filter((gt) => gt.group_id === selectedGroup.id)
+                      .map((gt) => {
+                        const name = allTeachers[gt.teacher_id] || 'Ustadz'
+                        return (
+                          <div
+                            key={gt.id}
+                            className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-text-secondary"
+                          >
+                            <User className="w-4 h-4 text-primary shrink-0" />
+                            <span className="truncate">{name}</span>
+                          </div>
+                        )
+                      })}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <KumoDialog.Close render={(props) => <Button variant="secondary" {...props}>Tutup</Button>} />
+              </div>
             </div>
-          </div>
-        )}
-      </Modal>
+          )}
+        </KumoDialog>
+      </KumoDialog.Root>
     </div>
   )
 }

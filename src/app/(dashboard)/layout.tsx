@@ -3,11 +3,10 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Sidebar from '@/components/Sidebar'
-import Modal from '@/components/Modal'
+import { Toasty, Dialog as KumoDialog } from '@cloudflare/kumo'
 import { useAppState, QK } from '@/hooks/useAppState'
 import { createClient } from '@/lib/supabase/client'
 import type { SantriWithCount, Memorization } from '@/lib/types'
-import { ToastProvider } from '@/components/ui/Toast'
 
 type App = ReturnType<typeof useAppState>
 
@@ -100,33 +99,42 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Settings Modal */}
-      <Modal
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        title="Pengaturan"
-      >
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs text-text-secondary">
-            Nama Ustadz / Guru
-          </label>
-          <input
-            type="text"
-            value={guruInput}
-            onChange={(e) => setGuruInput(e.target.value)}
-            placeholder="Ustadz Ahmad..."
-            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
-          />
-        </div>
-        <div className="mt-3.5 flex justify-end">
-          <button
-            onClick={handleSaveGuru}
-            className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity"
-          >
-            Simpan
-          </button>
-        </div>
-      </Modal>
+      {/* Settings Dialog */}
+      <KumoDialog.Root open={settingsOpen} onOpenChange={(open) => { if (!open) setSettingsOpen(false) }}>
+        <KumoDialog size="lg">
+          <KumoDialog.Title>Pengaturan</KumoDialog.Title>
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs text-text-secondary">
+                Nama Ustadz / Guru
+              </label>
+              <input
+                type="text"
+                value={guruInput}
+                onChange={(e) => setGuruInput(e.target.value)}
+                placeholder="Ustadz Ahmad..."
+                className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <KumoDialog.Close render={(props) => (
+                <button
+                  className="rounded-lg border border-border px-4 py-2 text-[13px] font-medium text-text-secondary hover:bg-card transition-colors"
+                  {...props}
+                >
+                  Batal
+                </button>
+              )} />
+              <button
+                onClick={handleSaveGuru}
+                className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </KumoDialog>
+      </KumoDialog.Root>
     </DashboardContext.Provider>
   )
 }
@@ -138,9 +146,9 @@ export default function DashboardLayout({
 }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>
+      <Toasty>
         <DashboardContent>{children}</DashboardContent>
-      </ToastProvider>
+      </Toasty>
     </QueryClientProvider>
   )
 }

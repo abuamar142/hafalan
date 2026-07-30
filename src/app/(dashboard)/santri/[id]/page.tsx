@@ -18,9 +18,8 @@ import {
   formatWaktu,
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
-import { Button } from '@/components/ui/Button'
+import { Button, useKumoToastManager } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
-import { useToast } from '@/components/ui/Toast'
 import { ArrowLeft, Trash2, CheckCircle2, RotateCcw, Circle } from 'lucide-react'
 
 export default function ProfilPage({
@@ -32,7 +31,7 @@ export default function ProfilPage({
   const queryClient = useQueryClient()
   const { state, refreshStudents, refreshMemorization, getStudent, getStudentMemorization } =
     useDashboard()
-  const { toast } = useToast()
+  const toastManager = useKumoToastManager()
 
   const [studentId, setStudentId] = useState<number | null>(null)
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
@@ -110,12 +109,12 @@ export default function ProfilPage({
     try {
       await toggleMemorizationAction(studentId, surahNo, next)
       await refreshMemorization()
-      toast('Status hafalan berhasil diperbarui!')
+      toastManager.add({ title: 'Status hafalan berhasil diperbarui!', variant: 'success' })
     } catch (e: unknown) {
       // Rollback on error
       queryClient.setQueryData(QK.memorization, prev)
       const msg = e instanceof Error ? e.message : String(e)
-      toast('Gagal memperbarui status hafalan: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal memperbarui status hafalan: ' + msg, variant: 'error' })
     }
   }
 
@@ -125,11 +124,11 @@ export default function ProfilPage({
     try {
       await deleteStudentAction(studentId)
       await refreshStudents()
-      toast('Santri berhasil dihapus!')
+      toastManager.add({ title: 'Santri berhasil dihapus!', variant: 'success' })
       router.push('/santri')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      toast('Gagal menghapus data santri: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal menghapus data santri: ' + msg, variant: 'error' })
     }
   }
 

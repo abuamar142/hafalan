@@ -4,13 +4,13 @@ import { useEffect, useState, useCallback } from 'react'
 import { useDashboard } from '../../layout'
 import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { addSubmissionAction } from '@/lib/actions/submissions'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@cloudflare/kumo'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Save, BookOpen, History } from 'lucide-react'
 import { getColor, initials, getPct, getTotalHafal, formatWaktu, getSurahNama } from '@/lib/helpers'
 import { Combobox } from '@/components/ui/Combobox'
-import { useToast } from '@/components/ui/Toast'
+import { useKumoToastManager } from '@cloudflare/kumo'
 
 function toLocalDatetimeString(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -19,7 +19,7 @@ function toLocalDatetimeString(d: Date) {
 
 export default function TambahSetoranPage() {
   const { state, refreshSubmissions } = useDashboard()
-  const { toast } = useToast()
+  const toastManager = useKumoToastManager()
 
   const [santriId, setSantriId] = useState('')
   const [surahNo, setSurahNo] = useState('')
@@ -85,7 +85,7 @@ export default function TambahSetoranPage() {
 
   async function handleSubmit() {
     if (!santriId || !surahNo) {
-      toast('Santri dan Surah harus dipilih', 'error')
+      toastManager.add({ title: 'Santri dan Surah harus dipilih', variant: 'error' })
       return
     }
 
@@ -113,10 +113,10 @@ export default function TambahSetoranPage() {
       resetDatetime()
 
       await refreshSubmissions()
-      toast('Setoran berhasil disimpan!', 'success')
+      toastManager.add({ title: 'Setoran berhasil disimpan!', variant: 'success' })
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      toast('Gagal menyimpan: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal menyimpan: ' + msg, variant: 'error' })
     } finally {
       setSaving(false)
     }

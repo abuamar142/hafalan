@@ -14,12 +14,10 @@ import {
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button, Dialog as KumoDialog, useKumoToastManager } from '@cloudflare/kumo'
 import { Input } from '@/components/ui/Input'
-import Modal from '@/components/Modal'
 import Pagination from '@/components/Pagination'
 import { Combobox } from '@/components/ui/Combobox'
-import { useToast } from '@/components/ui/Toast'
 import {
   Plus,
   Eye,
@@ -37,7 +35,7 @@ import {
 
 export default function SantriPage() {
   const { state, refreshStudents, getStudentMemorization } = useDashboard()
-  const { toast } = useToast()
+  const toastManager = useKumoToastManager()
 
   const groupOptions = useMemo(() => {
     return state.groups.map((g) => {
@@ -163,11 +161,11 @@ export default function SantriPage() {
       setGroupId('')
       setAddOpen(false)
       await refreshStudents()
-      toast('Siswa berhasil ditambahkan!')
+      toastManager.add({ title: 'Siswa berhasil ditambahkan!', variant: 'success' })
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal menyimpan: ' + msg)
-      toast('Gagal menambahkan siswa: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal menambahkan siswa: ' + msg, variant: 'error' })
     } finally {
       setSaving(false)
     }
@@ -189,11 +187,11 @@ export default function SantriPage() {
       await updateStudentAction(selectedStudent.id, nama.trim(), Number(groupId))
       setEditOpen(false)
       await refreshStudents()
-      toast('Siswa berhasil diperbarui!')
+      toastManager.add({ title: 'Siswa berhasil diperbarui!', variant: 'success' })
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setError('Gagal memperbarui: ' + msg)
-      toast('Gagal memperbarui siswa: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal memperbarui siswa: ' + msg, variant: 'error' })
     } finally {
       setSaving(false)
     }
@@ -205,10 +203,10 @@ export default function SantriPage() {
     try {
       await deleteStudentAction(id)
       await refreshStudents()
-      toast('Siswa berhasil dihapus!')
+      toastManager.add({ title: 'Siswa berhasil dihapus!', variant: 'success' })
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      toast('Gagal menghapus siswa: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal menghapus siswa: ' + msg, variant: 'error' })
     } finally {
       setSaving(false)
     }
@@ -222,10 +220,10 @@ export default function SantriPage() {
       const next = toggleSurahCycle(current)
       await toggleMemorizationAction(selectedStudent.id, surahNo, next)
       await refreshStudents()
-      toast('Status hafalan berhasil diperbarui!')
+      toastManager.add({ title: 'Status hafalan berhasil diperbarui!', variant: 'success' })
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      toast('Gagal memperbarui status hafalan: ' + msg, 'error')
+      toastManager.add({ title: 'Gagal memperbarui status hafalan: ' + msg, variant: 'error' })
     } finally {
       setToggling(false)
     }
@@ -343,7 +341,7 @@ export default function SantriPage() {
                           <div className="flex items-center justify-center gap-1.5">
                             <Button
                               variant="ghost"
-                              size="icon"
+                              shape="square"
                               onClick={() => openDetailModal(s)}
                               className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
                               title="Progres Hafalan"
@@ -352,7 +350,7 @@ export default function SantriPage() {
                             </Button>
                             <Button
                               variant="ghost"
-                              size="icon"
+                              shape="square"
                               onClick={() => openEditModal(s)}
                               className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
                               title="Edit"
@@ -361,7 +359,7 @@ export default function SantriPage() {
                             </Button>
                             <Button
                               variant="ghost"
-                              size="icon"
+                              shape="square"
                               onClick={() => handleDelete(s.id, s.nama)}
                               className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
                               title="Hapus"
@@ -386,102 +384,106 @@ export default function SantriPage() {
       </Card>
 
       {/* Add Modal */}
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Tambah Siswa Baru">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Nama Lengkap <span className="text-red">*</span>
-            </label>
-            <Input
-              type="text"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              placeholder="Masukkan nama lengkap"
-              disabled={saving}
-            />
+      <KumoDialog.Root open={addOpen} onOpenChange={(open) => { if (!open) setAddOpen(false) }}>
+        <KumoDialog.Title>Tambah Siswa Baru</KumoDialog.Title>
+        <KumoDialog>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+              {error}
+            </div>
+          )}
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Nama Lengkap <span className="text-red">*</span>
+              </label>
+              <Input
+                type="text"
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                placeholder="Masukkan nama lengkap"
+                disabled={saving}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Kelompok Halaqah <span className="text-red">*</span>
+              </label>
+              <Combobox
+                id="add-group-select"
+                options={groupOptions}
+                value={groupId}
+                onChange={setGroupId}
+                placeholder="Pilih Kelompok..."
+                searchPlaceholder="Cari kelompok..."
+                emptyText="Kelompok tidak ditemukan"
+              />
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Kelompok Halaqah <span className="text-red">*</span>
-            </label>
-            <Combobox
-              id="add-group-select"
-              options={groupOptions}
-              value={groupId}
-              onChange={setGroupId}
-              placeholder="Pilih Kelompok..."
-              searchPlaceholder="Cari kelompok..."
-              emptyText="Kelompok tidak ditemukan"
-            />
+          <div className="mt-6 flex justify-end gap-2">
+            <KumoDialog.Close render={(props) => <Button variant="secondary" {...props}>Batal</Button>} />
+            <Button onClick={handleAdd} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Simpan Siswa'}
+            </Button>
           </div>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleAdd} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan Siswa'}
-          </Button>
-        </div>
-      </Modal>
+        </KumoDialog>
+      </KumoDialog.Root>
 
       {/* Edit Modal */}
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Siswa">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Nama Lengkap <span className="text-red">*</span>
-            </label>
-            <Input
-              type="text"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              placeholder="Masukkan nama lengkap"
-              disabled={saving}
-            />
+      <KumoDialog.Root open={editOpen} onOpenChange={(open) => { if (!open) setEditOpen(false) }}>
+        <KumoDialog.Title>Edit Siswa</KumoDialog.Title>
+        <KumoDialog>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+              {error}
+            </div>
+          )}
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Nama Lengkap <span className="text-red">*</span>
+              </label>
+              <Input
+                type="text"
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                placeholder="Masukkan nama lengkap"
+                disabled={saving}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Kelompok Halaqah <span className="text-red">*</span>
+              </label>
+              <Combobox
+                id="edit-group-select"
+                options={groupOptions}
+                value={groupId}
+                onChange={setGroupId}
+                placeholder="Pilih Kelompok..."
+                searchPlaceholder="Cari kelompok..."
+                emptyText="Kelompok tidak ditemukan"
+              />
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Kelompok Halaqah <span className="text-red">*</span>
-            </label>
-            <Combobox
-              id="edit-group-select"
-              options={groupOptions}
-              value={groupId}
-              onChange={setGroupId}
-              placeholder="Pilih Kelompok..."
-              searchPlaceholder="Cari kelompok..."
-              emptyText="Kelompok tidak ditemukan"
-            />
+          <div className="mt-6 flex justify-end gap-2">
+            <KumoDialog.Close render={(props) => <Button variant="secondary" {...props}>Batal</Button>} />
+            <Button onClick={handleEdit} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Perbarui Siswa'}
+            </Button>
           </div>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleEdit} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Perbarui Siswa'}
-          </Button>
-        </div>
-      </Modal>
+        </KumoDialog>
+      </KumoDialog.Root>
 
       {/* Interactive Detail Modal (with Juz Grid and Setoran History) */}
-      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Detail & Progres Siswa" className="max-w-4xl">
-        {selectedStudent && (
+      <KumoDialog.Root open={detailOpen} onOpenChange={(open) => { if (!open) setDetailOpen(false) }}>
+        <KumoDialog.Title>Detail &amp; Progres Siswa</KumoDialog.Title>
+        <KumoDialog size="xl">
+          {selectedStudent && (
           <div className="space-y-6">
             {/* Header info */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-background p-4 rounded-lg border border-border/50">
@@ -660,11 +662,12 @@ export default function SantriPage() {
             </div>
 
             <div className="mt-4 border-t border-border pt-4 flex justify-end">
-              <Button onClick={() => setDetailOpen(false)}>Tutup</Button>
+              <KumoDialog.Close render={(props) => <Button variant="secondary" {...props}>Tutup</Button>} />
             </div>
           </div>
         )}
-      </Modal>
+        </KumoDialog>
+      </KumoDialog.Root>
     </div>
   )
 }

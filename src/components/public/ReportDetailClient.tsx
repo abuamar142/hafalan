@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ALL_SURAHS } from '@/lib/constants'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@cloudflare/kumo'
 import {
   ArrowLeft,
   Printer,

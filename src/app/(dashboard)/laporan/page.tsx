@@ -11,7 +11,7 @@ import {
 import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@cloudflare/kumo'
 import { Combobox } from '@/components/ui/Combobox'
 import { FileText, Printer, Users, User } from 'lucide-react'
 
@@ -206,7 +206,7 @@ export default function LaporanPage() {
             <Button
               onClick={cetakIndividu}
               disabled={!selectedStudent || isGenerating}
-              variant={selectedStudent ? 'default' : 'secondary'}
+              variant={selectedStudent ? 'primary' : 'secondary'}
               className="w-full gap-2 shadow-sm"
             >
               <FileText className="w-4 h-4" />

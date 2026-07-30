@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import ParentSearchWizard from '@/components/public/ParentSearchWizard'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
 import { BookOpen, LogIn, School, Users, FileBarChart, Sparkles } from 'lucide-react'
 
