@@ -3,7 +3,7 @@ import Link from 'next/link'
 import ParentSearchWizard from '@/components/public/ParentSearchWizard'
 import { Button } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
-import { BookOpen, SignIn, GraduationCap, Users, ChartBar, Sparkle } from '@phosphor-icons/react'
+import { BookOpen, SignIn, GraduationCap, Users, ChartBar, Sparkle } from '@phosphor-icons/react/dist/ssr'
 
 export default function LandingPage() {
   return (
