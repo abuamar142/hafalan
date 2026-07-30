@@ -6,16 +6,21 @@ import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
 import { Combobox } from '@/components/ui/Combobox'
 import { Input } from '@/components/ui/Input'
+import { Edit } from 'lucide-react'
+import EditSubmissionModal from '@/components/EditSubmissionModal'
 
 const PAGE_SIZE = 20
 
 export default function RiwayatSetoranPage() {
-  const { state } = useDashboard()
+  const { state, refreshSubmissions } = useDashboard()
   const [search, setSearch] = useState('')
   const [kelasFilter, setKelasFilter] = useState('')
   const [kelompokFilter, setKelompokFilter] = useState('')
   const [guruFilter, setGuruFilter] = useState('')
   const [page, setPage] = useState(1)
+
+  // Edit Submission state
+  const [editingSubmission, setEditingSubmission] = useState<SetoranItem | null>(null)
 
   // Reset to page 1 when filters change
   function applyKelasFilter(val: string) { setKelasFilter(val); setKelompokFilter(''); setPage(1) }
@@ -200,11 +205,20 @@ export default function RiwayatSetoranPage() {
                 )}
               </div>
 
-              {/* Right: nilai, ustadz, tanggal */}
+              {/* Right: nilai, ustadz, tanggal, edit */}
               <div className="mt-3 flex flex-row items-center gap-3 sm:mt-0 sm:flex-col sm:items-end sm:gap-1.5 shrink-0">
-                <span className="shrink-0 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[11px] font-bold text-primary">
-                  {item.nilai}
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setEditingSubmission(item)}
+                    className="p-1 text-text-muted hover:text-primary hover:bg-primary/10 rounded transition-colors cursor-pointer"
+                    title="Edit Setoran"
+                  >
+                    <Edit className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="shrink-0 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[11px] font-bold text-primary animate-in fade-in">
+                    {item.nilai}
+                  </span>
+                </div>
                 {item.guru_nama && (
                   <div className="text-xs font-medium text-text-secondary whitespace-nowrap">
                     {item.guru_nama}
@@ -251,6 +265,14 @@ export default function RiwayatSetoranPage() {
           </button>
         </div>
       )}
+
+      {/* Edit Submission Modal */}
+      <EditSubmissionModal
+        submission={editingSubmission}
+        isOpen={!!editingSubmission}
+        onClose={() => setEditingSubmission(null)}
+        onSuccess={refreshSubmissions}
+      />
     </div>
   )
 }

@@ -28,6 +28,9 @@ export interface Submission {
   ayat_start: number | null
   ayat_end: number | null
   guru_name: string | null
+  updated_at?: string | null
+  updated_by?: string | null
+  updated_by_name?: string | null
 }
 
 // ── App-level types ──
@@ -56,6 +59,9 @@ export interface SetoranItem {
   ayat_end: number | null
   guru_id: string | null
   guru_nama: string
+  updated_at?: string | null
+  updated_by?: string | null
+  updated_by_name?: string | null
 }
 
 export interface Class {

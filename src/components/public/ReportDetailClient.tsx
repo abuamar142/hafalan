@@ -45,6 +45,8 @@ interface ReportDetailClientProps {
     ayat_start: number | null
     ayat_end: number | null
     guru_nama: string | null
+    updated_at?: string | null
+    updated_by_name?: string | null
   }[]
   memorizations: {
     surah_no: number
@@ -494,6 +496,14 @@ export default function ReportDetailClient({
                                   <User className="w-3.5 h-3.5 opacity-60" />
                                   Ustadz {sub.guru_nama || 'Pembina'}
                                 </span>
+                                {sub.updated_at && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="text-[10px] text-accent/80 font-bold bg-accent/5 border border-accent/25 px-1.5 py-0.5 rounded" title={`Diedit pada ${formatWaktu(sub.updated_at).tanggal} oleh Ustadz ${sub.updated_by_name || 'Pembina'}`}>
+                                      Diedit
+                                    </span>
+                                  </>
+                                )}
                               </div>
                             </div>
 
