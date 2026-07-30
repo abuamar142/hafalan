@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
   CheckSquare,
@@ -14,6 +15,7 @@ import {
   FolderOpen,
   Moon,
   Sun,
+  ChevronRight,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -26,6 +28,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuAction,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
@@ -111,6 +114,11 @@ function CollapsibleWithState({
           {item.icon}
           <span>{item.label}</span>
         </CollapsibleTrigger>
+        <SidebarMenuAction
+          className={cn("transition-transform duration-200", open && "rotate-90")}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </SidebarMenuAction>
         <CollapsibleContent>
           <SidebarMenuSub>
             {item.children!.map((child) => (
