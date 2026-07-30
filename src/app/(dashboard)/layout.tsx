@@ -2,7 +2,10 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import Sidebar from '@/components/Sidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarInset } from '@/components/ui/sidebar'
+import AppSidebar from '@/components/app-sidebar'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import Modal from '@/components/Modal'
 import { useAppState, QK } from '@/hooks/useAppState'
 import { createClient } from '@/lib/supabase/client'
@@ -77,28 +80,31 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         getStudentMemorization: app.getStudentMemorization,
       }}
     >
-      <div className="flex min-h-screen bg-background text-text">
-        {/* Sidebar */}
-        <Sidebar userName={userName} onOpenSettings={openSettings} />
-
-        {/* Main content area */}
-        <div className="flex min-h-screen flex-1 flex-col">
-          {/* Spacer for mobile hamburger — content starts below it on small screens */}
-          <div className="h-14 md:hidden" />
-
-          {/* Loading */}
-          {app.loading && (
-            <div className="flex flex-1 items-center justify-center py-16">
-              <div className="text-sm text-text-muted">Memuat data...</div>
+      <SidebarProvider>
+        <AppSidebar userName={userName} onOpenSettings={openSettings} />
+        <SidebarInset>
+          <header className="flex h-14 shrink-0 items-center gap-2 px-4 md:hidden">
+            <SidebarTrigger className="-ml-1" />
+            <div className="ml-auto">
+              <ThemeToggle />
             </div>
-          )}
+          </header>
 
-          {/* Content */}
-          {!app.loading && (
-            <main className="flex-1 p-4 md:p-8 w-full max-w-6xl mx-auto">{children}</main>
-          )}
-        </div>
-      </div>
+          <div className="flex min-h-screen flex-1 flex-col">
+            {/* Loading */}
+            {app.loading && (
+              <div className="flex flex-1 items-center justify-center py-16">
+                <div className="text-sm text-text-muted">Memuat data...</div>
+              </div>
+            )}
+
+            {/* Content */}
+            {!app.loading && (
+              <main className="flex-1 p-4 md:p-8 w-full max-w-6xl mx-auto">{children}</main>
+            )}
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
 
       {/* Settings Modal */}
       <Modal

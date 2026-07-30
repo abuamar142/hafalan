@@ -11,7 +11,7 @@ import {
 import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/Combobox'
 import { FileText, Printer, Users, User } from 'lucide-react'
 

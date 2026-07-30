@@ -5,7 +5,7 @@ import { useDashboard } from '../../layout'
 import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
 import { Combobox } from '@/components/ui/Combobox'
-import { Input } from '@/components/ui/Input'
+import { Input } from '@/components/ui/input'
 import { Edit } from 'lucide-react'
 import EditSubmissionModal from '@/components/EditSubmissionModal'
 

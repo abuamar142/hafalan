@@ -8,8 +8,8 @@ import {
   updateClassAction,
 } from '@/lib/actions/classes'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import Modal from '@/components/Modal'
 import Pagination from '@/components/Pagination'
 import { useToast } from '@/components/ui/Toast'

@@ -18,7 +18,7 @@ import {
   formatWaktu,
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { useToast } from '@/components/ui/Toast'
 import { ArrowLeft, Trash2, CheckCircle2, RotateCcw, Circle } from 'lucide-react'

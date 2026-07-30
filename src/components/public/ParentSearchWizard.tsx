@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Combobox } from '@/components/ui/Combobox'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Loader2, Search } from 'lucide-react'
 
 interface ClassData {
