@@ -20,7 +20,7 @@ import {
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { Button, useKumoToastManager, Badge } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
-import { ArrowLeft, Trash2, CheckCircle2, RotateCcw, Circle } from 'lucide-react'
+import { ArrowLeft, Trash, CheckCircle, ArrowCounterClockwise, Circle } from '@phosphor-icons/react'
 
 function nilaiBadgeVariant(nilai: string) {
   const norm = nilai.toLowerCase()
@@ -175,7 +175,7 @@ export default function ProfilPage({
         onClick={() => router.push('/santri')}
         className="mb-6 -ml-3 text-text-secondary hover:text-text"
       >
-        <ArrowLeft className="w-4 h-4 mr-2" />
+        <ArrowLeft size={16} className="mr-2" />
         Kembali
       </Button>
 
@@ -234,7 +234,7 @@ export default function ProfilPage({
             <div className="mb-6 flex items-center justify-between border-b border-border/50 pb-4">
               <div className="flex items-center gap-4">
                 <Button variant="outline" size="sm" onClick={() => setSelectedJuz(null)} className="h-8 px-2">
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft size={16} />
                 </Button>
                 <div>
                   <h3 className="text-lg font-bold text-text">Juz {selectedJuz}</h3>
@@ -262,11 +262,11 @@ export default function ProfilPage({
                       'bg-background text-text-muted border border-border group-hover:border-border-hover'
                     }`}>
                       {status === 1 ? (
-                        <CheckCircle2 className="w-5 h-5" />
+                        <CheckCircle size={20} />
                       ) : status === 2 ? (
-                        <RotateCcw className="w-5 h-5" />
+                        <ArrowCounterClockwise size={20} />
                       ) : (
-                        <Circle className="w-5 h-5 opacity-40" />
+                        <Circle size={20} className="opacity-40" />
                       )}
                     </div>
 
@@ -317,7 +317,7 @@ export default function ProfilPage({
                     )}
                     {p === 100 && (
                       <div className="absolute top-1 right-1">
-                        <CheckCircle2 className="w-3 h-3 text-white/70" />
+                        <CheckCircle size={12} className="text-white/70" />
                       </div>
                     )}
                   </button>
@@ -372,7 +372,7 @@ export default function ProfilPage({
                 className="w-full gap-2 opacity-90 hover:opacity-100"
                 onClick={handleDelete}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash size={16} />
                 Hapus Data Santri
               </Button>
               <p className="text-[11px] text-text-muted text-center mt-2">

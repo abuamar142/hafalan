@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox, Table } from '@cloudflare/kumo'
 import Pagination from '@/components/Pagination'
-import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
+import { Plus, Eye, PencilSimple, Trash, User, MagnifyingGlass } from '@phosphor-icons/react'
 
 export default function KelompokPage() {
   const { state, refreshClasses } = useDashboard()
@@ -190,14 +190,14 @@ export default function KelompokPage() {
           className="gap-2 shadow-sm"
           disabled={saving}
         >
-          <Plus className="w-4 h-4" />
+          <Plus size={16} />
           Tambah Kelompok
         </Button>
       </div>
 
       {/* Search */}
       <div className="relative mb-4 max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
         <Input
           type="text"
           value={searchQuery}
@@ -281,7 +281,7 @@ export default function KelompokPage() {
                             className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
                             title="Detail"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye size={16} />
                           </Button>
                           <Button
                             variant="ghost"
@@ -290,7 +290,7 @@ export default function KelompokPage() {
                             className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
                             title="Edit"
                           >
-                            <Edit className="w-4 h-4" />
+                            <PencilSimple size={16} />
                           </Button>
                           <Button
                             variant="ghost"
@@ -299,7 +299,7 @@ export default function KelompokPage() {
                             className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
                             title="Hapus"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash size={16} />
                           </Button>
                         </div>
                       </Table.Cell>
@@ -484,7 +484,7 @@ export default function KelompokPage() {
                             key={gt.id}
                             className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-text-secondary"
                           >
-                            <User className="w-4 h-4 text-primary shrink-0" />
+                            <User size={16} className="text-primary shrink-0" />
                             <span className="truncate">{name}</span>
                           </div>
                         )

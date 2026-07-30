@@ -3,7 +3,7 @@
 import { getColor, initials, getPct, getTotalHafal } from '@/lib/helpers'
 import type { SantriWithCount } from '@/lib/types'
 import { Card, CardContent } from '@/components/ui/Card'
-import { ChevronRight } from 'lucide-react'
+import { CaretRight } from '@phosphor-icons/react'
 
 interface SantriCardProps {
   student: SantriWithCount
@@ -70,7 +70,7 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
 
           {/* Action Icon */}
           <div className="shrink-0 pl-1 text-text-muted/50 transition-colors group-hover:text-text-muted">
-            <ChevronRight className="w-5 h-5" />
+            <CaretRight size={20} />
           </div>
         </CardContent>
       </Card>

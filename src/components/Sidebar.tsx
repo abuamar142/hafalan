@@ -5,16 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
-import {
-  LayoutDashboard,
-  CheckSquare,
-  FileBarChart,
-  Settings,
-  LogOut,
-  ChevronRight,
-  Menu,
-  FolderOpen
-} from 'lucide-react'
+import { Layout, CheckSquare, ChartBar, Gear, SignOut, CaretRight, List, FolderOpen } from '@phosphor-icons/react'
 
 interface NavItem {
   label: string
@@ -27,12 +18,12 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/dashboard',
-    icon: <LayoutDashboard className="w-5 h-5" />,
+    icon: <Layout size={20} />,
   },
   {
     label: 'Management',
     href: '/management',
-    icon: <FolderOpen className="w-5 h-5" />,
+    icon: <FolderOpen size={20} />,
     children: [
       { label: 'Kelas', href: '/kelas' },
       { label: 'Kelompok', href: '/kelompok' },
@@ -42,7 +33,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Setoran',
     href: '/setoran',
-    icon: <CheckSquare className="w-5 h-5" />,
+    icon: <CheckSquare size={20} />,
     children: [
       { label: 'Tambah Setoran', href: '/setoran/tambah' },
       { label: 'Riwayat Setoran', href: '/setoran/riwayat' },
@@ -51,7 +42,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Laporan',
     href: '/laporan',
-    icon: <FileBarChart className="w-5 h-5" />,
+    icon: <ChartBar size={20} />,
   },
 ]
 
@@ -153,8 +144,9 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
                   </span>
                   <span className="flex-1 text-left">{item.label}</span>
                   {hasChildren && (
-                    <ChevronRight
-                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''} ${isActive ? 'text-primary' : 'text-text-muted'}`}
+                    <CaretRight
+                      size={16}
+                      className={`transition-transform ${isExpanded ? 'rotate-90' : ''} ${isActive ? 'text-primary' : 'text-text-muted'}`}
                       onClick={(e) => {
                         e.stopPropagation()
                         if (isExpanded) {
@@ -206,14 +198,14 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
             }}
             className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary transition-all hover:bg-card hover:text-text"
           >
-            <Settings className="w-5 h-5 text-text-muted group-hover:text-text" />
+            <Gear size={20} className="text-text-muted group-hover:text-text" />
             Pengaturan
           </button>
           <button
             onClick={handleLogout}
             className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary transition-all hover:bg-red/10 hover:text-red"
           >
-            <LogOut className="w-5 h-5 text-text-muted group-hover:text-red" />
+            <SignOut size={20} className="text-text-muted group-hover:text-red" />
             Keluar
           </button>
         </div>
@@ -229,7 +221,7 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
         className="fixed top-0 left-0 z-50 flex h-14 w-14 items-center justify-center bg-surface text-text md:hidden border-b border-r border-border"
         aria-label="Buka menu"
       >
-        <Menu className="w-5 h-5" />
+        <List size={20} />
       </button>
 
       {/* Mobile overlay */}

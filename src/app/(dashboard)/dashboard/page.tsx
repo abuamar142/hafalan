@@ -5,7 +5,7 @@ import { getPct, getTotalHafal } from '@/lib/helpers'
 import { computeRanking, computeDashboardStats } from '@/lib/domain/statistics'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Table, Badge } from '@cloudflare/kumo'
-import { Users, TrendingUp, BookOpen, Trophy } from 'lucide-react'
+import { Users, TrendUp, BookOpen, Trophy } from '@phosphor-icons/react'
 
 export default function DashboardPage() {
   const { state } = useDashboard()
@@ -25,7 +25,7 @@ export default function DashboardPage() {
         <Card className="border-border/30 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Users className="w-6 h-6" />
+              <Users size={24} />
             </div>
             <div>
               <p className="text-sm font-medium text-text-muted">Total Santri</p>
@@ -37,7 +37,7 @@ export default function DashboardPage() {
         <Card className="border-border/30 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-              <TrendingUp className="w-6 h-6" />
+              <TrendUp size={24} />
             </div>
             <div>
               <p className="text-sm font-medium text-text-muted">Rata-rata Hafal</p>
@@ -49,7 +49,7 @@ export default function DashboardPage() {
         <Card className="border-border/30 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-purple/10 text-purple">
-              <BookOpen className="w-6 h-6" />
+              <BookOpen size={24} />
             </div>
             <div>
               <p className="text-sm font-medium text-text-muted">Total Setoran</p>
@@ -62,7 +62,7 @@ export default function DashboardPage() {
       {/* Leaderboard Section */}
       <Card className="border-border/30 shadow-sm">
         <div className="p-5 border-b border-border/50 flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-accent" />
+          <Trophy size={20} className="text-accent" />
           <h3 className="text-lg font-semibold text-text">Peringkat Hafalan</h3>
         </div>
         <CardContent className="p-0">

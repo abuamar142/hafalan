@@ -3,7 +3,7 @@ import Link from 'next/link'
 import ParentSearchWizard from '@/components/public/ParentSearchWizard'
 import { Button } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
-import { BookOpen, LogIn, School, Users, FileBarChart, Sparkles } from 'lucide-react'
+import { BookOpen, SignIn, GraduationCap, Users, ChartBar, Sparkle } from '@phosphor-icons/react'
 
 export default function LandingPage() {
   return (
@@ -44,7 +44,7 @@ export default function LandingPage() {
         </div>
         <Link href="/login">
           <Button variant="outline" size="sm" className="gap-2 cursor-pointer text-xs font-semibold hover:bg-card">
-            <LogIn className="w-3.5 h-3.5" />
+            <SignIn size={14} />
             Login Guru
           </Button>
         </Link>
@@ -55,7 +55,7 @@ export default function LandingPage() {
         {/* Hero Section */}
         <div className="text-center space-y-4 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold">
-            <BookOpen className="w-4 h-4" />
+            <BookOpen size={16} />
             <span>Portal Wali Murid</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-text leading-[1.15]">
@@ -76,7 +76,7 @@ export default function LandingPage() {
         <div className="w-full max-w-4xl space-y-6 pt-6">
           <div className="text-center space-y-1">
             <div className="inline-flex items-center gap-1 text-primary text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 animate-bounce" />
+              <Sparkle size={14} className="animate-bounce" />
               Petunjuk Pencarian
             </div>
             <h3 className="text-lg font-extrabold text-text">Panduan Cek Rapor</h3>
@@ -86,7 +86,7 @@ export default function LandingPage() {
             <Card className="border-border/30 bg-surface/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
               <CardContent className="p-5 flex gap-4 items-start">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
-                  <School className="w-5 h-5" />
+                  <GraduationCap size={20} />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-text mb-1">1. Pilih Kelas</h4>
@@ -100,7 +100,7 @@ export default function LandingPage() {
             <Card className="border-border/30 bg-surface/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
               <CardContent className="p-5 flex gap-4 items-start">
                 <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center font-bold shrink-0">
-                  <Users className="w-5 h-5" />
+                  <Users size={20} />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-text mb-1">2. Pilih Halaqah</h4>
@@ -114,7 +114,7 @@ export default function LandingPage() {
             <Card className="border-border/30 bg-surface/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
               <CardContent className="p-5 flex gap-4 items-start">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
-                  <FileBarChart className="w-5 h-5" />
+                  <ChartBar size={20} />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-text mb-1">3. Lihat Raport</h4>

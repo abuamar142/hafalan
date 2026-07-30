@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import ReportDetailClient from '@/components/public/ReportDetailClient'
-import { Loader2 } from 'lucide-react'
+import { Spinner } from '@phosphor-icons/react'
 
 export default function RaportDetailPage({
   params,
@@ -84,7 +84,7 @@ export default function RaportDetailPage({
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <Spinner size={40} className="animate-spin text-primary" />
         <p className="text-sm font-semibold text-text-secondary">Memuat Rapor Santri...</p>
       </div>
     )

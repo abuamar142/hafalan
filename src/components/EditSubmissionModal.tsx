@@ -5,7 +5,7 @@ import { Dialog as KumoDialog, Button, useKumoToastManager, Combobox, Input } fr
 import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { updateSubmissionAction } from '@/lib/actions/submissions'
 import type { SetoranItem } from '@/lib/types'
-import { Save, Loader2 } from 'lucide-react'
+import { FloppyDisk, Spinner } from '@phosphor-icons/react'
 
 interface EditSubmissionModalProps {
   submission: SetoranItem | null
@@ -259,7 +259,7 @@ export default function EditSubmissionModal({
             <div className="mt-6 flex justify-end gap-2 border-t border-border/40 pt-4">
               <KumoDialog.Close render={(props) => <Button variant="secondary" {...props}>Batal</Button>} />
               <Button onClick={handleSave} disabled={saving} className="gap-2 cursor-pointer">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {saving ? <Spinner size={16} className="animate-spin" /> : <FloppyDisk size={16} />}
                 {saving ? 'Menyimpan...' : 'Perbarui Setoran'}
               </Button>
             </div>

@@ -15,20 +15,7 @@ import {
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox, Table, Pagination } from '@cloudflare/kumo'
-import {
-  Plus,
-  Eye,
-  Edit,
-  Trash2,
-  Users,
-  Layers,
-  ArrowLeft,
-  CheckCircle2,
-  RotateCcw,
-  Circle,
-  FileText,
-  Search,
-} from 'lucide-react'
+import { Plus, Eye, PencilSimple, Trash, Users, Stack, ArrowLeft, CheckCircle, ArrowCounterClockwise, Circle, FileText, MagnifyingGlass } from '@phosphor-icons/react'
 
 export default function SantriPage() {
   const { state, refreshStudents, getStudentMemorization } = useDashboard()
@@ -234,7 +221,7 @@ export default function SantriPage() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-text">Manajemen Siswa</h2>
           <p className="text-sm text-text-muted mt-1 flex items-center gap-1.5">
-            <Users className="w-4 h-4" />
+            <Users size={16} />
             {state.students.length} siswa terdaftar
           </p>
         </div>
@@ -243,14 +230,14 @@ export default function SantriPage() {
           className="gap-2 shadow-sm"
           disabled={saving}
         >
-          <Plus className="w-4 h-4" />
+          <Plus size={16} />
           Tambah Siswa
         </Button>
       </div>
 
       {/* Search */}
       <div className="relative mb-4 max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
         <Input
           type="text"
           value={searchQuery}
@@ -301,7 +288,7 @@ export default function SantriPage() {
                       <Table.Cell className="text-text-secondary font-medium">
                         {groupName !== 'Tanpa Kelompok' ? (
                           <span className="inline-flex items-center gap-1.5">
-                            <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
+                            <Stack size={14} className="text-primary shrink-0" />
                             {groupName}
                           </span>
                         ) : (
@@ -337,7 +324,7 @@ export default function SantriPage() {
                             className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
                             title="Progres Hafalan"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye size={16} />
                           </Button>
                           <Button
                             variant="ghost"
@@ -346,7 +333,7 @@ export default function SantriPage() {
                             className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
                             title="Edit"
                           >
-                            <Edit className="w-4 h-4" />
+                            <PencilSimple size={16} />
                           </Button>
                           <Button
                             variant="ghost"
@@ -355,7 +342,7 @@ export default function SantriPage() {
                             className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
                             title="Hapus"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash size={16} />
                           </Button>
                         </div>
                       </Table.Cell>
@@ -525,7 +512,7 @@ export default function SantriPage() {
                   <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
                     <div className="flex items-center gap-3 border-b border-border/30 pb-3">
                       <Button variant="outline" size="sm" onClick={() => setSelectedJuz(null)} className="h-8 px-2">
-                        <ArrowLeft className="w-4 h-4" />
+                        <ArrowLeft size={16} />
                       </Button>
                       <div>
                         <h5 className="font-bold text-text text-sm">Juz {selectedJuz}</h5>
@@ -551,11 +538,11 @@ export default function SantriPage() {
                               'bg-background text-text-muted border border-border group-hover:border-border-hover'
                             }`}>
                               {status === 1 ? (
-                                <CheckCircle2 className="w-4 h-4" />
+                                <CheckCircle size={16} />
                               ) : status === 2 ? (
-                                <RotateCcw className="w-4 h-4" />
+                                <ArrowCounterClockwise size={16} />
                               ) : (
-                                <Circle className="w-4 h-4 opacity-40" />
+                                <Circle size={16} className="opacity-40" />
                               )}
                             </div>
 
@@ -600,7 +587,7 @@ export default function SantriPage() {
                             )}
                             {p === 100 && (
                               <div className="absolute top-0.5 right-0.5">
-                                <CheckCircle2 className="w-2.5 h-2.5 text-white/70" />
+                                <CheckCircle size={10} className="text-white/70" />
                               </div>
                             )}
                           </button>
@@ -614,7 +601,7 @@ export default function SantriPage() {
               {/* History Column */}
               <div className="lg:col-span-2 space-y-4">
                 <div className="flex items-center gap-2 border-b border-border/30 pb-3">
-                  <FileText className="w-4 h-4 text-primary shrink-0" />
+                  <FileText size={16} className="text-primary shrink-0" />
                   <h5 className="font-bold text-text text-sm">Riwayat Setoran</h5>
                 </div>
 

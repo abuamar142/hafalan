@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Input, Button } from '@cloudflare/kumo'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeSlash } from '@phosphor-icons/react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -108,7 +108,7 @@ export default function LoginPage() {
                 aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded transition-colors"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>

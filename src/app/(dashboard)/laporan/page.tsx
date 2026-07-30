@@ -12,7 +12,7 @@ import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Button, Combobox } from '@cloudflare/kumo'
-import { FileText, Printer, Users, User } from 'lucide-react'
+import { FileText, Printer, Users, User } from '@phosphor-icons/react'
 
 export default function LaporanPage() {
   const { state } = useDashboard()
@@ -152,7 +152,7 @@ export default function LaporanPage() {
           <CardHeader className="pb-4 border-b border-border/30">
             <div className="flex items-center gap-3">
               <div className="bg-primary/10 p-2.5 rounded-lg text-primary">
-                <Users className="w-5 h-5" />
+                <Users size={20} />
               </div>
               <div>
                 <CardTitle className="text-lg">Kolektif</CardTitle>
@@ -169,7 +169,7 @@ export default function LaporanPage() {
               disabled={isGenerating}
               className="w-full gap-2 shadow-sm"
             >
-              <Printer className="w-4 h-4" />
+              <Printer size={16} />
               {isGenerating ? 'Menyiapkan...' : 'Cetak Rekap Kelas'}
             </Button>
           </CardContent>
@@ -180,7 +180,7 @@ export default function LaporanPage() {
           <CardHeader className="pb-4 border-b border-border/30">
             <div className="flex items-center gap-3">
               <div className="bg-accent/10 p-2.5 rounded-lg text-accent">
-                <User className="w-5 h-5" />
+                <User size={20} />
               </div>
               <div>
                 <CardTitle className="text-lg">Individu</CardTitle>
@@ -217,7 +217,7 @@ export default function LaporanPage() {
               variant={selectedStudent ? 'primary' : 'secondary'}
               className="w-full gap-2 shadow-sm"
             >
-              <FileText className="w-4 h-4" />
+              <FileText size={16} />
               {isGenerating ? 'Menyiapkan...' : 'Cetak Rapor Santri'}
             </Button>
           </CardContent>

@@ -5,7 +5,7 @@ import { useDashboard } from '../../layout'
 import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
 import { Combobox, Input, Badge, Pagination } from '@cloudflare/kumo'
-import { Edit } from 'lucide-react'
+import { PencilSimple } from '@phosphor-icons/react'
 import EditSubmissionModal from '@/components/EditSubmissionModal'
 
 const PAGE_SIZE = 20
@@ -238,7 +238,7 @@ export default function RiwayatSetoranPage() {
                     className="p-1 text-text-muted hover:text-primary hover:bg-primary/10 rounded transition-colors cursor-pointer"
                     title="Edit Setoran"
                   >
-                    <Edit className="w-3.5 h-3.5" />
+                    <PencilSimple size={14} />
                   </button>
                   <Badge variant={nilaiBadgeVariant(item.nilai)}>{item.nilai}</Badge>
                 </div>

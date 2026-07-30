@@ -6,16 +6,7 @@ import Image from 'next/image'
 import { ALL_SURAHS } from '@/lib/constants'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button, Badge } from '@cloudflare/kumo'
-import {
-  ArrowLeft,
-  Printer,
-  Calendar,
-  Award,
-  FileText,
-  User,
-  GraduationCap,
-  BookOpen
-} from 'lucide-react'
+import { ArrowLeft, Printer, CalendarBlank, Medal, FileText, User, GraduationCap, BookOpen } from '@phosphor-icons/react'
 import { initials, getColor, getSurahNama, formatWaktu } from '@/lib/helpers'
 
 interface ReportDetailClientProps {
@@ -176,7 +167,7 @@ export default function ReportDetailClient({
           onClick={() => router.push('/')}
           className="gap-2 cursor-pointer text-xs font-semibold hover:bg-card"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft size={16} />
           Kembali ke Pencarian
         </Button>
 
@@ -185,7 +176,7 @@ export default function ReportDetailClient({
           size="sm"
           className="gap-2 bg-primary hover:bg-primary/90 text-white cursor-pointer shadow-md shadow-primary/10"
         >
-          <Printer className="w-4 h-4" />
+          <Printer size={16} />
           Cetak Rapor
         </Button>
       </header>
@@ -257,7 +248,7 @@ export default function ReportDetailClient({
             <Card className="border-border/40 shadow-sm bg-surface flex flex-col justify-between p-6 print:border-black/30 print:p-4 print:break-inside-avoid">
               <div>
                 <div className="flex items-center gap-2 mb-4 border-b border-border/40 pb-3">
-                  <Award className="w-5 h-5 text-accent shrink-0" />
+                  <Medal size={20} className="text-accent shrink-0" />
                   <h3 className="text-sm font-bold text-text-secondary print:text-black uppercase tracking-wider">Ringkasan Progres</h3>
                 </div>
 
@@ -325,7 +316,7 @@ export default function ReportDetailClient({
             {/* Juz Map Legend Card (Print Hidden) */}
             <Card className="border-border/40 shadow-sm bg-surface p-4 print:hidden">
               <div className="flex items-center gap-2 mb-3 border-b border-border/40 pb-2">
-                <FileText className="w-4 h-4 text-text-muted" />
+                <FileText size={16} className="text-text-muted" />
                 <h4 className="text-xs font-bold text-text-secondary uppercase tracking-wider">Keterangan Warna</h4>
               </div>
               <div className="space-y-2 text-xs font-semibold text-text-secondary">
@@ -353,7 +344,7 @@ export default function ReportDetailClient({
             <Card className="border-border/40 shadow-sm bg-surface p-6 print:border-black/30 print:p-4 print:break-inside-avoid">
               <div className="flex items-center justify-between mb-4 border-b border-border/40 pb-3">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-primary shrink-0" />
+                  <FileText size={20} className="text-primary shrink-0" />
                   <h3 className="text-sm font-bold text-text-secondary print:text-black uppercase tracking-wider">Pemetaan Juz</h3>
                 </div>
                 
@@ -404,14 +395,14 @@ export default function ReportDetailClient({
             {/* Timeline of Submissions */}
             <div className="space-y-5 print:break-inside-avoid">
               <div className="flex items-center gap-2 border-b border-border/40 pb-2">
-                <Calendar className="w-5 h-5 text-text-secondary print:text-black shrink-0" />
+                <CalendarBlank size={20} className="text-text-secondary print:text-black shrink-0" />
                 <h3 className="text-base font-bold text-text print:text-black">Riwayat Setoran Hafalan</h3>
               </div>
 
               {submissions.length === 0 ? (
                 <div className="py-12 px-6 text-center border border-border/40 border-dashed rounded-xl bg-surface/50 backdrop-blur-sm space-y-4 max-w-lg mx-auto print:border-black/20">
                   <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
-                    <BookOpen className="w-6 h-6 animate-pulse" />
+                    <BookOpen size={24} className="animate-pulse" />
                   </div>
                   <div className="space-y-1">
                     <h4 className="text-sm font-bold text-text">Belum Ada Setoran Hafalan</h4>
@@ -462,7 +453,7 @@ export default function ReportDetailClient({
                                 <span>Juz {surah?.juz || '?'}</span>
                                 <span>•</span>
                                 <span className="flex items-center gap-1">
-                                  <User className="w-3.5 h-3.5 opacity-60" />
+                                  <User size={14} className="opacity-60" />
                                   Ustadz {sub.guru_nama || 'Pembina'}
                                 </span>
                                 {sub.updated_at && (
@@ -489,7 +480,7 @@ export default function ReportDetailClient({
                           {sub.catatan && (
                             <div className="mt-2.5 text-xs text-text-secondary bg-card/40 p-3 rounded-lg border border-border/30 leading-relaxed font-sans print:bg-white print:border-black/15">
                               <p className="font-bold text-[10px] uppercase text-text-muted print:text-black/60 tracking-wider mb-1 flex items-center gap-1.5">
-                                <GraduationCap className="w-3.5 h-3.5" />
+                                <GraduationCap size={14} />
                                 Catatan Pembina
                               </p>
                               {sub.catatan}

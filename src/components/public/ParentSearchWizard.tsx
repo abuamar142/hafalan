@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Combobox, Button } from '@cloudflare/kumo'
-import { Loader2, Search } from 'lucide-react'
+import { Spinner, MagnifyingGlass } from '@phosphor-icons/react'
 
 interface ClassData {
   id: number
@@ -178,7 +178,7 @@ export default function ParentSearchWizard() {
             </label>
             {loadingGroups ? (
               <div className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-card/40 text-xs text-text-muted">
-                <Loader2 className="w-4 h-4 animate-spin mr-2 text-primary" />
+                <Spinner size={16} className="animate-spin mr-2 text-primary" />
                 Memuat halaqah...
               </div>
             ) : (
@@ -208,7 +208,7 @@ export default function ParentSearchWizard() {
             </label>
             {loadingStudents ? (
               <div className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-card/40 text-xs text-text-muted">
-                <Loader2 className="w-4 h-4 animate-spin mr-2 text-primary" />
+                <Spinner size={16} className="animate-spin mr-2 text-primary" />
                 Memuat santri...
               </div>
             ) : (
@@ -239,7 +239,7 @@ export default function ParentSearchWizard() {
               disabled={!selectedStudent}
               className="w-full gap-2 bg-primary hover:bg-primary/95 text-white shadow-md shadow-primary/10 cursor-pointer h-10 font-bold transition-all text-xs"
             >
-              <Search className="w-4 h-4" />
+              <MagnifyingGlass size={16} />
               Cari Rapor
             </Button>
           </div>

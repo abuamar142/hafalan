@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 
 interface PaginationProps {
   currentPage: number
@@ -47,7 +47,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         className="flex items-center justify-center w-9 h-9 rounded-lg border border-border bg-surface text-sm font-medium text-text-secondary hover:bg-card hover:text-text disabled:opacity-40 disabled:pointer-events-none transition-colors"
         aria-label="Halaman sebelumnya"
       >
-        <ChevronLeft className="w-4 h-4" />
+        <CaretLeft size={16} />
       </button>
 
       {pageNumbers.map((p, i) =>
@@ -81,7 +81,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         className="flex items-center justify-center w-9 h-9 rounded-lg border border-border bg-surface text-sm font-medium text-text-secondary hover:bg-card hover:text-text disabled:opacity-40 disabled:pointer-events-none transition-colors"
         aria-label="Halaman selanjutnya"
       >
-        <ChevronRight className="w-4 h-4" />
+        <CaretRight size={16} />
       </button>
     </div>
   )

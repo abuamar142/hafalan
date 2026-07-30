@@ -6,7 +6,7 @@ import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { addSubmissionAction } from '@/lib/actions/submissions'
 import { Button, Input, Combobox, useKumoToastManager } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Save, BookOpen, History } from 'lucide-react'
+import { FloppyDisk, BookOpen, ClockCounterClockwise } from '@phosphor-icons/react'
 import { getColor, initials, getPct, getTotalHafal, formatWaktu, getSurahNama } from '@/lib/helpers'
 
 function toLocalDatetimeString(d: Date) {
@@ -315,7 +315,7 @@ export default function TambahSetoranPage() {
 
           <div className="flex justify-end">
             <Button onClick={handleSubmit} disabled={saving} className="gap-2 px-6 shadow-sm cursor-pointer">
-              <Save className="w-4 h-4" />
+              <FloppyDisk size={16} />
               {saving ? 'Menyimpan...' : 'Simpan Setoran'}
             </Button>
           </div>
@@ -326,7 +326,7 @@ export default function TambahSetoranPage() {
           {!selectedStudent ? (
             <Card className="border-border/30 bg-card/20 border-dashed h-full min-h-[300px] flex flex-col items-center justify-center p-6 text-center">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                <BookOpen className="w-6 h-6" />
+                <BookOpen size={24} />
               </div>
               <h4 className="text-sm font-semibold text-text">Belum ada Santri Terpilih</h4>
               <p className="text-xs text-text-muted max-w-xs mt-1.5 leading-relaxed">
@@ -381,7 +381,7 @@ export default function TambahSetoranPage() {
                 {/* Recent Submissions History */}
                 <div className="space-y-2.5">
                   <h5 className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
-                    <History className="w-3.5 h-3.5 text-text-muted" />
+                    <ClockCounterClockwise size={14} className="text-text-muted" />
                     Riwayat Setoran Terbaru
                   </h5>
                   <div className="space-y-2">
