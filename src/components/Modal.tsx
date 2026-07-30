@@ -10,10 +10,26 @@ interface ModalProps {
   title: string
   children: React.ReactNode
   className?: string
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 }
 
-export default function Modal({ open, onClose, title, children, className }: ModalProps) {
+export default function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  className,
+  size = 'md',
+}: ModalProps) {
   const backdropRef = useRef<HTMLDivElement>(null)
+
+  const sizeClasses = {
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
+    '2xl': 'max-w-2xl',
+  }
 
   useEffect(() => {
     if (!open) return
@@ -45,7 +61,8 @@ export default function Modal({ open, onClose, title, children, className }: Mod
         aria-modal="true"
         aria-labelledby="modal-title"
         className={cn(
-          "relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[var(--radius-lg)] bg-surface p-6 shadow-xl border border-border/50 animate-in zoom-in-95 duration-200",
+          "relative w-full max-h-[90vh] overflow-y-auto rounded-[var(--radius-lg)] bg-surface p-6 shadow-xl border border-border/50 animate-in zoom-in-95 duration-200",
+          sizeClasses[size],
           className
         )}
       >
