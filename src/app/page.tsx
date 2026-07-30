@@ -1,14 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import ParentSearchWizard from '@/components/public/ParentSearchWizard'
-import { getPublicClassesAction } from '@/lib/actions/public'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { BookOpen, LogIn, School, Users, FileBarChart, Sparkles } from 'lucide-react'
 
-export default async function LandingPage() {
-  const classes = await getPublicClassesAction()
-
+export default function LandingPage() {
   return (
     <div className="relative min-h-screen bg-background text-text flex flex-col justify-between overflow-hidden">
       {/* Repeating Islamic Geometric Pattern */}
@@ -72,7 +69,7 @@ export default async function LandingPage() {
 
         {/* Wizard Card Wrapper */}
         <div className="w-full max-w-4xl mx-auto">
-          <ParentSearchWizard classes={classes} />
+          <ParentSearchWizard />
         </div>
 
         {/* Portal Guide (3-Step Visual Instruction) */}

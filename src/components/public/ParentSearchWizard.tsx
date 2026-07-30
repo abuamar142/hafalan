@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { getPublicGroupsAction, getPublicStudentsAction } from '@/lib/actions/public'
+import { createClient } from '@/lib/supabase/client'
 import { Combobox } from '@/components/ui/Combobox'
 import { Button } from '@/components/ui/Button'
 import { Loader2, Search } from 'lucide-react'
@@ -23,8 +23,9 @@ interface StudentData {
   color: string
 }
 
-export default function ParentSearchWizard({ classes }: { classes: ClassData[] }) {
+export default function ParentSearchWizard() {
   const router = useRouter()
+  const supabase = createClient()
 
   // Selections
   const [classId, setClassId] = useState('')
@@ -32,6 +33,7 @@ export default function ParentSearchWizard({ classes }: { classes: ClassData[] }
   const [studentId, setStudentId] = useState('')
 
   // Loaded Options
+  const [classes, setClasses] = useState<ClassData[]>([])
   const [groups, setGroups] = useState<GroupData[]>([])
   const [students, setStudents] = useState<StudentData[]>([])
 
@@ -39,6 +41,25 @@ export default function ParentSearchWizard({ classes }: { classes: ClassData[] }
   const [loadingGroups, setLoadingGroups] = useState(false)
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [error, setError] = useState('')
+
+  // Fetch classes on mount
+  useEffect(() => {
+    async function loadClasses() {
+      setError('')
+      try {
+        const { data, error } = await supabase
+          .from('classes')
+          .select('id, nama:name')
+          .order('name', { ascending: true })
+
+        if (error) throw error
+        setClasses(data || [])
+      } catch (e: unknown) {
+        setError('Gagal memuat data kelas.')
+      }
+    }
+    loadClasses()
+  }, [])
 
   // Map Classes to Combobox Options
   const classOptions = useMemo(() => {
@@ -79,8 +100,14 @@ export default function ParentSearchWizard({ classes }: { classes: ClassData[] }
       setLoadingGroups(true)
       setError('')
       try {
-        const res = await getPublicGroupsAction(Number(classId))
-        setGroups(res)
+        const { data, error } = await supabase
+          .from('groups')
+          .select('id, nama:name')
+          .eq('class_id', Number(classId))
+          .order('name', { ascending: true })
+
+        if (error) throw error
+        setGroups(data || [])
         setGroupId('')
       } catch (e: unknown) {
         setError('Gagal memuat data kelompok.')
@@ -104,8 +131,14 @@ export default function ParentSearchWizard({ classes }: { classes: ClassData[] }
       setLoadingStudents(true)
       setError('')
       try {
-        const res = await getPublicStudentsAction(Number(groupId))
-        setStudents(res)
+        const { data, error } = await supabase
+          .from('students')
+          .select('id, nama, color')
+          .eq('group_id', Number(groupId))
+          .order('nama', { ascending: true })
+
+        if (error) throw error
+        setStudents(data || [])
         setStudentId('')
       } catch (e: unknown) {
         setError('Gagal memuat data santri.')
