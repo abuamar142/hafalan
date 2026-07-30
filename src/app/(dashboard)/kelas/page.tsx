@@ -9,7 +9,7 @@ import {
 } from '@/lib/actions/classes'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button, Dialog as KumoDialog, useKumoToastManager } from '@cloudflare/kumo'
-import { Input } from '@/components/ui/Input'
+import { Input } from '@cloudflare/kumo'
 import Pagination from '@/components/Pagination'
 import { Plus, Eye, Edit, Trash2, Layers, Search } from 'lucide-react'
 
@@ -187,7 +187,7 @@ export default function KelasPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Cari kelas..."
-          className="pl-9 h-9 text-sm"
+          className="pl-9"
         />
       </div>
 

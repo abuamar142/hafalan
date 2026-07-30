@@ -9,23 +9,20 @@ import {
 } from '@/lib/actions/groups'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button, Dialog as KumoDialog, useKumoToastManager } from '@cloudflare/kumo'
-import { Input } from '@/components/ui/Input'
+import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox } from '@cloudflare/kumo'
 import Pagination from '@/components/Pagination'
-import { Combobox } from '@/components/ui/Combobox'
 import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
 
 export default function KelompokPage() {
   const { state, refreshClasses } = useDashboard()
   const toastManager = useKumoToastManager()
 
-  const classOptions = useMemo(() => {
+  const classItems = useMemo(() => {
     return [
-      { id: '', label: 'Tanpa Kelas (Unassigned)', searchText: 'tanpa kelas' },
+      { id: '', label: 'Tanpa Kelas (Unassigned)' },
       ...state.classes.map((c) => ({
         id: c.id,
         label: c.name,
-        searchText: c.name,
       })),
     ]
   }, [state.classes])
@@ -59,10 +56,13 @@ export default function KelompokPage() {
   const [selectedGroup, setSelectedGroup] = useState<typeof state.groups[number] | null>(null)
   
   const [groupName, setGroupName] = useState('')
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(null)
+  const [selectedClassItem, setSelectedClassItem] = useState<{ id: number | string; label: string }>({ id: '', label: 'Tanpa Kelas (Unassigned)' })
   const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([])
   
   const [saving, setSaving] = useState(false)
+  function handleClassChange(item: { id: number | string; label: string } | null) {
+    if (item) setSelectedClassItem(item)
+  }
   const [error, setError] = useState('')
 
   const [allTeachers, setAllTeachers] = useState<Record<string, string>>({})
@@ -89,7 +89,8 @@ export default function KelompokPage() {
     setError('')
     setSelectedGroup(g)
     setGroupName(g.name)
-    setSelectedClassId(g.class_id)
+    const matchedClass = classItems.find((c) => c.id === g.class_id) ?? classItems[0]
+    setSelectedClassItem(matchedClass as { id: number | string; label: string })
     
     // Fetch currently assigned teacher IDs
     const currentTeacherIds = state.groupTeachers
@@ -138,7 +139,7 @@ export default function KelompokPage() {
     setSaving(true)
     setError('')
     try {
-      await updateGroupAction(selectedGroup.id, groupName.trim(), selectedClassId, selectedTeacherIds)
+      await updateGroupAction(selectedGroup.id, groupName.trim(), selectedClassItem.id === '' ? null : Number(selectedClassItem.id), selectedTeacherIds)
       setEditOpen(false)
       await refreshClasses()
       toastManager.add({ title: 'Kelompok berhasil diperbarui!', variant: 'success' })
@@ -202,7 +203,7 @@ export default function KelompokPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Cari kelompok..."
-          className="pl-9 h-9 text-sm"
+          className="pl-9"
         />
       </div>
 
@@ -383,13 +384,18 @@ export default function KelompokPage() {
                   Kelas
                 </label>
                 <Combobox
-                  id="edit-class-select"
-                  options={classOptions}
-                  value={selectedClassId === null ? '' : selectedClassId}
-                  onChange={(val) => setSelectedClassId(val === '' ? null : Number(val))}
-                  placeholder="Pilih Kelas..."
-                  searchPlaceholder="Cari kelas..."
-                />
+                  items={classItems}
+                  value={selectedClassItem}
+                  onValueChange={handleClassChange}
+                  itemToStringLabel={(item: { id: number | string; label: string }) => item.label}
+                >
+                  <Combobox.TriggerInput placeholder="Pilih Kelas..." />
+                  <Combobox.Content>
+                    <Combobox.List>
+                      {(item: { id: number | string; label: string }) => <Combobox.Item value={item}>{item.label}</Combobox.Item>}
+                    </Combobox.List>
+                  </Combobox.Content>
+                </Combobox>
               </div>
 
               <div>

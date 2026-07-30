@@ -4,8 +4,7 @@ import { useState, useMemo } from 'react'
 import { useDashboard } from '../../layout'
 import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
-import { Combobox } from '@/components/ui/Combobox'
-import { Input } from '@/components/ui/Input'
+import { Combobox, Input } from '@cloudflare/kumo'
 import { Edit } from 'lucide-react'
 import EditSubmissionModal from '@/components/EditSubmissionModal'
 
@@ -27,6 +26,9 @@ export default function RiwayatSetoranPage() {
   function applyKelompokFilter(val: string) { setKelompokFilter(val); setPage(1) }
   function applyGuruFilter(val: string) { setGuruFilter(val); setPage(1) }
   function applySearch(val: string) { setSearch(val); setPage(1) }
+  function handleKelasChange(item: { id: string; label: string } | null) { applyKelasFilter(item?.id ?? '') }
+  function handleKelompokChange(item: { id: string; label: string } | null) { applyKelompokFilter(item?.id ?? '') }
+  function handleGuruChange(item: { id: string; label: string } | null) { applyGuruFilter(item?.id ?? '') }
 
   // Map santri_id -> { group_id, group_name, class_name }
   const studentLookup = useMemo(() => {
@@ -57,36 +59,33 @@ export default function RiwayatSetoranPage() {
     return state.groups
   }, [state.groups, kelasFilter])
 
-  // Options mapped for Combobox
-  const kelasComboboxOptions = useMemo(() => {
+  // Items mapped for Kumo Combobox
+  const kelasItems = useMemo(() => {
     return [
-      { id: '', label: 'Semua Kelas', searchText: 'semua kelas' },
+      { id: '', label: 'Semua Kelas' },
       ...state.classes.map((c) => ({
         id: c.name,
         label: c.name,
-        searchText: c.name,
       })),
     ]
   }, [state.classes])
 
-  const kelompokComboboxOptions = useMemo(() => {
+  const kelompokItems = useMemo(() => {
     return [
-      { id: '', label: 'Semua Kelompok', searchText: 'semua kelompok' },
+      { id: '', label: 'Semua Kelompok' },
       ...kelompokOptions.map((g) => ({
         id: g.name,
         label: g.name,
-        searchText: g.name,
       })),
     ]
   }, [kelompokOptions])
 
-  const guruComboboxOptions = useMemo(() => {
+  const guruItems = useMemo(() => {
     return [
-      { id: '', label: 'Semua Guru', searchText: 'semua guru' },
+      { id: '', label: 'Semua Guru' },
       ...guruOptions.map((g) => ({
         id: g,
         label: g,
-        searchText: g,
       })),
     ]
   }, [guruOptions])
@@ -137,35 +136,52 @@ export default function RiwayatSetoranPage() {
             onChange={(e) => applySearch(e.target.value)}
             placeholder="Cari nama santri atau surah..."
             aria-label="Cari nama santri"
-            className="w-full text-sm"
           />
         </div>
         <div className="w-full sm:w-44 shrink-0">
           <Combobox
-            options={kelasComboboxOptions}
-            value={kelasFilter}
-            onChange={applyKelasFilter}
-            placeholder="Semua Kelas"
-            searchPlaceholder="Cari kelas..."
-          />
+            items={kelasItems}
+            value={kelasItems.find((i) => i.id === kelasFilter) || kelasItems[0]}
+            onValueChange={handleKelasChange}
+            itemToStringLabel={(item: { id: string; label: string }) => item.label}
+          >
+            <Combobox.TriggerInput placeholder="Semua Kelas" />
+            <Combobox.Content>
+              <Combobox.List>
+                {(item: { id: string; label: string }) => <Combobox.Item value={item}>{item.label}</Combobox.Item>}
+              </Combobox.List>
+            </Combobox.Content>
+          </Combobox>
         </div>
         <div className="w-full sm:w-44 shrink-0">
           <Combobox
-            options={kelompokComboboxOptions}
-            value={kelompokFilter}
-            onChange={applyKelompokFilter}
-            placeholder="Semua Kelompok"
-            searchPlaceholder="Cari kelompok..."
-          />
+            items={kelompokItems}
+            value={kelompokItems.find((i) => i.id === kelompokFilter) || kelompokItems[0]}
+            onValueChange={handleKelompokChange}
+            itemToStringLabel={(item: { id: string; label: string }) => item.label}
+          >
+            <Combobox.TriggerInput placeholder="Semua Kelompok" />
+            <Combobox.Content>
+              <Combobox.List>
+                {(item: { id: string; label: string }) => <Combobox.Item value={item}>{item.label}</Combobox.Item>}
+              </Combobox.List>
+            </Combobox.Content>
+          </Combobox>
         </div>
         <div className="w-full sm:w-44 shrink-0">
           <Combobox
-            options={guruComboboxOptions}
-            value={guruFilter}
-            onChange={applyGuruFilter}
-            placeholder="Semua Guru"
-            searchPlaceholder="Cari guru..."
-          />
+            items={guruItems}
+            value={guruItems.find((i) => i.id === guruFilter) || guruItems[0]}
+            onValueChange={handleGuruChange}
+            itemToStringLabel={(item: { id: string; label: string }) => item.label}
+          >
+            <Combobox.TriggerInput placeholder="Semua Guru" />
+            <Combobox.Content>
+              <Combobox.List>
+                {(item: { id: string; label: string }) => <Combobox.Item value={item}>{item.label}</Combobox.Item>}
+              </Combobox.List>
+            </Combobox.Content>
+          </Combobox>
         </div>
       </div>
 

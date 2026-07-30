@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Combobox } from '@/components/ui/Combobox'
-import { Button } from '@cloudflare/kumo'
+import { Combobox, Button } from '@cloudflare/kumo'
 import { Loader2, Search } from 'lucide-react'
 
 interface ClassData {
@@ -28,9 +27,9 @@ export default function ParentSearchWizard() {
   const supabase = createClient()
 
   // Selections
-  const [classId, setClassId] = useState('')
-  const [groupId, setGroupId] = useState('')
-  const [studentId, setStudentId] = useState('')
+  const [selectedClass, setSelectedClass] = useState<ClassData | null>(null)
+  const [selectedGroup, setSelectedGroup] = useState<GroupData | null>(null)
+  const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(null)
 
   // Loaded Options
   const [classes, setClasses] = useState<ClassData[]>([])
@@ -61,38 +60,16 @@ export default function ParentSearchWizard() {
     loadClasses()
   }, [])
 
-  // Map Classes to Combobox Options
-  const classOptions = useMemo(() => {
-    return classes.map((c) => ({
-      id: c.id,
-      label: c.nama,
-      searchText: c.nama.toLowerCase(),
-    }))
-  }, [classes])
+  // Combobox items (raw data passed directly)
+  const classItems = classes
+  const groupItems = groups
+  const studentItems = students
 
-  // Map Groups to Combobox Options
-  const groupOptions = useMemo(() => {
-    return groups.map((g) => ({
-      id: g.id,
-      label: g.nama,
-      searchText: g.nama.toLowerCase(),
-    }))
-  }, [groups])
-
-  // Map Students to Combobox Options
-  const studentOptions = useMemo(() => {
-    return students.map((s) => ({
-      id: s.id,
-      label: s.nama,
-      searchText: s.nama.toLowerCase(),
-    }))
-  }, [students])
-
-  // Fetch groups when classId changes
+  // Fetch groups when selectedClass changes
   useEffect(() => {
-    if (!classId) {
+    if (!selectedClass) {
       setGroups([])
-      setGroupId('')
+      setSelectedGroup(null)
       return
     }
 
@@ -103,12 +80,12 @@ export default function ParentSearchWizard() {
         const { data, error } = await supabase
           .from('groups')
           .select('id, nama:name')
-          .eq('class_id', Number(classId))
+          .eq('class_id', selectedClass!.id)
           .order('name', { ascending: true })
 
         if (error) throw error
         setGroups(data || [])
-        setGroupId('')
+        setSelectedGroup(null)
       } catch (e: unknown) {
         setError('Gagal memuat data kelompok.')
       } finally {
@@ -117,13 +94,13 @@ export default function ParentSearchWizard() {
     }
 
     loadGroups()
-  }, [classId])
+  }, [selectedClass])
 
-  // Fetch students when groupId changes
+  // Fetch students when selectedGroup changes
   useEffect(() => {
-    if (!groupId) {
+    if (!selectedGroup) {
       setStudents([])
-      setStudentId('')
+      setSelectedStudent(null)
       return
     }
 
@@ -134,12 +111,12 @@ export default function ParentSearchWizard() {
         const { data, error } = await supabase
           .from('students')
           .select('id, nama, color')
-          .eq('group_id', Number(groupId))
+          .eq('group_id', selectedGroup!.id)
           .order('nama', { ascending: true })
 
         if (error) throw error
         setStudents(data || [])
-        setStudentId('')
+        setSelectedStudent(null)
       } catch (e: unknown) {
         setError('Gagal memuat data santri.')
       } finally {
@@ -148,11 +125,11 @@ export default function ParentSearchWizard() {
     }
 
     loadStudents()
-  }, [groupId])
+  }, [selectedGroup])
 
   function handleGoToReport() {
-    if (studentId) {
-      router.push(`/raport/${studentId}`)
+    if (selectedStudent) {
+      router.push(`/raport/${selectedStudent.id}`)
     }
   }
 
@@ -179,18 +156,19 @@ export default function ParentSearchWizard() {
               1. Pilih Kelas
             </label>
             <Combobox
-              id="class-select"
-              options={classOptions}
-              value={classId}
-              onChange={(val) => {
-                setClassId(val)
-                setGroupId('')
-                setStudentId('')
-              }}
-              placeholder="Pilih kelas..."
-              searchPlaceholder="Ketik nama kelas..."
-              emptyText="Kelas tidak ditemukan"
-            />
+              items={classItems}
+              value={selectedClass}
+              onValueChange={setSelectedClass}
+              itemToStringLabel={(item: ClassData) => item.nama}
+            >
+              <Combobox.TriggerInput id="class-select" placeholder="Pilih kelas..." />
+              <Combobox.Content>
+                <Combobox.List>
+                  {(item: ClassData) => <Combobox.Item value={item}>{item.nama}</Combobox.Item>}
+                </Combobox.List>
+                <Combobox.Empty>Kelas tidak ditemukan</Combobox.Empty>
+              </Combobox.Content>
+            </Combobox>
           </div>
 
           {/* Step 2: Kelompok */}
@@ -204,19 +182,22 @@ export default function ParentSearchWizard() {
                 Memuat halaqah...
               </div>
             ) : (
-              <Combobox
-                id="group-select"
-                options={groupOptions}
-                value={groupId}
-                onChange={(val) => {
-                  setGroupId(val)
-                  setStudentId('')
-                }}
-                placeholder={classId ? "Pilih kelompok..." : "Pilih kelas dahulu"}
-                searchPlaceholder="Ketik nama kelompok..."
-                emptyText="Kelompok tidak ditemukan"
-                className={!classId ? "opacity-60 pointer-events-none" : ""}
-              />
+              <div className={!selectedClass ? "opacity-60 pointer-events-none" : ""}>
+                <Combobox
+                  items={groupItems}
+                  value={selectedGroup}
+                  onValueChange={setSelectedGroup}
+                  itemToStringLabel={(item: GroupData) => item.nama}
+                >
+                  <Combobox.TriggerInput id="group-select" placeholder={selectedClass ? "Pilih kelompok..." : "Pilih kelas dahulu"} />
+                  <Combobox.Content>
+                    <Combobox.List>
+                      {(item: GroupData) => <Combobox.Item value={item}>{item.nama}</Combobox.Item>}
+                    </Combobox.List>
+                    <Combobox.Empty>Kelompok tidak ditemukan</Combobox.Empty>
+                  </Combobox.Content>
+                </Combobox>
+              </div>
             )}
           </div>
 
@@ -231,16 +212,22 @@ export default function ParentSearchWizard() {
                 Memuat santri...
               </div>
             ) : (
-              <Combobox
-                id="student-select"
-                options={studentOptions}
-                value={studentId}
-                onChange={setStudentId}
-                placeholder={groupId ? "Pilih nama santri..." : "Pilih halaqah dahulu"}
-                searchPlaceholder="Ketik nama santri..."
-                emptyText="Santri tidak ditemukan"
-                className={!groupId ? "opacity-60 pointer-events-none" : ""}
-              />
+              <div className={!selectedGroup ? "opacity-60 pointer-events-none" : ""}>
+                <Combobox
+                  items={studentItems}
+                  value={selectedStudent}
+                  onValueChange={setSelectedStudent}
+                  itemToStringLabel={(item: StudentData) => item.nama}
+                >
+                  <Combobox.TriggerInput id="student-select" placeholder={selectedGroup ? "Pilih nama santri..." : "Pilih halaqah dahulu"} />
+                  <Combobox.Content>
+                    <Combobox.List>
+                      {(item: StudentData) => <Combobox.Item value={item}>{item.nama}</Combobox.Item>}
+                    </Combobox.List>
+                    <Combobox.Empty>Santri tidak ditemukan</Combobox.Empty>
+                  </Combobox.Content>
+                </Combobox>
+              </div>
             )}
           </div>
 
@@ -249,7 +236,7 @@ export default function ParentSearchWizard() {
             <Button
               type="button"
               onClick={handleGoToReport}
-              disabled={!studentId}
+              disabled={!selectedStudent}
               className="w-full gap-2 bg-primary hover:bg-primary/95 text-white shadow-md shadow-primary/10 cursor-pointer h-10 font-bold transition-all text-xs"
             >
               <Search className="w-4 h-4" />

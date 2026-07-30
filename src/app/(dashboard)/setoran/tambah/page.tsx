@@ -4,13 +4,10 @@ import { useEffect, useState, useCallback } from 'react'
 import { useDashboard } from '../../layout'
 import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { addSubmissionAction } from '@/lib/actions/submissions'
-import { Button } from '@cloudflare/kumo'
-import { Input } from '@/components/ui/Input'
+import { Button, Input, Combobox, useKumoToastManager } from '@cloudflare/kumo'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Save, BookOpen, History } from 'lucide-react'
 import { getColor, initials, getPct, getTotalHafal, formatWaktu, getSurahNama } from '@/lib/helpers'
-import { Combobox } from '@/components/ui/Combobox'
-import { useKumoToastManager } from '@cloudflare/kumo'
 
 function toLocalDatetimeString(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -21,8 +18,8 @@ export default function TambahSetoranPage() {
   const { state, refreshSubmissions } = useDashboard()
   const toastManager = useKumoToastManager()
 
-  const [santriId, setSantriId] = useState('')
-  const [surahNo, setSurahNo] = useState('')
+  const [selectedStudentItem, setSelectedStudentItem] = useState<Record<string, unknown> | null>(null)
+  const [selectedSurahItem, setSelectedSurahItem] = useState<Record<string, unknown> | null>(null)
   const [nilai, setNilai] = useState(NILAI_OPTIONS[0] || '')
   const [catatan, setCatatan] = useState('')
   const [waktu, setWaktu] = useState('')
@@ -31,13 +28,13 @@ export default function TambahSetoranPage() {
   const [ayatEnd, setAyatEnd] = useState<number | ''>('')
 
   // Selected entities
-  const selectedStudent = state.students.find(s => s.id === Number(santriId))
-  const selectedSurah = surahNo ? ALL_SURAHS.find(s => s.no === Number(surahNo)) : null
+  const selectedStudent = selectedStudentItem ? state.students.find(s => s.id === selectedStudentItem.id) : null
+  const selectedSurah = selectedSurahItem ? ALL_SURAHS.find(s => s.no === selectedSurahItem.no) : null
   const maxAyat = selectedSurah ? selectedSurah.ayat : 1
 
   // Student recent history
   const studentHistory = state.submissions
-    .filter((sub) => sub.santri_id === Number(santriId))
+    .filter((sub) => sub.santri_id === (selectedStudentItem?.id as number | undefined))
     .slice(0, 3)
 
   // Reset ayat defaults when surah changes
@@ -46,7 +43,7 @@ export default function TambahSetoranPage() {
       setAyatStart(1)
       setAyatEnd(selectedSurah.ayat)
     }
-  }, [surahNo, selectedSurah])
+  }, [selectedSurah])
 
   const resetDatetime = useCallback(() => {
     setWaktu(toLocalDatetimeString(new Date()))
@@ -68,23 +65,28 @@ export default function TambahSetoranPage() {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [resetDatetime])
 
-  // Map options
-  const santriOptions = state.students.map((s) => ({
+  // Map items for Kumo Combobox
+  const santriItems = state.students.map((s) => ({
     id: s.id,
-    label: s.nama,
-    sublabel: `${s.kelas || 'Tanpa Kelas'} ${s.group_name ? `• ${s.group_name}` : ''}`,
-    searchText: `${s.nama} ${s.kelas || ''} ${s.group_name || ''}`,
+    nama: s.nama,
+    kelas: s.kelas ?? '',
+    group_name: s.group_name ?? '',
+    _label: s.nama,
+    _sublabel: `${s.kelas || 'Tanpa Kelas'} ${s.group_name ? `• ${s.group_name}` : ''}`,
   }))
 
-  const surahOptions = ALL_SURAHS.map((s) => ({
-    id: s.no,
-    label: `${s.no}. ${s.nama}`,
-    sublabel: `Juz ${s.juz} • ${s.ayat} Ayat`,
-    searchText: `${s.no} ${s.nama} juz ${s.juz}`,
+  const surahItems = ALL_SURAHS.map((s) => ({
+    no: s.no,
+    nama: s.nama,
+    arab: s.arab,
+    juz: s.juz,
+    ayat: s.ayat,
+    _label: `${s.no}. ${s.nama}`,
+    _sublabel: `Juz ${s.juz} • ${s.ayat} Ayat`,
   }))
 
   async function handleSubmit() {
-    if (!santriId || !surahNo) {
+    if (!selectedStudentItem || !selectedSurahItem) {
       toastManager.add({ title: 'Santri dan Surah harus dipilih', variant: 'error' })
       return
     }
@@ -93,8 +95,8 @@ export default function TambahSetoranPage() {
 
     try {
       const formData = new FormData()
-      formData.append('student_id', santriId)
-      formData.append('surah_no', surahNo)
+      formData.append('student_id', String(selectedStudentItem.id))
+      formData.append('surah_no', String(selectedSurahItem.no))
       formData.append('nilai', nilai)
       formData.append('catatan', catatan.trim())
       formData.append('waktu', new Date(waktu).toISOString())
@@ -104,8 +106,8 @@ export default function TambahSetoranPage() {
       await addSubmissionAction(formData)
 
       // Reset form
-      setSantriId('')
-      setSurahNo('')
+      setSelectedStudentItem(null)
+      setSelectedSurahItem(null)
       setNilai(NILAI_OPTIONS[0] || '')
       setCatatan('')
       setAyatStart(1)
@@ -140,30 +142,54 @@ export default function TambahSetoranPage() {
                 
                 {/* Searchable Santri Select */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <label htmlFor="santri-select" className="block text-sm font-medium text-text-secondary">Santri</label>
+                  <label className="block text-sm font-medium text-text-secondary">Santri</label>
                   <Combobox
-                    id="santri-select"
-                    options={santriOptions}
-                    value={santriId}
-                    onChange={setSantriId}
-                    placeholder="Cari dan pilih santri..."
-                    searchPlaceholder="Ketik nama atau kelas santri..."
-                    emptyText="Siswa tidak ditemukan"
-                  />
+                    items={santriItems}
+                    value={selectedStudentItem}
+                    onValueChange={(item) => setSelectedStudentItem(item as Record<string, unknown> | null)}
+                    itemToStringLabel={(item) => `${(item as Record<string, string>)._label} ${(item as Record<string, string>).kelas || ''} ${(item as Record<string, string>).group_name || ''}`}
+                  >
+                    <Combobox.TriggerInput placeholder="Cari dan pilih santri..." />
+                    <Combobox.Content>
+                      <Combobox.List>
+                        {(item) => (
+                          <Combobox.Item value={item}>
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate">{(item as Record<string, string>)._label}</div>
+                              <div className="text-[11px] text-text-muted truncate mt-0.5 font-normal">{(item as Record<string, string>)._sublabel}</div>
+                            </div>
+                          </Combobox.Item>
+                        )}
+                      </Combobox.List>
+                      <Combobox.Empty>Siswa tidak ditemukan</Combobox.Empty>
+                    </Combobox.Content>
+                  </Combobox>
                 </div>
 
                 {/* Searchable Surah Select */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <label htmlFor="surah-select" className="block text-sm font-medium text-text-secondary">Surah</label>
+                  <label className="block text-sm font-medium text-text-secondary">Surah</label>
                   <Combobox
-                    id="surah-select"
-                    options={surahOptions}
-                    value={surahNo}
-                    onChange={setSurahNo}
-                    placeholder="Cari dan pilih surah..."
-                    searchPlaceholder="Ketik nama atau nomor surah..."
-                    emptyText="Surah tidak ditemukan"
-                  />
+                    items={surahItems}
+                    value={selectedSurahItem}
+                    onValueChange={(item) => setSelectedSurahItem(item as Record<string, unknown> | null)}
+                    itemToStringLabel={(item) => `${(item as Record<string, string>).no} ${(item as Record<string, string>).nama} juz ${(item as Record<string, string>).juz}`}
+                  >
+                    <Combobox.TriggerInput placeholder="Cari dan pilih surah..." />
+                    <Combobox.Content>
+                      <Combobox.List>
+                        {(item) => (
+                          <Combobox.Item value={item}>
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate">{(item as Record<string, string>)._label}</div>
+                              <div className="text-[11px] text-text-muted truncate mt-0.5 font-normal">{(item as Record<string, string>)._sublabel}</div>
+                            </div>
+                          </Combobox.Item>
+                        )}
+                      </Combobox.List>
+                      <Combobox.Empty>Surah tidak ditemukan</Combobox.Empty>
+                    </Combobox.Content>
+                  </Combobox>
                 </div>
 
                 {/* Interactive Surah & Ayat Preview */}

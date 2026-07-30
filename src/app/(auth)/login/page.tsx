@@ -5,8 +5,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Input } from '@/components/ui/Input'
-import { Button } from '@cloudflare/kumo'
+import { Input, Button } from '@cloudflare/kumo'
 import { Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
@@ -81,7 +80,8 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@contoh.com"
-              className="h-11"
+              size="lg"
+              aria-label="Email"
             />
           </div>
 
@@ -98,7 +98,9 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukkan password"
-                className="h-11 pr-10"
+                size="lg"
+                className="pr-10"
+                aria-label="Password"
               />
               <button
                 type="button"

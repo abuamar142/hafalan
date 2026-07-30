@@ -14,10 +14,8 @@ import {
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Button, Dialog as KumoDialog, useKumoToastManager } from '@cloudflare/kumo'
-import { Input } from '@/components/ui/Input'
+import { Button, Dialog as KumoDialog, useKumoToastManager, Input, Combobox } from '@cloudflare/kumo'
 import Pagination from '@/components/Pagination'
-import { Combobox } from '@/components/ui/Combobox'
 import {
   Plus,
   Eye,
@@ -37,14 +35,10 @@ export default function SantriPage() {
   const { state, refreshStudents, getStudentMemorization } = useDashboard()
   const toastManager = useKumoToastManager()
 
-  const groupOptions = useMemo(() => {
+  const groupItems = useMemo(() => {
     return state.groups.map((g) => {
       const cName = state.classes.find(c => c.id === g.class_id)?.name || 'Tanpa Kelas'
-      return {
-        id: g.id,
-        label: `${g.name} (${cName})`,
-        searchText: `${g.name} ${cName}`,
-      }
+      return { ...g, _label: `${g.name} (${cName})` }
     })
   }, [state.groups, state.classes])
 
@@ -78,7 +72,7 @@ export default function SantriPage() {
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
 
   const [nama, setNama] = useState('')
-  const [groupId, setGroupId] = useState('')
+  const [groupItem, setGroupItem] = useState<typeof groupItems[number] | null>(null)
   const [saving, setSaving] = useState(false)
   const [toggling, setToggling] = useState(false)
   const [error, setError] = useState('')
@@ -123,7 +117,7 @@ export default function SantriPage() {
   function openAddModal() {
     setError('')
     setNama('')
-    setGroupId('')
+    setGroupItem(null)
     setAddOpen(true)
   }
 
@@ -131,7 +125,8 @@ export default function SantriPage() {
     setError('')
     setSelectedStudent(s)
     setNama(s.nama)
-    setGroupId(String(s.group_id))
+    const matchedGroup = groupItems.find((g) => g.id === s.group_id)
+    setGroupItem(matchedGroup || null)
     setEditOpen(true)
   }
 
@@ -146,7 +141,7 @@ export default function SantriPage() {
       setError('Nama wajib diisi')
       return
     }
-    if (!groupId) {
+    if (!groupItem) {
       setError('Kelompok wajib dipilih')
       return
     }
@@ -155,10 +150,10 @@ export default function SantriPage() {
     try {
       const formData = new FormData()
       formData.append('nama', nama.trim())
-      formData.append('groupId', groupId)
+      formData.append('groupId', String(groupItem.id))
       await addStudentAction(formData)
       setNama('')
-      setGroupId('')
+      setGroupItem(null)
       setAddOpen(false)
       await refreshStudents()
       toastManager.add({ title: 'Siswa berhasil ditambahkan!', variant: 'success' })
@@ -177,14 +172,14 @@ export default function SantriPage() {
       setError('Nama wajib diisi')
       return
     }
-    if (!groupId) {
+    if (!groupItem) {
       setError('Kelompok wajib dipilih')
       return
     }
     setSaving(true)
     setError('')
     try {
-      await updateStudentAction(selectedStudent.id, nama.trim(), Number(groupId))
+      await updateStudentAction(selectedStudent.id, nama.trim(), groupItem.id)
       setEditOpen(false)
       await refreshStudents()
       toastManager.add({ title: 'Siswa berhasil diperbarui!', variant: 'success' })
@@ -264,7 +259,7 @@ export default function SantriPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Cari siswa..."
-          className="pl-9 h-9 text-sm"
+          className="pl-9"
         />
       </div>
 
@@ -406,19 +401,24 @@ export default function SantriPage() {
               />
             </div>
 
-            <div>
-              <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block">
                 Kelompok Halaqah <span className="text-red">*</span>
               </label>
               <Combobox
-                id="add-group-select"
-                options={groupOptions}
-                value={groupId}
-                onChange={setGroupId}
-                placeholder="Pilih Kelompok..."
-                searchPlaceholder="Cari kelompok..."
-                emptyText="Kelompok tidak ditemukan"
-              />
+                items={groupItems}
+                value={groupItem}
+                onValueChange={setGroupItem}
+                itemToStringLabel={(item: typeof groupItems[number]) => item._label}
+              >
+                <Combobox.TriggerInput placeholder="Pilih Kelompok..." />
+                <Combobox.Content>
+                  <Combobox.List>
+                    {(item: typeof groupItems[number]) => <Combobox.Item value={item}>{item._label}</Combobox.Item>}
+                  </Combobox.List>
+                  <Combobox.Empty>Kelompok tidak ditemukan</Combobox.Empty>
+                </Combobox.Content>
+              </Combobox>
             </div>
           </div>
 
@@ -454,19 +454,24 @@ export default function SantriPage() {
               />
             </div>
 
-            <div>
-              <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block">
                 Kelompok Halaqah <span className="text-red">*</span>
               </label>
               <Combobox
-                id="edit-group-select"
-                options={groupOptions}
-                value={groupId}
-                onChange={setGroupId}
-                placeholder="Pilih Kelompok..."
-                searchPlaceholder="Cari kelompok..."
-                emptyText="Kelompok tidak ditemukan"
-              />
+                items={groupItems}
+                value={groupItem}
+                onValueChange={setGroupItem}
+                itemToStringLabel={(item: typeof groupItems[number]) => item._label}
+              >
+                <Combobox.TriggerInput placeholder="Pilih Kelompok..." />
+                <Combobox.Content>
+                  <Combobox.List>
+                    {(item: typeof groupItems[number]) => <Combobox.Item value={item}>{item._label}</Combobox.Item>}
+                  </Combobox.List>
+                  <Combobox.Empty>Kelompok tidak ditemukan</Combobox.Empty>
+                </Combobox.Content>
+              </Combobox>
             </div>
           </div>
 

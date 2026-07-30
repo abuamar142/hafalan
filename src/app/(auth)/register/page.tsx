@@ -5,8 +5,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Input } from '@/components/ui/Input'
-import { Button } from '@cloudflare/kumo'
+import { Input, Button } from '@cloudflare/kumo'
 import { Eye, EyeOff } from 'lucide-react'
 
 export default function RegisterPage() {
@@ -96,7 +95,7 @@ export default function RegisterPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nama lengkap"
-              className="h-11"
+              size="lg"
             />
           </div>
 
@@ -112,7 +111,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@contoh.com"
-              className="h-11"
+              size="lg"
             />
           </div>
 
@@ -129,7 +128,8 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Minimal 6 karakter"
-                className="h-11 pr-10"
+                size="lg"
+                className="pr-10"
               />
               <button
                 type="button"

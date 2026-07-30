@@ -11,22 +11,23 @@ import {
 import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
-import { Button } from '@cloudflare/kumo'
-import { Combobox } from '@/components/ui/Combobox'
+import { Button, Combobox } from '@cloudflare/kumo'
 import { FileText, Printer, Users, User } from 'lucide-react'
 
 export default function LaporanPage() {
   const { state } = useDashboard()
-  const [selectedStudent, setSelectedStudent] = useState<string>('')
+  const [selectedStudent, setSelectedStudent] = useState<Record<string, unknown> | null>(null)
   const [printHtml, setPrintHtml] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [currentUserName, setCurrentUserName] = useState('')
 
-  const studentOptions = useMemo(() => {
+  const studentItems = useMemo(() => {
     return state.students.map((s) => ({
       id: s.id,
-      label: s.nama + (s.kelas ? ` (${s.kelas})` : ''),
-      searchText: s.nama + (s.kelas ? ` ${s.kelas}` : ''),
+      nama: s.nama,
+      kelas: s.kelas ?? '',
+      group_name: s.group_name ?? '',
+      _label: s.nama + (s.kelas ? ` (${s.kelas})` : ''),
     }))
   }, [state.students])
 
@@ -101,11 +102,11 @@ export default function LaporanPage() {
     setIsGenerating(true)
     
     try {
-      const sId = Number(selectedStudent)
-      const student = sorted.find((s) => s.id === sId)
+      const studentId = (selectedStudent as Record<string, number>).id ?? 0
+      const student = sorted.find((s) => s.id === studentId)
       if (!student) return
 
-      const { hafalan, submissions } = await fetchStudentData(sId)
+      const { hafalan, submissions } = await fetchStudentData(studentId)
 
       const mappedSubmissions: SetoranItem[] = submissions.map((s) => ({
         id: s.id,
@@ -195,12 +196,19 @@ export default function LaporanPage() {
               <div className="space-y-1.5">
                 <label className="block text-[13px] font-medium text-text-secondary">Pilih Santri</label>
                 <Combobox
-                  options={studentOptions}
+                  items={studentItems}
                   value={selectedStudent}
-                  onChange={setSelectedStudent}
-                  placeholder="Cari dan pilih santri..."
-                  searchPlaceholder="Ketik nama santri..."
-                />
+                  onValueChange={(item) => setSelectedStudent(item as Record<string, unknown> | null)}
+                  itemToStringLabel={(item) => (item as Record<string, string>)._label ?? ''}
+                >
+                  <Combobox.TriggerInput placeholder="Cari dan pilih santri..." />
+                  <Combobox.Content>
+                    <Combobox.List>
+                      {(item) => <Combobox.Item value={item}>{(item as Record<string, string>)._label}</Combobox.Item>}
+                    </Combobox.List>
+                    <Combobox.Empty>Tidak ditemukan</Combobox.Empty>
+                  </Combobox.Content>
+                </Combobox>
               </div>
             </div>
             <Button

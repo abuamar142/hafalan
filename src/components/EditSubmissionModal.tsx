@@ -1,9 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { Dialog as KumoDialog, Button, useKumoToastManager } from '@cloudflare/kumo'
-import { Combobox } from '@/components/ui/Combobox'
-import { Input } from '@/components/ui/Input'
+import { Dialog as KumoDialog, Button, useKumoToastManager, Combobox, Input } from '@cloudflare/kumo'
 import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { updateSubmissionAction } from '@/lib/actions/submissions'
 import type { SetoranItem } from '@/lib/types'
@@ -29,7 +27,7 @@ export default function EditSubmissionModal({
 }: EditSubmissionModalProps) {
   const toastManager = useKumoToastManager()
 
-  const [surahNo, setSurahNo] = useState('')
+  const [surahItem, setSurahItem] = useState<typeof surahItems[number] | null>(null)
   const [nilai, setNilai] = useState('')
   const [catatan, setCatatan] = useState('')
   const [waktu, setWaktu] = useState('')
@@ -37,42 +35,42 @@ export default function EditSubmissionModal({
   const [ayatEnd, setAyatEnd] = useState<number | ''>('')
   const [saving, setSaving] = useState(false)
 
-  // Map Surahs to Combobox Options
-  const surahOptions = useMemo(() => {
+  // Map Surahs to Combobox items
+  const surahItems = useMemo(() => {
     return ALL_SURAHS.map((s) => ({
-      id: s.no,
-      label: `${s.no}. ${s.nama}`,
-      sublabel: `Juz ${s.juz} • ${s.ayat} Ayat`,
-      searchText: `${s.no} ${s.nama} juz ${s.juz}`,
+      ...s,
+      _label: `${s.no}. ${s.nama}`,
+      _sublabel: `Juz ${s.juz} • ${s.ayat} Ayat`,
     }))
   }, [])
 
-  const selectedSurah = surahNo ? ALL_SURAHS.find(s => s.no === Number(surahNo)) : null
+  const selectedSurah = surahItem
   const maxAyat = selectedSurah ? selectedSurah.ayat : 1
 
   // Populate form values when submission is loaded
   useEffect(() => {
     if (submission) {
-      setSurahNo(String(submission.surah_no))
+      const matched = surahItems.find((s) => s.no === submission.surah_no)
+      setSurahItem(matched || null)
       setNilai(submission.nilai)
       setCatatan(submission.catatan || '')
       setAyatStart(submission.ayat_start || 1)
       setAyatEnd(submission.ayat_end || 1)
       setWaktu(toLocalDatetimeString(new Date(submission.waktu)))
     }
-  }, [submission, isOpen])
+  }, [submission, isOpen, surahItems])
 
   // Reset range if surah changes during editing
   useEffect(() => {
-    if (selectedSurah && submission && Number(surahNo) !== submission.surah_no) {
+    if (selectedSurah && submission && selectedSurah.no !== submission.surah_no) {
       setAyatStart(1)
       setAyatEnd(selectedSurah.ayat)
     }
-  }, [surahNo, selectedSurah, submission])
+  }, [surahItem, selectedSurah, submission])
 
   async function handleSave() {
     if (!submission) return
-    if (!surahNo) {
+    if (!surahItem) {
       toastManager.add({ title: 'Surah harus dipilih', variant: 'error' })
       return
     }
@@ -82,7 +80,7 @@ export default function EditSubmissionModal({
     try {
       const formData = new FormData()
       formData.append('id', String(submission.id))
-      formData.append('surah_no', surahNo)
+      formData.append('surah_no', String(surahItem.no))
       formData.append('nilai', nilai)
       formData.append('catatan', catatan.trim())
       formData.append('waktu', new Date(waktu).toISOString())
@@ -123,14 +121,24 @@ export default function EditSubmissionModal({
                     Surah
                   </label>
                   <Combobox
-                    id="edit-modal-surah"
-                    options={surahOptions}
-                    value={surahNo}
-                    onChange={setSurahNo}
-                    placeholder="Pilih surah..."
-                    searchPlaceholder="Ketik nama surah..."
-                    emptyText="Surah tidak ditemukan"
-                  />
+                    items={surahItems}
+                    value={surahItem}
+                    onValueChange={setSurahItem}
+                    itemToStringLabel={(item: typeof surahItems[number]) => item._label}
+                  >
+                    <Combobox.TriggerInput placeholder="Pilih surah..." />
+                    <Combobox.Content>
+                      <Combobox.List>
+                        {(item: typeof surahItems[number]) => (
+                          <Combobox.Item value={item}>
+                            <span>{item._label}</span>
+                            <span className="text-xs text-text-muted ml-2">{item._sublabel}</span>
+                          </Combobox.Item>
+                        )}
+                      </Combobox.List>
+                      <Combobox.Empty>Surah tidak ditemukan</Combobox.Empty>
+                    </Combobox.Content>
+                  </Combobox>
                 </div>
 
                 {selectedSurah && (
