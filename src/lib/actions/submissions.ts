@@ -25,7 +25,6 @@ export async function addSubmissionAction(formData: FormData) {
   const wDate = new Date(waktu)
 
   const { error } = await supabase.from('submissions').insert({
-    id: Date.now(),
     student_id: studentId,
     surah_no: surahNo,
     nilai,

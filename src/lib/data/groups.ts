@@ -23,19 +23,6 @@ export async function getGroups(): Promise<Group[]> {
   })
 }
 
-export async function getGroupTeachers(
-  groupId: number
-): Promise<{ teacher_id: string }[]> {
-  const supabase = createClient()
-  const { data, error } = await supabase
-    .from('group_teachers')
-    .select('teacher_id, teacher_name')
-    .eq('group_id', groupId)
-
-  if (error) throw error
-  return (data ?? []) as { teacher_id: string; teacher_name: string }[]
-}
-
 export async function getAllGroupTeachers(): Promise<{ id: number; group_id: number; teacher_id: string; teacher_name: string }[]> {
   const supabase = createClient()
   const { data, error } = await supabase

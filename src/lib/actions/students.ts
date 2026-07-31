@@ -22,7 +22,6 @@ export async function addStudentAction(formData: FormData) {
   const colorIndex = (students?.length ?? 0) % AVATAR_COLORS.length
 
   const { error: insertError } = await supabase.from('students').insert({
-    id: Date.now(),
     group_id: groupId,
     nama,
     color: AVATAR_COLORS[colorIndex],

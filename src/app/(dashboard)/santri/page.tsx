@@ -13,6 +13,7 @@ import {
   formatWaktu,
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
+import { getPageNumbers } from '@/lib/pagination'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
@@ -253,32 +254,6 @@ export default function SantriPage() {
     ? juzSurahs.filter((s) => hafalan[s.no] === 1).length
     : 0
 
-  function getPageNumbers(): (number | 'ellipsis')[] {
-    const pages: (number | 'ellipsis')[] = []
-
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i)
-      return pages
-    }
-
-    pages.push(1)
-
-    if (page > 3) pages.push('ellipsis')
-
-    const start = Math.max(2, page - 1)
-    const end = Math.min(totalPages - 1, page + 1)
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i)
-    }
-
-    if (page < totalPages - 2) pages.push('ellipsis')
-
-    pages.push(totalPages)
-
-    return pages
-  }
-
   return (
     <div className="max-w-6xl pb-10">
       {/* Top Bar */}
@@ -425,7 +400,7 @@ export default function SantriPage() {
                     className={page === 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
                   />
                 </PaginationItem>
-                {getPageNumbers().map((p, i) =>
+                {getPageNumbers(page, totalPages).map((p, i) =>
                   p === 'ellipsis' ? (
                     <PaginationItem key={`e-${i}`}>
                       <PaginationEllipsis />

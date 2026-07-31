@@ -19,9 +19,8 @@ export default function RaportDetailPage({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const supabase = createClient()
-
   useEffect(() => {
+    const supabase = createClient()
     if (isNaN(studentId)) {
       setError('ID Santri tidak valid')
       setLoading(false)
@@ -79,7 +78,7 @@ export default function RaportDetailPage({
     }
 
     fetchData()
-  }, [studentId, supabase])
+  }, [studentId])
 
   if (loading) {
     return (

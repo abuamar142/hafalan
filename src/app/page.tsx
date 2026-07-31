@@ -4,6 +4,7 @@ import ParentSearchWizard from '@/components/public/ParentSearchWizard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { BookOpen, LogIn, School, Users, FileBarChart, Sparkles } from 'lucide-react'
+import { SCHOOL_NAME } from '@/lib/constants'
 
 export default function LandingPage() {
   return (
@@ -38,7 +39,7 @@ export default function LandingPage() {
             className="w-9 h-9 rounded-lg object-cover shadow-sm ring-1 ring-black/5"
           />
           <div>
-            <h1 className="text-sm font-bold leading-tight text-foreground">SMA Islam Bunga Bangsa</h1>
+            <h1 className="text-sm font-bold leading-tight text-foreground">{SCHOOL_NAME}</h1>
             <p className="text-[10px] text-muted-foreground">E-Raport Tahfidz</p>
           </div>
         </div>
@@ -131,7 +132,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 border-t border-border/20 text-center z-10">
         <p className="text-[11px] font-medium text-muted-foreground">
-          &copy; {new Date().getFullYear()} SMA Islam Bunga Bangsa. Hak Cipta Dilindungi Undang-Undang.
+          &copy; {new Date().getFullYear()} {SCHOOL_NAME}. Hak Cipta Dilindungi Undang-Undang.
         </p>
       </footer>
     </div>

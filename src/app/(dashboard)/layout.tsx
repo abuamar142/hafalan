@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { SidebarInset } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/app-sidebar'
-import { ThemeToggle } from '@/components/ThemeToggle'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useAppState, QK } from '@/hooks/useAppState'
@@ -86,9 +85,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <SidebarInset>
           <header className="flex h-14 shrink-0 items-center gap-2 px-4 md:hidden">
             <SidebarTrigger className="-ml-1" />
-            <div className="ml-auto">
-              <ThemeToggle />
-            </div>
           </header>
 
           <div className="flex min-h-screen flex-1 flex-col">

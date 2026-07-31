@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { ALL_SURAHS, TARGET_JUZ } from '@/lib/constants'
+import { ALL_SURAHS, TARGET_JUZ, SCHOOL_NAME, SCHOOL_CITY } from '@/lib/constants'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -235,7 +235,7 @@ export default function ReportDetailClient({
               className="w-12 h-12 rounded-lg object-cover"
             />
             <div>
-              <h1 className="text-lg font-bold text-black uppercase tracking-tight">SMA ISLAM BUNGA BANGSA</h1>
+              <h1 className="text-lg font-bold text-black uppercase tracking-tight">{SCHOOL_NAME.toUpperCase()}</h1>
               <p className="text-xs text-black/70 font-semibold tracking-wide">LAPORAN RAPORT TAHFIDZ AL-QURAN</p>
             </div>
           </div>
@@ -277,7 +277,7 @@ export default function ReportDetailClient({
 
                 <div className="hidden print:block text-right">
                   <div className="inline-flex flex-col gap-1 text-xs text-black">
-                    <p className="font-semibold">Nama Lembaga: <span className="font-bold">SMA Islam Bunga Bangsa</span></p>
+                    <p className="font-semibold">Nama Lembaga: <span className="font-bold">{SCHOOL_NAME}</span></p>
                     <p className="font-semibold">Evaluator: <span className="font-bold">Ustadz Pembina Halaqah</span></p>
                   </div>
                 </div>
@@ -549,7 +549,7 @@ export default function ReportDetailClient({
                 <div className="border-t border-black/40 w-44 mx-auto pt-1.5 font-bold">....................................</div>
               </div>
               <div className="space-y-16">
-                <p className="font-bold">Samarinda, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>Pembina Halaqah</p>
+                <p className="font-bold">{SCHOOL_CITY}, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>Pembina Halaqah</p>
                 <div className="border-t border-black/40 w-44 mx-auto pt-1.5 font-bold">Ustadz {submissions[0]?.guru_nama || 'Pembina'}</div>
               </div>
             </div>

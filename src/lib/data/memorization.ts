@@ -26,18 +26,6 @@ export async function getStudentMemorization(
   return (data ?? []) as Memorization[]
 }
 
-export async function toggleMemorization(
-  studentId: number,
-  surahNo: number,
-  status: number
-): Promise<void> {
-  const supabase = createClient()
-  await supabase.from('memorization').upsert(
-    { student_id: studentId, surah_no: surahNo, status },
-    { onConflict: 'student_id,surah_no' }
-  )
-}
-
 export async function getAllMemorizationMap(): Promise<Record<number, Memorization[]>> {
   const supabase = createClient()
   const { data } = await supabase

@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff } from 'lucide-react'
+import { SCHOOL_NAME } from '@/lib/constants'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -56,7 +57,7 @@ export default function LoginPage() {
             Hafalan
           </h1>
           <p className="text-sm font-medium text-muted-foreground">
-            SMA Islam Bunga Bangsa
+            {SCHOOL_NAME}
           </p>
         </div>
 

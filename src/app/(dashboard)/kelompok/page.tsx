@@ -25,6 +25,7 @@ import {
 import { Combobox } from '@/components/ui/combobox'
 import { useToast } from '@/components/ui/toast-wrapper'
 import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
+import { getPageNumbers } from '@/lib/pagination'
 
 export default function KelompokPage() {
   const { state, refreshClasses } = useDashboard()
@@ -191,22 +192,6 @@ export default function KelompokPage() {
     )
   }
 
-  function getPageNumbers(): (number | 'ellipsis')[] {
-    const pages: (number | 'ellipsis')[] = []
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i)
-      return pages
-    }
-    pages.push(1)
-    if (page > 3) pages.push('ellipsis')
-    const start = Math.max(2, page - 1)
-    const end = Math.min(totalPages - 1, page + 1)
-    for (let i = start; i <= end; i++) pages.push(i)
-    if (page < totalPages - 2) pages.push('ellipsis')
-    pages.push(totalPages)
-    return pages
-  }
-
   return (
     <div className="max-w-6xl pb-10">
       {/* Top Header */}
@@ -352,7 +337,7 @@ export default function KelompokPage() {
                     className={page === 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
                   />
                 </PaginationItem>
-                {getPageNumbers().map((p, i) =>
+                {getPageNumbers(page, totalPages).map((p, i) =>
                   p === 'ellipsis' ? (
                     <PaginationItem key={`e-${i}`}>
                       <PaginationEllipsis />

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { SCHOOL_NAME } from '@/lib/constants'
 import {
   LayoutDashboard,
   CheckSquare,
@@ -142,7 +143,7 @@ function CollapsibleWithState({
 export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const { setOpenMobile } = useSidebar()
   const [dark, setDark] = useState(false)
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
@@ -182,7 +183,7 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" tooltip="SMA Islam Bunga Bangsa">
+            <SidebarMenuButton size="lg" tooltip={SCHOOL_NAME}>
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <Image
                   src="/images/logo.jpg"
@@ -194,7 +195,7 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  SMA Islam Bunga Bangsa
+                  {SCHOOL_NAME}
                 </span>
                 {userName && (
                   <span className="truncate text-xs text-sidebar-muted-foreground">

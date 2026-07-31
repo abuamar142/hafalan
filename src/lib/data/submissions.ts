@@ -27,16 +27,4 @@ export async function getStudentSubmissions(
   return (data ?? []) as SubmissionRow[]
 }
 
-export async function addSubmission(submission: {
-  student_id: number
-  surah_no: number
-  nilai: string
-  catatan: string
-  waktu: string
-  guru_id: string | null
-  ayat_start?: number | null
-  ayat_end?: number | null
-}): Promise<void> {
-  const supabase = createClient()
-  await supabase.from('submissions').insert(submission)
-}
+

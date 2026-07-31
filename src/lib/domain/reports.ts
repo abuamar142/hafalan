@@ -1,4 +1,4 @@
-import { ALL_SURAHS, TARGET_JUZ } from '../constants'
+import { ALL_SURAHS, TARGET_JUZ, SCHOOL_NAME } from '../constants'
 import {
   getPct,
   getJuzSurahsFromHafalan,
@@ -92,7 +92,7 @@ export function generateCollectiveReport(
   return `
       <div style="font-family:system-ui,sans-serif;color:#2C2C2A;max-width:800px;margin:0 auto">
         <div style="text-align:center;margin-bottom:24px">
-          <div style="font-size:18px;font-weight:700">SMA Islam Bunga Bangsa</div>
+          <div style="font-size:18px;font-weight:700">${SCHOOL_NAME}</div>
           <div style="font-size:14px;color:#5F5E5A;margin-top:4px">Laporan Kolektif \u00B7 ${escapeHtml(guruName || '-')}</div>
           <div style="font-size:12px;color:#888780;margin-top:2px">${nowStr()}</div>
         </div>
@@ -220,7 +220,7 @@ export function generateIndividualReport(
   return `
       <div style="font-family:system-ui,sans-serif;color:#2C2C2A;max-width:800px;margin:0 auto">
         <div style="text-align:center;margin-bottom:20px">
-          <div style="font-size:18px;font-weight:700">SMA Islam Bunga Bangsa</div>
+          <div style="font-size:18px;font-weight:700">${SCHOOL_NAME}</div>
           <div style="font-size:14px;color:#5F5E5A;margin-top:4px">Laporan Individu</div>
           <div style="font-size:12px;color:#888780;margin-top:2px">${nowStr()}</div>
         </div>
@@ -451,9 +451,9 @@ export function generateDevelopmentReport(
   return `
 <div style="font-family:system-ui,sans-serif;color:#2C2C2A;width:100%;margin:0 auto">
   <div style="text-align:center;margin-bottom:10px">
-    <div style="font-size:16px;font-weight:700">SMA Islam Bunga Bangsa</div>
+    <div style="font-size:16px;font-weight:700">${SCHOOL_NAME}</div>
     <div style="font-size:12px;color:#5F5E5A;margin-top:2px">Rekap Hasil Perkembangan Tahfidz</div>
-    <div style="font-size:11px;color:#5F5E5A;margin-top:1px">Siswa dan Siswi SMA Islam Bunga Bangsa</div>
+    <div style="font-size:11px;color:#5F5E5A;margin-top:1px">Siswa dan Siswi ${SCHOOL_NAME}</div>
     <div style="font-size:11px;color:#888780;margin-top:1px">${escapeHtml(tahunAjaran)}</div>
   </div>
 

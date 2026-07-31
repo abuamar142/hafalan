@@ -38,7 +38,6 @@ export default function ProfilPage({
 
   const [studentId, setStudentId] = useState<number | null>(null)
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
-  const [toggling] = useState(false)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [deleteSubmissionTarget, setDeleteSubmissionTarget] = useState<{ id: number; surahName: string } | null>(null)
 
@@ -93,7 +92,7 @@ export default function ProfilPage({
 
   // Toggle surah status
   async function toggleSurah(surahNo: number) {
-    if (toggling || studentId == null) return
+    if (studentId == null) return
     const current = hafalan[surahNo] || 0
     const next = toggleSurahCycle(current)
 
@@ -271,7 +270,6 @@ export default function ProfilPage({
                     variant="ghost"
                     key={s.no}
                     onClick={() => toggleSurah(s.no)}
-                    disabled={toggling}
                     className="group flex w-full items-center gap-4 p-3 text-left hover:bg-card border border-transparent hover:border-border/50 justify-start"
                   >
                     {/* Status Toggle */}

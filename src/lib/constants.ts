@@ -1,5 +1,8 @@
 import type { Surah } from './types'
 
+export const SCHOOL_NAME = 'SMA Islam Bunga Bangsa'
+export const SCHOOL_CITY = 'Samarinda'
+
 export const AVATAR_COLORS = [
   '#1D9E75', '#534AB7', '#BA7517', '#A32D2D',
   '#0F6E56', '#3C3489', '#633806', '#2D4EA3',
