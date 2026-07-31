@@ -56,20 +56,20 @@ export function generateCollectiveReport(
 
       return `
         <tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center">${i + 1}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;font-weight:500">${escapeHtml(s.nama)}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center;color:#666">${s.kelas ? escapeHtml(s.kelas) : '-'}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center">${hafal}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center">${juzSelesai}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5">
+          <td style="padding:8px 12px;border:1px solid #d1d5db;text-align:center">${i + 1}</td>
+          <td style="padding:8px 12px;border:1px solid #d1d5db;font-weight:500">${escapeHtml(s.nama)}</td>
+          <td style="padding:8px 12px;border:1px solid #d1d5db;text-align:center;color:#666">${s.kelas ? escapeHtml(s.kelas) : '-'}</td>
+          <td style="padding:8px 12px;border:1px solid #d1d5db;text-align:center">${hafal}</td>
+          <td style="padding:8px 12px;border:1px solid #d1d5db;text-align:center">${juzSelesai}</td>
+          <td style="padding:8px 12px;border:1px solid #d1d5db">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="flex:1;height:6px;background:#e5e5e5;border-radius:3px;overflow:hidden">
+              <div style="flex:1;height:6px;background:#d1d5db;border-radius:3px;overflow:hidden">
                 <div style="height:100%;width:${p}%;background:#1D9E75;border-radius:3px"></div>
               </div>
               <span style="font-size:12px;font-weight:500;min-width:32px">${p}%</span>
             </div>
           </td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:center">${subCount}</td>
+          <td style="padding:8px 12px;border:1px solid #d1d5db;text-align:center">${subCount}</td>
         </tr>`
     })
     .join('')
@@ -81,11 +81,11 @@ export function generateCollectiveReport(
     .map(
       (sub) => `
         <tr>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${escapeHtml(sub.santri_nama)}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${escapeHtml(getSurahNama(sub.surah_no))}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `\u2013${sub.ayat_end}` : ''}` : ''}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${escapeHtml(sub.nilai)}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).tanggal}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan ? escapeHtml(sub.catatan) : '-'}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db">${escapeHtml(sub.santri_nama)}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db">${escapeHtml(getSurahNama(sub.surah_no))}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `\u2013${sub.ayat_end}` : ''}` : ''}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db;text-align:center">${escapeHtml(sub.nilai)}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db">${formatWaktu(sub.waktu).tanggal}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db">${sub.catatan ? escapeHtml(sub.catatan) : '-'}</td>
         </tr>`,
     )
     .join('')
@@ -119,16 +119,16 @@ export function generateCollectiveReport(
 
         <div style="margin-bottom:24px">
           <div style="font-size:14px;font-weight:600;margin-bottom:8px">Ranking Santri</div>
-          <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:13px;border:1px solid #d1d5db">
             <thead>
               <tr style="background:#F1EFE8">
-                <th style="padding:8px 12px;text-align:center;font-weight:600;border-radius:6px 0 0 0">#</th>
-                <th style="padding:8px 12px;text-align:left;font-weight:600">Nama</th>
-                <th style="padding:8px 12px;text-align:center;font-weight:600">Kelas</th>
-                <th style="padding:8px 12px;text-align:center;font-weight:600">Surah</th>
-                <th style="padding:8px 12px;text-align:center;font-weight:600">Juz</th>
-                <th style="padding:8px 12px;text-align:left;font-weight:600">Progress</th>
-                <th style="padding:8px 12px;text-align:center;font-weight:600;border-radius:0 6px 0 0">Setoran</th>
+                <th style="padding:8px 12px;text-align:center;font-weight:600;border:1px solid #d1d5db">#</th>
+                <th style="padding:8px 12px;text-align:left;font-weight:600;border:1px solid #d1d5db">Nama</th>
+                <th style="padding:8px 12px;text-align:center;font-weight:600;border:1px solid #d1d5db">Kelas</th>
+                <th style="padding:8px 12px;text-align:center;font-weight:600;border:1px solid #d1d5db">Surah</th>
+                <th style="padding:8px 12px;text-align:center;font-weight:600;border:1px solid #d1d5db">Juz</th>
+                <th style="padding:8px 12px;text-align:left;font-weight:600;border:1px solid #d1d5db">Progress</th>
+                <th style="padding:8px 12px;text-align:center;font-weight:600;border:1px solid #d1d5db">Setoran</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -138,14 +138,14 @@ export function generateCollectiveReport(
         ${latestSubs ? `
         <div>
           <div style="font-size:14px;font-weight:600;margin-bottom:8px">10 Setoran Terakhir</div>
-          <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:12px;border:1px solid #d1d5db">
             <thead>
               <tr style="background:#F1EFE8">
-                <th style="padding:6px 10px;text-align:left;font-weight:600;border-radius:6px 0 0 0">Santri</th>
-                <th style="padding:6px 10px;text-align:left;font-weight:600">Surah</th>
-                <th style="padding:6px 10px;text-align:center;font-weight:600">Nilai</th>
-                <th style="padding:6px 10px;text-align:left;font-weight:600">Tanggal</th>
-                <th style="padding:6px 10px;text-align:left;font-weight:600;border-radius:0 6px 0 0">Catatan</th>
+                <th style="padding:6px 10px;text-align:left;font-weight:600;border:1px solid #d1d5db">Santri</th>
+                <th style="padding:6px 10px;text-align:left;font-weight:600;border:1px solid #d1d5db">Surah</th>
+                <th style="padding:6px 10px;text-align:center;font-weight:600;border:1px solid #d1d5db">Nilai</th>
+                <th style="padding:6px 10px;text-align:left;font-weight:600;border:1px solid #d1d5db">Tanggal</th>
+                <th style="padding:6px 10px;text-align:left;font-weight:600;border:1px solid #d1d5db">Catatan</th>
               </tr>
             </thead>
             <tbody>${latestSubs}</tbody>
@@ -189,7 +189,7 @@ export function generateIndividualReport(
     .map((_, i) => {
       const j = i + 1
       const jp = getJuzSurahsFromHafalan(hafalan, j)
-      const bg = jp === 100 ? '#1D9E75' : jp > 0 ? '#BA7517' : '#e5e5e5'
+      const bg = jp === 100 ? '#1D9E75' : jp > 0 ? '#BA7517' : '#d1d5db'
       const fg = jp === 100 ? '#fff' : jp > 0 ? '#BA7517' : '#999'
       return `
         <div style="width:48px;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;background:${bg};color:${fg};font-size:13px;font-weight:600">
@@ -209,11 +209,11 @@ export function generateIndividualReport(
     .map(
       (sub) => `
         <tr>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${escapeHtml(getSurahNama(sub.surah_no))}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `\u2013${sub.ayat_end}` : ''}` : ''}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5;text-align:center">${escapeHtml(sub.nilai)}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).tanggal}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${formatWaktu(sub.waktu).jam}</td>
-          <td style="padding:6px 10px;border-bottom:1px solid #e5e5e5">${sub.catatan ? escapeHtml(sub.catatan) : '-'}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db">${escapeHtml(getSurahNama(sub.surah_no))}${sub.ayat_start && sub.ayat_end ? `: ${sub.ayat_start}${sub.ayat_end !== sub.ayat_start ? `\u2013${sub.ayat_end}` : ''}` : ''}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db;text-align:center">${escapeHtml(sub.nilai)}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db">${formatWaktu(sub.waktu).tanggal}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db">${formatWaktu(sub.waktu).jam}</td>
+          <td style="padding:6px 10px;border:1px solid #d1d5db">${sub.catatan ? escapeHtml(sub.catatan) : '-'}</td>
         </tr>`,
     )
     .join('')
@@ -285,14 +285,14 @@ export function generateIndividualReport(
             ? `
         <div style="margin-bottom:24px">
           <div style="font-size:13px;font-weight:600;margin-bottom:8px">Riwayat Setoran (${submissions.length})</div>
-          <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:12px;border:1px solid #d1d5db">
             <thead>
               <tr style="background:#F1EFE8">
-                <th style="padding:6px 10px;text-align:left;font-weight:600;border-radius:6px 0 0 0">Surah</th>
-                <th style="padding:6px 10px;text-align:center;font-weight:600">Nilai</th>
-                <th style="padding:6px 10px;text-align:left;font-weight:600">Tanggal</th>
-                <th style="padding:6px 10px;text-align:left;font-weight:600">Jam</th>
-                <th style="padding:6px 10px;text-align:left;font-weight:600;border-radius:0 6px 0 0">Catatan</th>
+                <th style="padding:6px 10px;text-align:left;font-weight:600;border:1px solid #d1d5db">Surah</th>
+                <th style="padding:6px 10px;text-align:center;font-weight:600;border:1px solid #d1d5db">Nilai</th>
+                <th style="padding:6px 10px;text-align:left;font-weight:600;border:1px solid #d1d5db">Tanggal</th>
+                <th style="padding:6px 10px;text-align:left;font-weight:600;border:1px solid #d1d5db">Jam</th>
+                <th style="padding:6px 10px;text-align:left;font-weight:600;border:1px solid #d1d5db">Catatan</th>
               </tr>
             </thead>
             <tbody>${subRows}</tbody>
@@ -395,19 +395,20 @@ export function generateDevelopmentReport(
   const totalCols = 1 + juzColumns.length + 1 // Kelas + juz + Jml. Siswa
 
   // 8. Build HTML
+  const bdr = '1px solid #d1d5db'
   const monthHeaderRow = `
       <tr style="background:#F1EFE8">
-        <th colspan="${totalCols}" style="padding:8px;font-weight:600">${escapeHtml(bulan)}</th>
+        <th colspan="${totalCols}" style="padding:6px 10px;font-weight:600;border:${bdr}">${escapeHtml(bulan)}</th>
       </tr>`
 
   const subHeaderCells = [
-    `<th style="padding:8px;font-weight:600;text-align:left;border-right:1px solid #e5e5e5">Kelas</th>`,
+    `<th style="padding:6px 10px;font-weight:600;text-align:left;border:${bdr}">Kelas</th>`,
     ...juzColumns.map(
       (j) =>
-        `<th style="padding:8px;font-weight:600;border-right:1px solid #e5e5e5">${j}</th>`,
+        `<th style="padding:6px 10px;font-weight:600;border:${bdr}">${j}</th>`,
     ),
-    `<th style="padding:8px;font-weight:600;border-left:1px solid #e5e5e5">Jml. Siswa</th>`,
-  ].join('\n        ')
+    `<th style="padding:6px 10px;font-weight:600;border:${bdr}">Jml. Siswa</th>`,
+  ].join('')
   const subHeaderRow = `
       <tr style="background:#F1EFE8">
         ${subHeaderCells}
@@ -423,14 +424,14 @@ export function generateDevelopmentReport(
       const cells = juzColumns
         .map((j) => {
           const c = juzCounts.get(j)!
-          return `<td style="padding:8px;border-bottom:1px solid #e5e5e5;border-right:1px solid #e5e5e5">${c === 0 ? '' : c}</td>`
+          return `<td style="padding:6px 10px;border:${bdr}">${c === 0 ? '' : c}</td>`
         })
-        .join('\n          ')
+        .join('')
       return `
         <tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:left;font-weight:500;border-right:1px solid #e5e5e5">${escapeHtml(kelas)}</td>
+          <td style="padding:6px 10px;border:${bdr};text-align:left;font-weight:500">${escapeHtml(kelas)}</td>
           ${cells}
-          <td style="padding:8px;border-bottom:1px solid #e5e5e5;font-weight:500;border-left:1px solid #e5e5e5">${kelasTotal}</td>
+          <td style="padding:6px 10px;border:${bdr};font-weight:500">${kelasTotal}</td>
         </tr>`
     })
     .join('')
@@ -438,26 +439,26 @@ export function generateDevelopmentReport(
   const footerCells = juzColumns
     .map(
       (j) =>
-        `<td style="padding:8px;border-right:1px solid #e5e5e5">${juzTotals.get(j) || 0}</td>`,
+        `<td style="padding:6px 10px;border:${bdr}">${juzTotals.get(j) || 0}</td>`,
     )
-    .join('\n        ')
+    .join('')
   const footerRow = `
       <tr style="background:#F1EFE8;font-weight:600">
-        <td style="padding:8px 12px;border-right:1px solid #e5e5e5">Jml</td>
+        <td style="padding:6px 10px;border:${bdr}">Jml</td>
         ${footerCells}
-        <td style="padding:8px;border-left:1px solid #e5e5e5">${grandTotal}</td>
+        <td style="padding:6px 10px;border:${bdr}">${grandTotal}</td>
       </tr>`
 
   return `
-<div style="font-family:system-ui,sans-serif;color:#2C2C2A;max-width:900px;margin:0 auto">
-  <div style="text-align:center;margin-bottom:20px">
-    <div style="font-size:18px;font-weight:700">SMA Islam Bunga Bangsa</div>
-    <div style="font-size:14px;color:#5F5E5A;margin-top:4px">Rekap Hasil Perkembangan Tahfidz</div>
-    <div style="font-size:13px;color:#5F5E5A;margin-top:2px">Siswa dan Siswi SMA Islam Bunga Bangsa</div>
-    <div style="font-size:12px;color:#888780;margin-top:2px">${escapeHtml(tahunAjaran)}</div>
+<div style="font-family:system-ui,sans-serif;color:#2C2C2A;width:100%;margin:0 auto">
+  <div style="text-align:center;margin-bottom:10px">
+    <div style="font-size:16px;font-weight:700">SMA Islam Bunga Bangsa</div>
+    <div style="font-size:12px;color:#5F5E5A;margin-top:2px">Rekap Hasil Perkembangan Tahfidz</div>
+    <div style="font-size:11px;color:#5F5E5A;margin-top:1px">Siswa dan Siswi SMA Islam Bunga Bangsa</div>
+    <div style="font-size:11px;color:#888780;margin-top:1px">${escapeHtml(tahunAjaran)}</div>
   </div>
 
-  <table style="width:100%;border-collapse:collapse;font-size:13px;text-align:center">
+  <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:12px;text-align:center;border:${bdr};page-break-inside:avoid">
     <thead>
       ${monthHeaderRow}
       ${subHeaderRow}

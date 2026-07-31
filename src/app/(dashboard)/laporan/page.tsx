@@ -152,7 +152,21 @@ export default function LaporanPage() {
   }
 
   function handlePrint() {
-    window.print()
+    if (!printHtml) return
+    const win = window.open('', '_blank')
+    if (!win) return
+    win.document.write(`<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Cetak Laporan</title>
+<style>
+  @page { size: landscape; margin: 8mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; color: #2C2C2A; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  table { border-collapse: separate; border-spacing: 0; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 6px 10px; font-size: 12px; }
+  img { max-width: 100%; }
+</style></head><body>${printHtml}</body></html>`)
+    win.document.close()
+    win.onload = () => { win.print(); win.close() }
   }
 
   function handleCardClick(type: ReportType) {

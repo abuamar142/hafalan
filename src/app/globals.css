@@ -146,26 +146,20 @@
   border-radius: 12px;
 }
 
-/* ── Print ── */
+/* ── Print (window.open handles main print; this is fallback) ── */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  #print-area,
-  #print-area * {
-    visibility: visible;
-  }
-  #print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
-  aside {
+  body > *:not(#print-area):not(#print-area *):not(script):not(style) {
     display: none !important;
   }
+  #print-area {
+    background: white !important;
+    color: #2C2C2A !important;
+    padding: 0 !important;
+    border-radius: 0;
+  }
   @page {
-    margin: 15mm;
+    size: landscape;
+    margin: 8mm;
   }
 }
 
