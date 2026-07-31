@@ -19,8 +19,8 @@ import {
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/Card'
-import { useToast } from '@/components/ui/Toast'
+import { Card, CardContent } from '@/components/ui/card'
+import { useToast } from '@/components/ui/toast-wrapper'
 import { ArrowLeft, Trash2, CheckCircle2, RotateCcw, Circle } from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
 

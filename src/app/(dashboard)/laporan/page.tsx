@@ -10,7 +10,7 @@ import {
 } from '@/lib/data/memorization'
 import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
 import { FileText, Printer, Users, User } from 'lucide-react'

@@ -6,11 +6,11 @@ import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { addSubmissionAction } from '@/lib/actions/submissions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Save, BookOpen, History } from 'lucide-react'
 import { getColor, initials, getPct, getTotalHafal, formatWaktu, getSurahNama } from '@/lib/helpers'
 import { Combobox } from '@/components/ui/combobox'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/components/ui/toast-wrapper'
 
 function toLocalDatetimeString(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')

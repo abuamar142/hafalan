@@ -2,7 +2,7 @@
 
 import { getColor, initials, getPct, getTotalHafal } from '@/lib/helpers'
 import type { SantriWithCount } from '@/lib/types'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import { ChevronRight } from 'lucide-react'
 
 interface SantriCardProps {
