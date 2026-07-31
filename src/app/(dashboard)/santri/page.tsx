@@ -282,7 +282,7 @@ export default function SantriPage() {
   return (
     <div className="max-w-6xl pb-10">
       {/* Top Bar */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-foreground">Manajemen Siswa</h2>
           <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
@@ -301,7 +301,7 @@ export default function SantriPage() {
       </div>
 
       {/* Search */}
-      <div className="relative mb-4 max-w-xs">
+      <div className="relative mb-6 max-w-xs">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <Input
           type="text"
@@ -465,7 +465,7 @@ export default function SantriPage() {
               {error}
             </div>
           )}
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Nama Lengkap <span className="text-destructive">*</span>
@@ -516,7 +516,7 @@ export default function SantriPage() {
               {error}
             </div>
           )}
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Nama Lengkap <span className="text-destructive">*</span>

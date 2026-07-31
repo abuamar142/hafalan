@@ -210,7 +210,7 @@ export default function KelompokPage() {
   return (
     <div className="max-w-6xl pb-10">
       {/* Top Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-foreground">Manajemen Kelompok</h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -228,7 +228,7 @@ export default function KelompokPage() {
       </div>
 
       {/* Search */}
-      <div className="relative mb-4 max-w-xs">
+      <div className="relative mb-6 max-w-xs">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <Input
           type="text"
@@ -392,7 +392,7 @@ export default function KelompokPage() {
               {error}
             </div>
           )}
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Nama Kelompok / Halaqah <span className="text-destructive">*</span>
@@ -429,7 +429,7 @@ export default function KelompokPage() {
             </div>
           )}
           {selectedGroup && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Nama Kelompok <span className="text-destructive">*</span>

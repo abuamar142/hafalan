@@ -100,7 +100,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
             {/* Content */}
             {!app.loading && (
-              <main className="flex-1 p-4 md:p-8 w-full max-w-6xl mx-auto">{children}</main>
+              <main className="flex-1 px-4 py-6 md:px-8 md:py-10 w-full max-w-6xl mx-auto">{children}</main>
             )}
           </div>
         </SidebarInset>
@@ -121,7 +121,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               value={guruInput}
               onChange={(e) => setGuruInput(e.target.value)}
               placeholder="Ustadz Ahmad..."
-              className="w-full rounded-lg border-[1.5px] border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              className="w-full rounded-md border-[1.5px] border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
             />
           </div>
           <div className="mt-3.5 flex justify-end">
