@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { ALL_SURAHS } from '@/lib/constants'
+import { ALL_SURAHS, TARGET_JUZ } from '@/lib/constants'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -75,11 +75,6 @@ export default function ReportDetailClient({
     return Object.values(memorizationMap).filter((status) => status === 1).length
   }, [memorizationMap])
 
-  // Progress percentage
-  const pct = useMemo(() => {
-    return Math.round((totalHafal / ALL_SURAHS.length) * 100)
-  }, [totalHafal])
-
   // Selesai Juz (all surahs in that Juz are status = 1)
   const juzSelesai = useMemo(() => {
     return [...Array(30)].filter((_, i) => {
@@ -89,6 +84,11 @@ export default function ReportDetailClient({
       return juzSurahs.every((s) => memorizationMap[s.no] === 1)
     }).length
   }, [memorizationMap])
+
+  // Progress percentage (juz-based)
+  const pct = useMemo(() => {
+    return Math.round((juzSelesai / TARGET_JUZ) * 100)
+  }, [juzSelesai])
 
   // Total verses setoran
   const totalVerses = useMemo(() => {
@@ -324,11 +324,16 @@ export default function ReportDetailClient({
                   <div className="space-y-2 flex-1 w-full text-xs text-muted-foreground print:text-black font-semibold">
                     <div className="flex justify-between py-1 border-b border-border/20">
                       <span>Target Akhir</span>
-                      <span className="font-bold text-foreground print:text-black">30 Juz</span>
+                      <span className="font-bold text-foreground print:text-black">{TARGET_JUZ} Juz</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-border/20">
                       <span>Juz Selesai</span>
-                      <span className="font-bold text-primary">{juzSelesai} Juz</span>
+                      <span className="font-bold text-primary">
+                        {juzSelesai} / {TARGET_JUZ} Juz
+                        {juzSelesai >= TARGET_JUZ && (
+                          <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">(Target Terpenuhi)</span>
+                        )}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-border/20">
                       <span>Surah Hafal</span>

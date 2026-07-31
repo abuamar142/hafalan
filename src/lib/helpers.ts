@@ -1,16 +1,12 @@
-import { ALL_SURAHS, AVATAR_COLORS } from './constants'
+import { ALL_SURAHS, AVATAR_COLORS, TARGET_JUZ } from './constants'
 import type { SantriWithCount } from './types'
 
 export function getJuzSurahs(juz: number) {
   return ALL_SURAHS.filter((s) => s.juz === juz)
 }
 
-export function getPctFromCount(count: number) {
-  return Math.round((count / ALL_SURAHS.length) * 100)
-}
-
 export function getPct(s: SantriWithCount) {
-  return getPctFromCount(s.hafal_count || 0)
+  return Math.round(((s.juz_selesai || 0) / TARGET_JUZ) * 100)
 }
 
 export function getTotalHafal(s: SantriWithCount) {

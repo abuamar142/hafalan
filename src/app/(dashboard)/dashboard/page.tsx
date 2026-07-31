@@ -1,7 +1,7 @@
 'use client'
 
 import { useDashboard } from '../layout'
-import { getPct, getTotalHafal } from '@/lib/helpers'
+import { getPct } from '@/lib/helpers'
 import { computeRanking, computeDashboardStats } from '@/lib/domain/statistics'
 import { Card, CardContent } from '@/components/ui/card'
 import { Users, TrendingUp, BookOpen, Trophy } from 'lucide-react'
@@ -40,7 +40,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Rata-rata Hafal</p>
-              <h3 className="text-2xl font-bold text-foreground">{stats.averageHafal}</h3>
+              <h3 className="text-2xl font-bold text-foreground">{stats.averageJuz}</h3>
             </div>
           </CardContent>
         </Card>
@@ -76,7 +76,7 @@ export default function DashboardPage() {
           <div className="divide-y divide-border/30">
             {sorted.slice(0, 10).map((s, i) => {
               const pct = getPct(s)
-              const hafal = getTotalHafal(s)
+              const juzDone = s.juz_selesai || 0
 
               return (
                 <div
@@ -115,8 +115,8 @@ export default function DashboardPage() {
 
                   {/* Hafal count */}
                   <div className="shrink-0 text-right">
-                    <div className="text-sm font-bold text-primary">{hafal}</div>
-                    <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Surah</div>
+                    <div className="text-sm font-bold text-primary">{juzDone}</div>
+                    <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Juz</div>
                   </div>
                 </div>
               )

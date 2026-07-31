@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Save, BookOpen, History } from 'lucide-react'
-import { getColor, initials, getPct, getTotalHafal, formatWaktu, getSurahNama } from '@/lib/helpers'
+import { getColor, initials, getPct, formatWaktu, getSurahNama } from '@/lib/helpers'
 import { Combobox } from '@/components/ui/combobox'
 import { useToast } from '@/components/ui/toast-wrapper'
 
@@ -349,8 +349,8 @@ export default function TambahSetoranPage() {
                     />
                   </div>
                   <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-muted-foreground">Total Surah Dihafal</span>
-                    <span className="font-semibold text-muted-foreground">{getTotalHafal(selectedStudent)} surah</span>
+                    <span className="text-muted-foreground">Juz Selesai</span>
+                    <span className="font-semibold text-muted-foreground">{selectedStudent.juz_selesai || 0} juz</span>
                   </div>
                 </div>
 

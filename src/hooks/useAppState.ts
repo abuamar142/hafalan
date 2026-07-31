@@ -59,8 +59,8 @@ export function useAppState() {
   // ── Derived state ──
   const hafalCounts = useMemo(() => computeHafalCounts(mq.data ?? []), [mq.data])
   const studentsWithCount = useMemo(
-    () => computeStudentsWithCount(students, hafalCounts),
-    [students, hafalCounts],
+    () => computeStudentsWithCount(students, hafalCounts, mq.data ?? []),
+    [students, hafalCounts, mq.data],
   )
 
   const submissions: SetoranItem[] = useMemo(

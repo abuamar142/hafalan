@@ -13,7 +13,7 @@ import {
   getJuzSurahs,
   getJuzSurahsFromHafalan,
   getJuzSelesaiFromHafalan,
-  getPctFromCount,
+  getPct,
   getColor,
   initials,
   formatWaktu,
@@ -84,7 +84,7 @@ export default function ProfilPage({
     [hafalan]
   )
 
-  const pct = getPctFromCount(hafalCount)
+  const pct = student ? getPct(student) : 0
 
   const colorIndex = useMemo(() => {
     if (!student) return 0

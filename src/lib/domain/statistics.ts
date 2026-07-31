@@ -1,10 +1,10 @@
-import { getPct, getTotalHafal } from '../helpers'
+import { getPct } from '../helpers'
 import type { SantriWithCount } from '../types'
 
 export interface DashboardStats {
   totalStudents: number
-  totalHafal: number
-  averageHafal: number
+  totalJuz: number
+  averageJuz: number
 }
 
 /**
@@ -14,14 +14,14 @@ export function computeDashboardStats(
   studentsWithCount: SantriWithCount[],
 ): DashboardStats {
   const totalStudents = studentsWithCount.length
-  const totalHafal = studentsWithCount.reduce(
-    (sum, s) => sum + getTotalHafal(s),
+  const totalJuz = studentsWithCount.reduce(
+    (sum, s) => sum + (s.juz_selesai || 0),
     0,
   )
-  const averageHafal =
-    totalStudents > 0 ? Math.round(totalHafal / totalStudents) : 0
+  const averageJuz =
+    totalStudents > 0 ? Math.round(totalJuz / totalStudents) : 0
 
-  return { totalStudents, totalHafal, averageHafal }
+  return { totalStudents, totalJuz, averageJuz }
 }
 
 /**
@@ -35,8 +35,8 @@ export function computeRanking(
 
 export interface ReportStats {
   totalStudents: number
-  totalHafal: number
-  averageHafal: number
+  totalJuz: number
+  averageJuz: number
   averagePct: number
 }
 
@@ -47,12 +47,12 @@ export function computeReportStats(
   studentsWithCount: SantriWithCount[],
 ): ReportStats {
   const totalStudents = studentsWithCount.length
-  const totalHafal = studentsWithCount.reduce(
-    (sum, s) => sum + getTotalHafal(s),
+  const totalJuz = studentsWithCount.reduce(
+    (sum, s) => sum + (s.juz_selesai || 0),
     0,
   )
-  const averageHafal =
-    totalStudents > 0 ? Math.round(totalHafal / totalStudents) : 0
+  const averageJuz =
+    totalStudents > 0 ? Math.round(totalJuz / totalStudents) : 0
   const averagePct =
     totalStudents > 0
       ? Math.round(
@@ -61,5 +61,5 @@ export function computeReportStats(
         )
       : 0
 
-  return { totalStudents, totalHafal, averageHafal, averagePct }
+  return { totalStudents, totalJuz, averageJuz, averagePct }
 }

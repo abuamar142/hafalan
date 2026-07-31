@@ -14,7 +14,8 @@ describe('statistics domain logic', () => {
       kelas: '10-A',
       color: '#e5e5e5',
       group_id: 101,
-      hafal_count: 5, // 5 / 68 surahs
+      hafal_count: 5,
+      juz_selesai: 1,
     },
     {
       id: 2,
@@ -22,28 +23,29 @@ describe('statistics domain logic', () => {
       kelas: '10-A',
       color: '#e5e5e5',
       group_id: 101,
-      hafal_count: 10, // 10 / 68 surahs
+      hafal_count: 10,
+      juz_selesai: 2,
     },
   ]
 
   it('computes dashboard stats correctly', () => {
     const stats = computeDashboardStats(mockStudents)
     expect(stats.totalStudents).toBe(2)
-    expect(stats.totalHafal).toBe(15)
-    expect(stats.averageHafal).toBe(8) // Math.round(15 / 2) = 8
+    expect(stats.totalJuz).toBe(3)
+    expect(stats.averageJuz).toBe(2) // Math.round(3 / 2) = 2
   })
 
   it('computes rankings correctly', () => {
     const ranked = computeRanking(mockStudents)
-    expect(ranked[0]?.nama).toBe('Budi') // Budi has 10, Ahmad has 5
+    expect(ranked[0]?.nama).toBe('Budi') // Budi has 2 juz, Ahmad has 1
     expect(ranked[1]?.nama).toBe('Ahmad')
   })
 
   it('computes report stats correctly', () => {
     const stats = computeReportStats(mockStudents)
     expect(stats.totalStudents).toBe(2)
-    expect(stats.totalHafal).toBe(15)
-    expect(stats.averageHafal).toBe(8)
-    expect(stats.averagePct).toBe(11) // Budi is 15%, Ahmad is 7%. Average is (15+7)/2 = 11%
+    expect(stats.totalJuz).toBe(3)
+    expect(stats.averageJuz).toBe(2)
+    expect(stats.averagePct).toBe(30) // Ahmad=20%, Budi=40%. Average = (20+40)/2 = 30%
   })
 })

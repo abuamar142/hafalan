@@ -1,7 +1,6 @@
-import { ALL_SURAHS } from '../constants'
+import { ALL_SURAHS, TARGET_JUZ } from '../constants'
 import {
   getPct,
-  getPctFromCount,
   getJuzSurahsFromHafalan,
   getJuzSelesaiFromHafalan,
   getSurahNama,
@@ -104,8 +103,8 @@ export function generateCollectiveReport(
             <div style="font-size:11px;color:#5F5E5A">Total Santri</div>
           </div>
           <div style="background:#F1EFE8;padding:12px;border-radius:8px;text-align:center">
-            <div style="font-size:20px;font-weight:700">${stats.averageHafal}</div>
-            <div style="font-size:11px;color:#5F5E5A">Rata-rata Hafal</div>
+            <div style="font-size:20px;font-weight:700">${stats.averageJuz}</div>
+            <div style="font-size:11px;color:#5F5E5A">Rata-rata Juz</div>
           </div>
           <div style="background:#F1EFE8;padding:12px;border-radius:8px;text-align:center">
             <div style="font-size:20px;font-weight:700;color:#1D9E75">${stats.averagePct}%</div>
@@ -181,8 +180,8 @@ export function generateIndividualReport(
   const { student, hafalan, submissions, guruName } = input
 
   const hafalCount = Object.values(hafalan).filter((v) => v === 1).length
-  const p = getPctFromCount(hafalCount)
   const juzSelesai = getJuzSelesaiFromHafalan(hafalan)
+  const p = Math.round((juzSelesai / TARGET_JUZ) * 100)
 
   // Juz grid
   const juzCells = [...Array(30)]

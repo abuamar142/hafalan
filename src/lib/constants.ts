@@ -5,6 +5,8 @@ export const AVATAR_COLORS = [
   '#0F6E56', '#3C3489', '#633806', '#2D4EA3',
 ]
 
+export const TARGET_JUZ = 5
+
 export const NILAI_OPTIONS = [
   'Mumtaz',
   'Jayyid Jiddan',

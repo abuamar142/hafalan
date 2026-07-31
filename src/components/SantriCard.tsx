@@ -1,6 +1,6 @@
 'use client'
 
-import { getColor, initials, getPct, getTotalHafal } from '@/lib/helpers'
+import { getColor, initials, getPct } from '@/lib/helpers'
 import type { SantriWithCount } from '@/lib/types'
 import { Card, CardContent } from '@/components/ui/card'
 import { ChevronRight } from 'lucide-react'
@@ -14,7 +14,7 @@ interface SantriCardProps {
 export default function SantriCard({ student, index, onClick }: SantriCardProps) {
   const color = getColor(student, index)
   const pct = getPct(student)
-  const hafal = getTotalHafal(student)
+  const juzDone = student.juz_selesai || 0
 
   return (
     <div
@@ -56,7 +56,7 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
                 </>
               )}
               <span className="w-1 h-1 rounded-full bg-border"></span>
-              <span className="font-semibold text-muted-foreground">{hafal} surah</span>
+              <span className="font-semibold text-muted-foreground">{juzDone} juz</span>
             </div>
             
             {/* Progress Bar */}

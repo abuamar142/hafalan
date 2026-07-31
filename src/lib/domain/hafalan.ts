@@ -1,4 +1,5 @@
 import type { Memorization, Student, SantriWithCount } from '../types'
+import { getJuzSelesaiFromHafalan } from '../helpers'
 
 /**
  * Count hafal (done) and inProgress memorization entries per student.
@@ -26,15 +27,28 @@ export function computeHafalCounts(
 }
 
 /**
- * Enrich students with their hafal count (done) for dashboard display.
+ * Enrich students with their hafal count (done) and juz selesai for dashboard display.
  */
 export function computeStudentsWithCount(
   students: Student[],
   hafalCounts: Record<number, { done: number; inProgress: number }>,
+  memorization: Memorization[],
 ): SantriWithCount[] {
+  // Build per-student hafalan maps for juz selesai calculation
+  const hafalanByStudent = new Map<number, Record<number, number>>()
+  for (const m of memorization) {
+    let map = hafalanByStudent.get(m.student_id)
+    if (!map) {
+      map = {}
+      hafalanByStudent.set(m.student_id, map)
+    }
+    map[m.surah_no] = m.status
+  }
+
   return students.map((s) => ({
     ...s,
     hafal_count: hafalCounts[s.id]?.done ?? 0,
+    juz_selesai: getJuzSelesaiFromHafalan(hafalanByStudent.get(s.id) || {}),
   }))
 }
 

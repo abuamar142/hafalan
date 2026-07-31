@@ -45,6 +45,7 @@ export interface Surah {
 
 export interface SantriWithCount extends Student {
   hafal_count: number
+  juz_selesai: number
 }
 
 export interface SetoranItem {
