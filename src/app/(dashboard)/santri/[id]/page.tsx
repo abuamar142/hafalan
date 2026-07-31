@@ -7,6 +7,7 @@ import { useDashboard, QK } from '../../layout'
 import type { Memorization } from '@/lib/types'
 import { toggleMemorizationAction } from '@/lib/actions/memorization'
 import { deleteStudentAction } from '@/lib/actions/students'
+import { deleteSubmissionAction } from '@/lib/actions/submissions'
 import {
   getSurahNama,
   getJuzSurahs,
@@ -39,6 +40,7 @@ export default function ProfilPage({
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
   const [toggling] = useState(false)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deleteSubmissionTarget, setDeleteSubmissionTarget] = useState<{ id: number; surahName: string } | null>(null)
 
   // Unwrap async params
   useEffect(() => {
@@ -136,6 +138,23 @@ export default function ProfilPage({
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       toast('Gagal menghapus data santri: ' + msg, 'error')
+    }
+  }
+
+  function handleDeleteSubmission(sub: { id: number; surah_no: number }) {
+    setDeleteSubmissionTarget({ id: sub.id, surahName: getSurahNama(sub.surah_no) })
+  }
+
+  async function handleDeleteSubmissionConfirmed() {
+    if (!deleteSubmissionTarget) return
+    try {
+      await deleteSubmissionAction(deleteSubmissionTarget.id)
+      setDeleteSubmissionTarget(null)
+      await refreshStudents()
+      toast('Setoran berhasil dihapus!')
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      toast('Gagal menghapus setoran: ' + msg, 'error')
     }
   }
 
@@ -349,9 +368,20 @@ export default function ProfilPage({
                               </span>
                             ) : null}
                           </div>
-                          <span className="inline-flex shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary px-2 py-0.5 text-[11px] font-bold border border-primary/20">
-                            {sub.nilai}
-                          </span>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleDeleteSubmission(sub)}
+                              title="Hapus Setoran"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                            <span className="inline-flex shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary px-2 py-0.5 text-[11px] font-bold border border-primary/20">
+                              {sub.nilai}
+                            </span>
+                          </div>
                         </div>
                         <div className="text-[12px] font-medium text-muted-foreground mb-2">
                           {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}
@@ -393,6 +423,14 @@ export default function ProfilPage({
       description={`Hapus santri "${student?.nama}"? Semua data terkait akan dihapus.`}
       confirmText="Hapus"
       onConfirm={handleDeleteConfirmed}
+    />
+    <ConfirmDialog
+      open={deleteSubmissionTarget !== null}
+      onOpenChange={(open) => { if (!open) setDeleteSubmissionTarget(null) }}
+      title="Hapus Setoran?"
+      description={`Hapus setoran ${deleteSubmissionTarget?.surahName || ''}? Data yang dihapus tidak dapat dikembalikan.`}
+      confirmText="Hapus"
+      onConfirm={handleDeleteSubmissionConfirmed}
     />
     </>
   )
