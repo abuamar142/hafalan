@@ -21,7 +21,7 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from '@/components/ui/pagination'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/components/ui/toast-wrapper'
 import { Plus, Eye, Edit, Trash2, Layers, Search } from 'lucide-react'
 
 export default function KelasPage() {

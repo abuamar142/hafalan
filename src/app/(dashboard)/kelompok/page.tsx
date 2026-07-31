@@ -23,7 +23,7 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import { Combobox } from '@/components/ui/combobox'
-import { useToast } from '@/components/ui/Toast'
+import { useToast } from '@/components/ui/toast-wrapper'
 import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
 
 export default function KelompokPage() {

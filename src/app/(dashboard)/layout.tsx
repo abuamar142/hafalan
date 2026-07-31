@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useAppState, QK } from '@/hooks/useAppState'
 import { createClient } from '@/lib/supabase/client'
 import type { SantriWithCount, Memorization } from '@/lib/types'
-import { ToastProvider } from '@/components/ui/Toast'
+import { ToastProvider } from '@/components/ui/toast-wrapper'
 
 type App = ReturnType<typeof useAppState>
 
