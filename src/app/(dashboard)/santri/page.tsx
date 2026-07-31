@@ -558,15 +558,15 @@ export default function SantriPage() {
 
       {/* Interactive Detail Modal (with Juz Grid and Setoran History) */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-5xl">
           <DialogHeader>
             <DialogTitle>Detail & Progres Siswa</DialogTitle>
           </DialogHeader>
           {selectedStudent && (
             <div className="space-y-6">
               {/* Header info */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-background p-4 rounded-lg border border-border/50">
-                <div className="min-w-0 text-center sm:text-left">
+              <div className="bg-background p-4 rounded-lg border border-border/50 space-y-3">
+                <div className="text-center sm:text-left">
                   <h4 className="text-lg font-bold text-foreground">{selectedStudent.nama}</h4>
                   <div className="text-xs text-muted-foreground mt-1 font-medium flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
                     <span className="bg-card px-2 py-0.5 rounded border border-border/50">
@@ -582,7 +582,7 @@ export default function SantriPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6 shrink-0 bg-card px-4 py-2.5 rounded-lg border border-border/40 shadow-sm">
+                <div className="flex items-center justify-center gap-6 bg-card px-4 py-2.5 rounded-lg border border-border/40 shadow-sm">
                   <div className="text-center">
                     <div className="text-sm font-bold text-foreground">{hafalCount}</div>
                     <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Surah</div>

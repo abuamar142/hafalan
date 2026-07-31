@@ -107,7 +107,7 @@ export default function EditSubmissionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-[720px]">
         <DialogHeader>
           <DialogTitle>Edit Setoran Hafalan</DialogTitle>
         </DialogHeader>
