@@ -61,16 +61,16 @@ export default function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         className={cn(
-          "relative w-full max-h-[90vh] overflow-y-auto rounded-[var(--radius-lg)] bg-surface p-6 shadow-xl border border-border/50 animate-in zoom-in-95 duration-200",
+          "relative w-full max-h-[90vh] overflow-y-auto rounded-[var(--radius-lg)] bg-card p-6 shadow-xl border border-border/50 animate-in zoom-in-95 duration-200",
           sizeClasses[size],
           className
         )}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 id="modal-title" className="text-lg font-semibold tracking-tight text-text">{title}</h2>
+          <h2 id="modal-title" className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
           <button 
             onClick={onClose}
-            className="rounded-full p-2.5 text-text-muted hover:bg-card hover:text-text transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="rounded-full p-2.5 text-muted-foreground hover:bg-card hover:text-foreground transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Tutup"
           >
             <X className="w-5 h-5" />

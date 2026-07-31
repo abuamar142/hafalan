@@ -124,8 +124,8 @@ export default function RiwayatSetoranPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-2">
-        <h2 className="text-2xl font-bold tracking-tight text-text">Riwayat Setoran</h2>
-        <p className="text-sm text-text-muted mt-1">Daftar riwayat setoran hafalan santri.</p>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">Riwayat Setoran</h2>
+        <p className="text-sm text-muted-foreground mt-1">Daftar riwayat setoran hafalan santri.</p>
       </div>
 
       {/* Search + Filters */}
@@ -171,7 +171,7 @@ export default function RiwayatSetoranPage() {
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="py-16 text-center text-sm text-text-muted border border-border/50 border-dashed rounded-lg bg-surface">
+        <div className="py-16 text-center text-sm text-muted-foreground border border-border/50 border-dashed rounded-lg bg-card">
           Belum ada setoran
         </div>
       ) : (
@@ -179,17 +179,17 @@ export default function RiwayatSetoranPage() {
           {pageItems.map((item) => (
             <div
               key={item.id}
-              className="rounded-lg bg-surface p-4 border border-border/50 hover:shadow-md transition-all duration-200 bento-shadow flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+              className="rounded-lg bg-card p-4 border border-border/50 hover:shadow-md transition-all duration-200 bento-shadow flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4"
             >
               {/* Left: nama, hafalan, catatan */}
               <div className="min-w-0 flex-1 space-y-1">
-                <div className="text-[15px] font-bold text-text truncate">
+                <div className="text-[15px] font-bold text-foreground truncate">
                   {item.santri_nama}
                 </div>
-                <div className="text-xs font-semibold text-text-secondary">
+                <div className="text-xs font-semibold text-muted-foreground">
                   {getSurahNama(item.surah_no)}
                   {item.ayat_start != null && item.ayat_end != null && (
-                    <span className="text-text-muted font-normal">
+                    <span className="text-muted-foreground font-normal">
                       {' '}
                       : {item.ayat_start}
                       {item.ayat_end !== item.ayat_start
@@ -199,7 +199,7 @@ export default function RiwayatSetoranPage() {
                   )}
                 </div>
                 {item.catatan && (
-                  <div className="mt-2 text-xs text-text-muted leading-relaxed bg-card p-2 rounded-md border border-border/40 max-w-2xl">
+                  <div className="mt-2 text-xs text-muted-foreground leading-relaxed bg-card p-2 rounded-md border border-border/40 max-w-2xl">
                     {item.catatan}
                   </div>
                 )}
@@ -210,7 +210,7 @@ export default function RiwayatSetoranPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setEditingSubmission(item)}
-                    className="p-1 text-text-muted hover:text-primary hover:bg-primary/10 rounded transition-colors cursor-pointer"
+                    className="p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded transition-colors cursor-pointer"
                     title="Edit Setoran"
                   >
                     <Edit className="w-3.5 h-3.5" />
@@ -220,11 +220,11 @@ export default function RiwayatSetoranPage() {
                   </span>
                 </div>
                 {item.guru_nama && (
-                  <div className="text-xs font-medium text-text-secondary whitespace-nowrap">
+                  <div className="text-xs font-medium text-muted-foreground whitespace-nowrap">
                     {item.guru_nama}
                   </div>
                 )}
-                <div className="text-[11px] text-text-muted whitespace-nowrap">
+                <div className="text-[11px] text-muted-foreground whitespace-nowrap">
                   {formatWaktu(item.waktu).tanggal} &middot; {formatWaktu(item.waktu).jam}
                 </div>
               </div>
@@ -239,7 +239,7 @@ export default function RiwayatSetoranPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safePage <= 1}
-            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
+            className="rounded-md border border-border bg-card px-3 py-1.5 text-[13px] text-muted-foreground hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
           >
             Sebelumnya
           </button>
@@ -250,7 +250,7 @@ export default function RiwayatSetoranPage() {
               className={`min-w-[32px] rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors cursor-pointer ${
                 p === safePage
                   ? 'bg-primary text-white shadow-sm'
-                  : 'text-text-secondary hover:bg-card border border-transparent hover:border-border/50'
+                  : 'text-muted-foreground hover:bg-card border border-transparent hover:border-border/50'
               }`}
             >
               {p}
@@ -259,7 +259,7 @@ export default function RiwayatSetoranPage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={safePage >= totalPages}
-            className="rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] text-text-secondary hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
+            className="rounded-md border border-border bg-card px-3 py-1.5 text-[13px] text-muted-foreground hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
           >
             Selanjutnya
           </button>

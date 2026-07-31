@@ -172,14 +172,14 @@ export default function ReportDetailClient({
       }
     }
     return {
-      bg: 'bg-red/10 border-red/30 text-red',
+      bg: 'bg-destructive/10 border-red/30 text-destructive',
       label: 'Perlu Ulang',
       icon: null
     }
   }
 
   return (
-    <div className="relative min-h-screen bg-background text-text pb-16 print:bg-white print:text-black print:pb-0 overflow-x-hidden">
+    <div className="relative min-h-screen bg-background text-foreground pb-16 print:bg-white print:text-black print:pb-0 overflow-x-hidden">
       {/* Repeating Islamic Geometric Pattern (Print Hidden) */}
       <div className="absolute inset-0 text-primary/10 opacity-[0.03] pointer-events-none print:hidden">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -251,7 +251,7 @@ export default function ReportDetailClient({
           <div className="lg:col-span-4 space-y-6 print:block print:w-full">
             
             {/* Student Identity Card */}
-            <Card className="border-border/40 shadow-md bg-surface print:shadow-none print:border-black/30 overflow-hidden print:break-inside-avoid">
+            <Card className="border-border/40 shadow-md bg-card print:shadow-none print:border-black/30 overflow-hidden print:break-inside-avoid">
               <div className="h-16 bg-gradient-to-r from-primary/15 via-accent/5 to-transparent print:hidden"></div>
               <CardContent className="p-6 pt-6 sm:flex sm:items-center sm:justify-between print:p-4">
                 <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-center -mt-0">
@@ -262,11 +262,11 @@ export default function ReportDetailClient({
                     {initials(student.nama)}
                   </div>
                   <div className="text-center sm:text-left">
-                    <h1 className="text-2xl font-extrabold text-text print:text-black tracking-tight mb-1">
+                    <h1 className="text-2xl font-extrabold text-foreground print:text-black tracking-tight mb-1">
                       {student.nama}
                     </h1>
-                    <div className="text-sm font-semibold text-text-secondary flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                      <span className="bg-background print:bg-white px-2.5 py-0.5 rounded-md border border-border print:border-black/30 font-bold text-text-secondary print:text-black">
+                    <div className="text-sm font-semibold text-muted-foreground flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                      <span className="bg-background print:bg-white px-2.5 py-0.5 rounded-md border border-border print:border-black/30 font-bold text-muted-foreground print:text-black">
                         Kelas {student.group?.class?.nama || 'Tanpa kelas'}
                       </span>
                       <span className="print:text-black/55">•</span>
@@ -285,11 +285,11 @@ export default function ReportDetailClient({
             </Card>
 
             {/* Progress Overview Card */}
-            <Card className="border-border/40 shadow-sm bg-surface flex flex-col justify-between p-6 print:border-black/30 print:p-4 print:break-inside-avoid">
+            <Card className="border-border/40 shadow-sm bg-card flex flex-col justify-between p-6 print:border-black/30 print:p-4 print:break-inside-avoid">
               <div>
                 <div className="flex items-center gap-2 mb-4 border-b border-border/40 pb-3">
                   <Award className="w-5 h-5 text-accent shrink-0" />
-                  <h3 className="text-sm font-bold text-text-secondary print:text-black uppercase tracking-wider">Ringkasan Progres</h3>
+                  <h3 className="text-sm font-bold text-muted-foreground print:text-black uppercase tracking-wider">Ringkasan Progres</h3>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center gap-6 justify-center my-4">
@@ -315,16 +315,16 @@ export default function ReportDetailClient({
                       />
                     </svg>
                     <div className="absolute text-center">
-                      <span className="text-2xl font-black text-text print:text-black leading-none">{pct}%</span>
-                      <span className="text-[10px] text-text-muted print:text-black/60 font-bold block uppercase tracking-wide">Dihafal</span>
+                      <span className="text-2xl font-black text-foreground print:text-black leading-none">{pct}%</span>
+                      <span className="text-[10px] text-muted-foreground print:text-black/60 font-bold block uppercase tracking-wide">Dihafal</span>
                     </div>
                   </div>
 
                   {/* Legend & Target metrics */}
-                  <div className="space-y-2 flex-1 w-full text-xs text-text-secondary print:text-black font-semibold">
+                  <div className="space-y-2 flex-1 w-full text-xs text-muted-foreground print:text-black font-semibold">
                     <div className="flex justify-between py-1 border-b border-border/20">
                       <span>Target Akhir</span>
-                      <span className="font-bold text-text print:text-black">30 Juz</span>
+                      <span className="font-bold text-foreground print:text-black">30 Juz</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-border/20">
                       <span>Juz Selesai</span>
@@ -332,21 +332,21 @@ export default function ReportDetailClient({
                     </div>
                     <div className="flex justify-between py-1 border-b border-border/20">
                       <span>Surah Hafal</span>
-                      <span className="font-bold text-text print:text-black">{totalHafal} / {ALL_SURAHS.length}</span>
+                      <span className="font-bold text-foreground print:text-black">{totalHafal} / {ALL_SURAHS.length}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Total verses setoran & keaktifan */}
-              <div className="space-y-2 pt-3 border-t border-border/30 text-xs text-text-muted print:text-black">
+              <div className="space-y-2 pt-3 border-t border-border/30 text-xs text-muted-foreground print:text-black">
                 <div className="flex justify-between">
                   <span>Total Ayat Setoran:</span>
-                  <span className="font-bold text-text print:text-black">{totalVerses} Ayat</span>
+                  <span className="font-bold text-foreground print:text-black">{totalVerses} Ayat</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Keaktifan Terakhir:</span>
-                  <span className="font-bold text-text print:text-black">
+                  <span className="font-bold text-foreground print:text-black">
                     {lastActive ? formatWaktu(lastActive).tanggal : 'Belum aktif'}
                   </span>
                 </div>
@@ -354,12 +354,12 @@ export default function ReportDetailClient({
             </Card>
 
             {/* Juz Map Legend Card (Print Hidden) */}
-            <Card className="border-border/40 shadow-sm bg-surface p-4 print:hidden">
+            <Card className="border-border/40 shadow-sm bg-card p-4 print:hidden">
               <div className="flex items-center gap-2 mb-3 border-b border-border/40 pb-2">
-                <FileText className="w-4 h-4 text-text-muted" />
-                <h4 className="text-xs font-bold text-text-secondary uppercase tracking-wider">Keterangan Warna</h4>
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Keterangan Warna</h4>
               </div>
-              <div className="space-y-2 text-xs font-semibold text-text-secondary">
+              <div className="space-y-2 text-xs font-semibold text-muted-foreground">
                 <div className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
                   <span className="text-primary font-bold">Lengkap (100%)</span>
                   <span className="text-[10px] text-primary/80 uppercase font-extrabold">Satu Juz</span>
@@ -369,8 +369,8 @@ export default function ReportDetailClient({
                   <span className="text-[10px] text-accent/80 uppercase font-extrabold">Sedang Dihafal</span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-lg bg-card/40 border border-border">
-                  <span className="text-text-muted font-bold">Belum Hafal (0%)</span>
-                  <span className="text-[10px] text-text-muted/80 uppercase font-extrabold">Belum Mulai</span>
+                  <span className="text-muted-foreground font-bold">Belum Hafal (0%)</span>
+                  <span className="text-[10px] text-muted-foreground/80 uppercase font-extrabold">Belum Mulai</span>
                 </div>
               </div>
             </Card>
@@ -381,15 +381,15 @@ export default function ReportDetailClient({
           <div className="lg:col-span-8 space-y-6 print:block print:w-full">
             
             {/* Juz Grid Card */}
-            <Card className="border-border/40 shadow-sm bg-surface p-6 print:border-black/30 print:p-4 print:break-inside-avoid">
+            <Card className="border-border/40 shadow-sm bg-card p-6 print:border-black/30 print:p-4 print:break-inside-avoid">
               <div className="flex items-center justify-between mb-4 border-b border-border/40 pb-3">
                 <div className="flex items-center gap-2">
                   <FileText className="w-5 h-5 text-primary shrink-0" />
-                  <h3 className="text-sm font-bold text-text-secondary print:text-black uppercase tracking-wider">Pemetaan Juz</h3>
+                  <h3 className="text-sm font-bold text-muted-foreground print:text-black uppercase tracking-wider">Pemetaan Juz</h3>
                 </div>
                 
                 {/* Legend (Print hidden) */}
-                <div className="flex items-center gap-3 text-[10px] font-bold text-text-muted print:hidden">
+                <div className="flex items-center gap-3 text-[10px] font-bold text-muted-foreground print:hidden">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-sm bg-primary shadow-sm"></div>
                     <span>Lengkap</span>
@@ -412,7 +412,7 @@ export default function ReportDetailClient({
                           ? 'bg-primary border-primary text-white font-bold shadow-md shadow-primary/5 hover:bg-primary/95 hover:scale-[1.03]'
                           : j.status === 'partial'
                             ? 'bg-accent/10 border-accent/25 text-accent font-bold hover:bg-accent/15 hover:scale-[1.03]'
-                            : 'bg-card/40 border-border text-text-muted hover:border-text-muted/40 hover:scale-[1.03]'
+                            : 'bg-card/40 border-border text-muted-foreground hover:border-text-muted/40 hover:scale-[1.03]'
                       }`}
                       title={`${j.pct}% Hafal`}
                     >
@@ -426,7 +426,7 @@ export default function ReportDetailClient({
                 })}
               </div>
               {submissions.length === 0 && (
-                <div className="mt-4 p-3 rounded-lg border border-dashed border-border/40 bg-card/25 text-center text-xs text-text-muted">
+                <div className="mt-4 p-3 rounded-lg border border-dashed border-border/40 bg-card/25 text-center text-xs text-muted-foreground">
                   Belum ada progres hafalan yang tercatat untuk Juz 1-30.
                 </div>
               )}
@@ -435,23 +435,23 @@ export default function ReportDetailClient({
             {/* Timeline of Submissions */}
             <div className="space-y-5 print:break-inside-avoid">
               <div className="flex items-center gap-2 border-b border-border/40 pb-2">
-                <Calendar className="w-5 h-5 text-text-secondary print:text-black shrink-0" />
-                <h3 className="text-base font-bold text-text print:text-black">Riwayat Setoran Hafalan</h3>
+                <Calendar className="w-5 h-5 text-muted-foreground print:text-black shrink-0" />
+                <h3 className="text-base font-bold text-foreground print:text-black">Riwayat Setoran Hafalan</h3>
               </div>
 
               {submissions.length === 0 ? (
-                <div className="py-12 px-6 text-center border border-border/40 border-dashed rounded-xl bg-surface/50 backdrop-blur-sm space-y-4 max-w-lg mx-auto print:border-black/20">
+                <div className="py-12 px-6 text-center border border-border/40 border-dashed rounded-xl bg-card/50 backdrop-blur-sm space-y-4 max-w-lg mx-auto print:border-black/20">
                   <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
                     <BookOpen className="w-6 h-6 animate-pulse" />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-sm font-bold text-text">Belum Ada Setoran Hafalan</h4>
-                    <p className="text-xs text-text-muted leading-relaxed max-w-xs mx-auto">
+                    <h4 className="text-sm font-bold text-foreground">Belum Ada Setoran Hafalan</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed max-w-xs mx-auto">
                       Ananda belum memulai penyetoran hafalan Quran untuk periode rapor ini.
                     </p>
                   </div>
-                  <div className="bg-card p-3 rounded-lg border border-border/30 text-[11px] text-text-secondary leading-relaxed text-left print:bg-white print:border-black/15">
-                    <span className="font-bold text-text block mb-1">Langkah Selanjutnya:</span>
+                  <div className="bg-card p-3 rounded-lg border border-border/30 text-[11px] text-muted-foreground leading-relaxed text-left print:bg-white print:border-black/15">
+                    <span className="font-bold text-foreground block mb-1">Langkah Selanjutnya:</span>
                     Silakan berkoordinasi dengan Ustadz Pembina Halaqah untuk menjadwalkan setoran harian ananda di kelas tahfidz.
                   </div>
                 </div>
@@ -467,15 +467,15 @@ export default function ReportDetailClient({
                       <div key={sub.id} className="relative group print:break-inside-avoid">
                         
                         {/* Pulsing indicator on timeline line */}
-                        <div className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-surface border-2 border-primary group-hover:scale-125 transition-transform duration-300 print:bg-black print:border-black" />
+                        <div className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-card border-2 border-primary group-hover:scale-125 transition-transform duration-300 print:bg-black print:border-black" />
 
-                        <div className="rounded-xl border border-border/40 bg-surface p-4 shadow-sm hover:shadow-md hover:border-primary/25 transition-all duration-300 print:shadow-none print:border-black/20 print:p-3">
+                        <div className="rounded-xl border border-border/40 bg-card p-4 shadow-sm hover:shadow-md hover:border-primary/25 transition-all duration-300 print:shadow-none print:border-black/20 print:p-3">
                           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2.5">
                             
                             {/* Surah Name & Details */}
                             <div className="min-w-0 flex-1 space-y-1">
                               <div className="flex items-center flex-wrap gap-2.5">
-                                <h4 className="text-base font-bold text-text print:text-black">
+                                <h4 className="text-base font-bold text-foreground print:text-black">
                                   {getSurahNama(sub.surah_no)}
                                 </h4>
                                 {surah?.arab && (
@@ -485,8 +485,8 @@ export default function ReportDetailClient({
                                 )}
                               </div>
                               
-                              <div className="text-xs text-text-muted print:text-black/60 flex flex-wrap items-center gap-2 font-medium">
-                                <span className="bg-card print:bg-white border border-border/50 print:border-black/20 px-2 py-0.5 rounded text-[11px] font-bold text-text-secondary print:text-black">
+                              <div className="text-xs text-muted-foreground print:text-black/60 flex flex-wrap items-center gap-2 font-medium">
+                                <span className="bg-card print:bg-white border border-border/50 print:border-black/20 px-2 py-0.5 rounded text-[11px] font-bold text-muted-foreground print:text-black">
                                   Ayat {sub.ayat_start}{sub.ayat_end && sub.ayat_end !== sub.ayat_start ? ` \u2013 ${sub.ayat_end}` : ''}
                                 </span>
                                 <span>•</span>
@@ -513,7 +513,7 @@ export default function ReportDetailClient({
                                 {gradeInfo.icon}
                                 {gradeInfo.label}
                               </span>
-                              <span className="text-[11px] text-text-muted print:text-black/75 whitespace-nowrap font-medium">
+                              <span className="text-[11px] text-muted-foreground print:text-black/75 whitespace-nowrap font-medium">
                                 {formatWaktu(sub.waktu).tanggal}
                               </span>
                             </div>
@@ -521,8 +521,8 @@ export default function ReportDetailClient({
 
                           {/* Evaluator Notes */}
                           {sub.catatan && (
-                            <div className="mt-2.5 text-xs text-text-secondary bg-card/40 p-3 rounded-lg border border-border/30 leading-relaxed font-sans print:bg-white print:border-black/15">
-                              <p className="font-bold text-[10px] uppercase text-text-muted print:text-black/60 tracking-wider mb-1 flex items-center gap-1.5">
+                            <div className="mt-2.5 text-xs text-muted-foreground bg-card/40 p-3 rounded-lg border border-border/30 leading-relaxed font-sans print:bg-white print:border-black/15">
+                              <p className="font-bold text-[10px] uppercase text-muted-foreground print:text-black/60 tracking-wider mb-1 flex items-center gap-1.5">
                                 <GraduationCap className="w-3.5 h-3.5" />
                                 Catatan Pembina
                               </p>

@@ -44,7 +44,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={cn("font-sans", geist.variable)}>
-      <body className={`${inter.className} text-text antialiased selection:bg-primary/20 selection:text-primary`}>
+      <body className={`${inter.className} text-foreground antialiased selection:bg-primary/20 selection:text-primary`}>
         <TooltipProvider>
           {children}
         </TooltipProvider>

@@ -16,7 +16,7 @@ export default function SantriLoading() {
       <div className="h-9 w-64 rounded-md bg-border/40" />
 
       {/* Table Skeleton */}
-      <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
+      <Card className="border-border/40 shadow-sm overflow-hidden bg-card">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">

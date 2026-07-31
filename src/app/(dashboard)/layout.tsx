@@ -94,7 +94,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             {/* Loading */}
             {app.loading && (
               <div className="flex flex-1 items-center justify-center py-16">
-                <div className="text-sm text-text-muted">Memuat data...</div>
+                <div className="text-sm text-muted-foreground">Memuat data...</div>
               </div>
             )}
 
@@ -113,7 +113,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         title="Pengaturan"
       >
         <div className="mb-3">
-          <label className="mb-1.5 block text-xs text-text-secondary">
+          <label className="mb-1.5 block text-xs text-muted-foreground">
             Nama Ustadz / Guru
           </label>
           <input
@@ -121,7 +121,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             value={guruInput}
             onChange={(e) => setGuruInput(e.target.value)}
             placeholder="Ustadz Ahmad..."
-            className="w-full rounded-lg border-[1.5px] border-border bg-surface px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
+            className="w-full rounded-lg border-[1.5px] border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
           />
         </div>
         <div className="mt-3.5 flex justify-end">

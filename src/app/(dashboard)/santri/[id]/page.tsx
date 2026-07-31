@@ -136,7 +136,7 @@ export default function ProfilPage({
   // Not found
   if (studentId != null && !student) {
     return (
-      <div className="py-16 text-center text-sm text-text-muted border border-border/50 rounded-lg bg-surface border-dashed">
+      <div className="py-16 text-center text-sm text-muted-foreground border border-border/50 rounded-lg bg-card border-dashed">
         Santri tidak ditemukan
       </div>
     )
@@ -145,7 +145,7 @@ export default function ProfilPage({
   if (!student) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="text-sm text-text-muted">Memuat data...</div>
+        <div className="text-sm text-muted-foreground">Memuat data...</div>
       </div>
     )
   }
@@ -165,7 +165,7 @@ export default function ProfilPage({
         variant="ghost"
         size="sm"
         onClick={() => router.push('/santri')}
-        className="mb-6 -ml-3 text-text-secondary hover:text-text"
+        className="mb-6 -ml-3 text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Kembali
@@ -183,10 +183,10 @@ export default function ProfilPage({
               {initials(student.nama)}
             </div>
             <div className="text-center sm:text-left">
-              <h1 className="text-2xl font-bold text-text mb-1">
+              <h1 className="text-2xl font-bold text-foreground mb-1">
                 {student.nama}
               </h1>
-              <div className="text-sm font-medium text-text-secondary flex items-center justify-center sm:justify-start gap-2">
+              <div className="text-sm font-medium text-muted-foreground flex items-center justify-center sm:justify-start gap-2">
                 <span className="bg-background px-2.5 py-0.5 rounded-md border border-border">{student.kelas || 'Tanpa kelas'}</span>
                 {student.group_name && <span>• {student.group_name}</span>}
               </div>
@@ -196,16 +196,16 @@ export default function ProfilPage({
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3 w-full sm:w-auto">
             <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
-              <div className="text-xl font-bold text-text">{hafalCount}</div>
-              <div className="text-[11px] font-medium text-text-muted uppercase tracking-wider mt-0.5">Surah</div>
+              <div className="text-xl font-bold text-foreground">{hafalCount}</div>
+              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">Surah</div>
             </div>
             <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
-              <div className="text-xl font-bold text-text">{juzSelesai}</div>
-              <div className="text-[11px] font-medium text-text-muted uppercase tracking-wider mt-0.5">Juz Selesai</div>
+              <div className="text-xl font-bold text-foreground">{juzSelesai}</div>
+              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">Juz Selesai</div>
             </div>
             <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
               <div className="text-xl font-bold text-primary">{pct}%</div>
-              <div className="text-[11px] font-medium text-text-muted uppercase tracking-wider mt-0.5">Progress</div>
+              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">Progress</div>
             </div>
           </div>
         </CardContent>
@@ -229,8 +229,8 @@ export default function ProfilPage({
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
                 <div>
-                  <h3 className="text-lg font-bold text-text">Juz {selectedJuz}</h3>
-                  <p className="text-xs font-medium text-text-muted">
+                  <h3 className="text-lg font-bold text-foreground">Juz {selectedJuz}</h3>
+                  <p className="text-xs font-medium text-muted-foreground">
                     {juzHafalCount} dari {juzSurahs.length} surah dihafal
                   </p>
                 </div>
@@ -251,7 +251,7 @@ export default function ProfilPage({
                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
                       status === 1 ? 'bg-primary/10 text-primary border border-primary/20' : 
                       status === 2 ? 'bg-accent/10 text-accent border border-accent/20' : 
-                      'bg-background text-text-muted border border-border group-hover:border-border-hover'
+                      'bg-background text-muted-foreground border border-border group-hover:border-border-hover'
                     }`}>
                       {status === 1 ? (
                         <CheckCircle2 className="w-5 h-5" />
@@ -264,14 +264,14 @@ export default function ProfilPage({
 
                     {/* Surah info */}
                     <div className="min-w-0 flex-1">
-                      <div className="text-[15px] font-semibold text-text">{s.no}. {s.nama}</div>
-                      <div className="text-[12px] font-medium text-text-muted mt-0.5">
+                      <div className="text-[15px] font-semibold text-foreground">{s.no}. {s.nama}</div>
+                      <div className="text-[12px] font-medium text-muted-foreground mt-0.5">
                         {s.ayat} ayat
                       </div>
                     </div>
 
                     {/* Arabic */}
-                    <div className="shrink-0 text-xl text-text-muted font-arabic pr-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <div className="shrink-0 text-xl text-muted-foreground font-arabic pr-2 opacity-60 group-hover:opacity-100 transition-opacity">
                       {s.arab}
                     </div>
                   </button>
@@ -284,8 +284,8 @@ export default function ProfilPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-text">Pencapaian Juz</h3>
-              <span className="text-xs font-medium text-text-muted bg-card px-2.5 py-1 rounded-md border border-border">Pilih juz untuk detail</span>
+              <h3 className="text-lg font-bold text-foreground">Pencapaian Juz</h3>
+              <span className="text-xs font-medium text-muted-foreground bg-card px-2.5 py-1 rounded-md border border-border">Pilih juz untuk detail</span>
             </div>
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
               {[...Array(30)].map((_, i) => {
@@ -300,7 +300,7 @@ export default function ProfilPage({
                         ? 'bg-primary text-white shadow-md shadow-primary/20 hover:bg-primary/90 hover:-translate-y-0.5'
                         : p > 0
                           ? 'bg-accent/10 text-accent border border-accent/20 hover:bg-accent/15 hover:-translate-y-0.5'
-                          : 'bg-surface border border-border text-text-muted hover:border-text-muted/30 hover:text-text-secondary hover:-translate-y-0.5'
+                          : 'bg-card border border-border text-muted-foreground hover:border-text-muted/30 hover:text-muted-foreground hover:-translate-y-0.5'
                     }`}
                   >
                     <div className="text-[15px] font-bold">{j}</div>
@@ -319,10 +319,10 @@ export default function ProfilPage({
           </div>
 
           <div>
-            <h3 className="text-lg font-bold text-text mb-4">Riwayat Setoran</h3>
+            <h3 className="text-lg font-bold text-foreground mb-4">Riwayat Setoran</h3>
             
             {studentSubmissions.length === 0 ? (
-              <div className="py-10 text-center text-sm text-text-muted border border-border/50 rounded-lg bg-surface border-dashed">
+              <div className="py-10 text-center text-sm text-muted-foreground border border-border/50 rounded-lg bg-card border-dashed">
                 Belum ada setoran
               </div>
             ) : (
@@ -333,10 +333,10 @@ export default function ProfilPage({
                       <div className="w-1.5 bg-primary/20 group-hover:bg-primary/40 transition-colors"></div>
                       <div className="p-4 flex-1">
                         <div className="flex items-start justify-between gap-3 mb-1">
-                          <div className="font-semibold text-[14px] text-text">
+                          <div className="font-semibold text-[14px] text-foreground">
                             {getSurahNama(sub.surah_no)}
                             {sub.ayat_start && sub.ayat_end ? (
-                              <span className="text-text-muted font-normal ml-1">
+                              <span className="text-muted-foreground font-normal ml-1">
                                 ayat {sub.ayat_start}{sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}
                               </span>
                             ) : null}
@@ -345,11 +345,11 @@ export default function ProfilPage({
                             {sub.nilai}
                           </span>
                         </div>
-                        <div className="text-[12px] font-medium text-text-muted mb-2">
+                        <div className="text-[12px] font-medium text-muted-foreground mb-2">
                           {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}
                         </div>
                         {sub.catatan && (
-                          <div className="text-[13px] text-text-secondary bg-background rounded-md p-2.5 border border-border/50">
+                          <div className="text-[13px] text-muted-foreground bg-background rounded-md p-2.5 border border-border/50">
                             {sub.catatan}
                           </div>
                         )}
@@ -369,7 +369,7 @@ export default function ProfilPage({
                 <Trash2 className="w-4 h-4" />
                 Hapus Data Santri
               </Button>
-              <p className="text-[11px] text-text-muted text-center mt-2">
+              <p className="text-[11px] text-muted-foreground text-center mt-2">
                 Tindakan ini tidak dapat dibatalkan.
               </p>
             </div>

@@ -109,8 +109,8 @@ export default function EditSubmissionModal({
       {submission && (
         <div className="space-y-5">
           {/* Header Santri */}
-          <div className="bg-card p-3 rounded-lg border border-border/50 text-xs text-text-secondary leading-relaxed">
-            <span className="font-semibold text-text block">Santri:</span>
+          <div className="bg-card p-3 rounded-lg border border-border/50 text-xs text-muted-foreground leading-relaxed">
+            <span className="font-semibold text-foreground block">Santri:</span>
             {submission.santri_nama}
           </div>
 
@@ -119,7 +119,7 @@ export default function EditSubmissionModal({
             {/* Left Column: Surah */}
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="edit-modal-surah" className="text-xs font-semibold text-text-secondary uppercase tracking-wider block">
+                <label htmlFor="edit-modal-surah" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                   Surah
                 </label>
                 <Combobox
@@ -136,8 +136,8 @@ export default function EditSubmissionModal({
               {selectedSurah && (
                 <div className="flex items-center justify-between bg-card p-3 rounded-lg border border-border/40 h-[72px]">
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-text-muted">Surah Terpilih</p>
-                    <p className="text-xs font-bold text-text mt-0.5">{selectedSurah.nama} (Juz {selectedSurah.juz})</p>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground">Surah Terpilih</p>
+                    <p className="text-xs font-bold text-foreground mt-0.5">{selectedSurah.nama} (Juz {selectedSurah.juz})</p>
                   </div>
                   <span className="text-xl font-bold text-primary font-serif select-none" style={{ fontFamily: 'var(--font-arabic), serif' }}>
                     {selectedSurah.arab}
@@ -149,7 +149,7 @@ export default function EditSubmissionModal({
             {/* Right Column: Time & Verse Range */}
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="edit-modal-waktu" className="text-xs font-semibold text-text-secondary uppercase tracking-wider block">
+                <label htmlFor="edit-modal-waktu" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                   Waktu Setoran
                 </label>
                 <Input
@@ -163,7 +163,7 @@ export default function EditSubmissionModal({
               {selectedSurah && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider block">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                       Rentang Ayat
                     </label>
                     <button
@@ -179,7 +179,7 @@ export default function EditSubmissionModal({
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
-                      <span className="text-[10px] text-text-muted mb-1 block">Dari Ayat</span>
+                      <span className="text-[10px] text-muted-foreground mb-1 block">Dari Ayat</span>
                       <Input
                         type="number"
                         min={1}
@@ -188,9 +188,9 @@ export default function EditSubmissionModal({
                         onChange={(e) => setAyatStart(Math.max(1, Math.min(maxAyat, Number(e.target.value) || 1)))}
                       />
                     </div>
-                    <span className="text-text-muted mt-5 shrink-0 text-xs">hingga</span>
+                    <span className="text-muted-foreground mt-5 shrink-0 text-xs">hingga</span>
                     <div className="flex-1">
-                      <span className="text-[10px] text-text-muted mb-1 block">Sampai Ayat</span>
+                      <span className="text-[10px] text-muted-foreground mb-1 block">Sampai Ayat</span>
                       <Input
                         type="number"
                         min={1}
@@ -208,7 +208,7 @@ export default function EditSubmissionModal({
 
           {/* Score Pills (Pills row is full-width below the columns) */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider block">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
               Predikat / Nilai
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -222,7 +222,7 @@ export default function EditSubmissionModal({
                     className={`px-2.5 py-2.5 rounded-md text-xs font-semibold border transition-all text-center cursor-pointer ${
                       isSelected
                         ? 'bg-primary border-primary text-white shadow-sm ring-2 ring-primary/20'
-                        : 'border-border bg-surface text-text-secondary hover:bg-card/65'
+                        : 'border-border bg-card text-muted-foreground hover:bg-card/65'
                     }`}
                   >
                     {n}
@@ -234,7 +234,7 @@ export default function EditSubmissionModal({
 
           {/* Catatan Textarea */}
           <div className="space-y-1.5">
-            <label htmlFor="edit-modal-catatan" className="text-xs font-semibold text-text-secondary uppercase tracking-wider block">
+            <label htmlFor="edit-modal-catatan" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
               Catatan (Opsional)
             </label>
             <textarea
@@ -243,7 +243,7 @@ export default function EditSubmissionModal({
               onChange={(e) => setCatatan(e.target.value)}
               placeholder="Evaluasi tajwid atau kelancaran..."
               rows={3}
-              className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors resize-none text-text focus:border-primary font-sans"
+              className="flex w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors resize-none text-foreground focus:border-primary font-sans"
             />
           </div>
 

@@ -59,31 +59,31 @@ export function Combobox({
           setOpen(!open)
           if (!open) setSearch('')
         }}
-        className="flex h-10 w-full items-center justify-between rounded-md border border-border bg-surface px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all hover:bg-card/30 cursor-pointer"
+        className="flex h-10 w-full items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all hover:bg-card/30 cursor-pointer"
       >
-        <span className={selectedOption ? 'text-text font-medium truncate' : 'text-text-muted truncate'}>
+        <span className={selectedOption ? 'text-foreground font-medium truncate' : 'text-muted-foreground truncate'}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronsUpDown className="h-4 w-4 shrink-0 text-text-muted ml-2" />
+        <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground ml-2" />
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 max-h-60 w-full overflow-hidden rounded-md border border-border bg-surface shadow-lg flex flex-col animate-in fade-in zoom-in-95 duration-100">
+        <div className="absolute z-50 mt-1 max-h-60 w-full overflow-hidden rounded-md border border-border bg-card shadow-lg flex flex-col animate-in fade-in zoom-in-95 duration-100">
           <div className="flex items-center border-b border-border/50 px-3 bg-card/25 shrink-0">
-            <Search className="h-4 w-4 shrink-0 text-text-muted mr-2" />
+            <Search className="h-4 w-4 shrink-0 text-muted-foreground mr-2" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex h-9 w-full rounded-md bg-transparent py-2 text-sm outline-none placeholder:text-text-muted text-text"
+              className="flex h-9 w-full rounded-md bg-transparent py-2 text-sm outline-none placeholder:text-muted-foreground text-foreground"
               autoFocus
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                className="p-1 rounded-full text-text-muted hover:bg-border/40 cursor-pointer"
+                className="p-1 rounded-full text-muted-foreground hover:bg-border/40 cursor-pointer"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -91,7 +91,7 @@ export function Combobox({
           </div>
           <div className="overflow-y-auto flex-1 py-1">
             {filteredOptions.length === 0 ? (
-              <div className="py-6 text-center text-xs text-text-muted">{emptyText}</div>
+              <div className="py-6 text-center text-xs text-muted-foreground">{emptyText}</div>
             ) : (
               filteredOptions.map((o) => {
                 const isSelected = String(o.id) === String(value)
@@ -104,13 +104,13 @@ export function Combobox({
                       setOpen(false)
                     }}
                     className={`flex w-full items-center justify-between px-3 py-2 text-sm text-left transition-colors hover:bg-primary/5 hover:text-primary cursor-pointer ${
-                      isSelected ? 'bg-primary/10 text-primary font-semibold' : 'text-text-secondary'
+                      isSelected ? 'bg-primary/10 text-primary font-semibold' : 'text-muted-foreground'
                     }`}
                   >
                     <div className="min-w-0 flex-1">
                       <div className="truncate">{o.label}</div>
                       {o.sublabel && (
-                        <div className="text-[11px] text-text-muted truncate mt-0.5 font-normal">
+                        <div className="text-[11px] text-muted-foreground truncate mt-0.5 font-normal">
                           {o.sublabel}
                         </div>
                       )}

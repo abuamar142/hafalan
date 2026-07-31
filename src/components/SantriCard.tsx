@@ -30,7 +30,7 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
       aria-label={`Buka detail ${student.nama}`}
       className="cursor-pointer mb-3"
     >
-      <Card className="border-border/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 bg-surface">
+      <Card className="border-border/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 bg-card">
         <CardContent className="p-4 flex items-center gap-4">
           {/* Avatar */}
           <div
@@ -43,11 +43,11 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
           {/* Info */}
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between mb-0.5">
-              <div className="text-[15px] font-semibold text-text truncate pr-2">{student.nama}</div>
+              <div className="text-[15px] font-semibold text-foreground truncate pr-2">{student.nama}</div>
               <div className="shrink-0 text-sm font-bold" style={{ color }}>{pct}%</div>
             </div>
             
-            <div className="text-xs text-text-muted font-medium mb-2.5 flex items-center gap-1.5">
+            <div className="text-xs text-muted-foreground font-medium mb-2.5 flex items-center gap-1.5">
               <span className="bg-card px-2 py-0.5 rounded-md border border-border/50">{student.kelas || 'Tanpa kelas'}</span>
               {student.group_name && (
                 <>
@@ -56,7 +56,7 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
                 </>
               )}
               <span className="w-1 h-1 rounded-full bg-border"></span>
-              <span className="font-semibold text-text-secondary">{hafal} surah</span>
+              <span className="font-semibold text-muted-foreground">{hafal} surah</span>
             </div>
             
             {/* Progress Bar */}
@@ -69,7 +69,7 @@ export default function SantriCard({ student, index, onClick }: SantriCardProps)
           </div>
 
           {/* Action Icon */}
-          <div className="shrink-0 pl-1 text-text-muted/50 transition-colors group-hover:text-text-muted">
+          <div className="shrink-0 pl-1 text-muted-foreground/50 transition-colors group-hover:text-muted-foreground">
             <ChevronRight className="w-5 h-5" />
           </div>
         </CardContent>

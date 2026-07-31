@@ -140,8 +140,8 @@ export default function LaporanPage() {
     <div className="max-w-5xl">
       {/* Title */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold tracking-tight text-text">Laporan</h2>
-        <p className="text-sm text-text-muted mt-1">Cetak rekapitulasi hafalan santri.</p>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">Laporan</h2>
+        <p className="text-sm text-muted-foreground mt-1">Cetak rekapitulasi hafalan santri.</p>
       </div>
 
       {/* Report options */}
@@ -160,7 +160,7 @@ export default function LaporanPage() {
             </div>
           </CardHeader>
           <CardContent className="pt-6 flex-1 flex flex-col justify-between gap-6">
-            <div className="text-sm text-text-secondary leading-relaxed bg-surface border border-border/50 rounded-lg p-4">
+            <div className="text-sm text-muted-foreground leading-relaxed bg-card border border-border/50 rounded-lg p-4">
               Laporan ini mencakup daftar seluruh santri yang diurutkan berdasarkan pencapaian hafalan terbanyak. Berguna untuk evaluasi kelas bulanan atau semester.
             </div>
             <Button 
@@ -189,11 +189,11 @@ export default function LaporanPage() {
           </CardHeader>
           <CardContent className="pt-6 flex-1 flex flex-col justify-between gap-6">
             <div className="space-y-4">
-              <div className="text-sm text-text-secondary leading-relaxed bg-surface border border-border/50 rounded-lg p-4">
+              <div className="text-sm text-muted-foreground leading-relaxed bg-card border border-border/50 rounded-lg p-4">
                 Laporan ini berisi detail pencapaian juz, progres hafalan, dan riwayat setoran lengkap untuk satu santri secara spesifik.
               </div>
               <div className="space-y-1.5">
-                <label className="block text-[13px] font-medium text-text-secondary">Pilih Santri</label>
+                <label className="block text-[13px] font-medium text-muted-foreground">Pilih Santri</label>
                 <Combobox
                   options={studentOptions}
                   value={selectedStudent}

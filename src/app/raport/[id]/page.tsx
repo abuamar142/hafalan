@@ -85,7 +85,7 @@ export default function RaportDetailPage({
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
         <Loader2 className="w-10 h-10 animate-spin text-primary" />
-        <p className="text-sm font-semibold text-text-secondary">Memuat Rapor Santri...</p>
+        <p className="text-sm font-semibold text-muted-foreground">Memuat Rapor Santri...</p>
       </div>
     )
   }
@@ -93,9 +93,9 @@ export default function RaportDetailPage({
   if (error || !student) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 text-center">
-        <div className="max-w-md space-y-4 bg-surface p-8 rounded-2xl border border-border shadow-lg">
-          <h2 className="text-xl font-bold text-red">Rapor Tidak Ditemukan</h2>
-          <p className="text-sm text-text-secondary">
+        <div className="max-w-md space-y-4 bg-card p-8 rounded-2xl border border-border shadow-lg">
+          <h2 className="text-xl font-bold text-destructive">Rapor Tidak Ditemukan</h2>
+          <p className="text-sm text-muted-foreground">
             {error || 'Data santri atau riwayat hafalan tidak dapat ditemukan.'}
           </p>
           <a

@@ -37,8 +37,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={t.id}
             className={`pointer-events-auto flex items-start gap-2.5 rounded-lg border p-3.5 shadow-lg animate-in fade-in slide-in-from-bottom-3 duration-200 ${
               t.type === 'error'
-                ? 'bg-red-light border-red/20 text-red'
-                : 'bg-primary-light border-primary/20 text-primary'
+                ? 'bg-destructive/10 border-destructive/20 text-destructive'
+                : 'bg-primary/10 border-primary/20 text-primary'
             }`}
           >
             {t.type === 'error' ? (
@@ -49,7 +49,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <div className="flex-1 text-sm font-medium leading-normal">{t.message}</div>
             <button
               onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
-              className="p-0.5 rounded-full hover:bg-black/5 text-text-secondary cursor-pointer"
+              className="p-0.5 rounded-full hover:bg-black/5 text-muted-foreground cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>

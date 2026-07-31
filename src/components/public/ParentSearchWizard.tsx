@@ -159,13 +159,13 @@ export default function ParentSearchWizard() {
   return (
     <div className="w-full space-y-4">
       {error && (
-        <div className="max-w-4xl mx-auto rounded-lg border-l-[3px] border-red bg-red/10 px-4 py-2.5 text-xs text-red font-semibold animate-in fade-in duration-200">
+        <div className="max-w-4xl mx-auto rounded-lg border-l-[3px] border-red bg-destructive/10 px-4 py-2.5 text-xs text-destructive font-semibold animate-in fade-in duration-200">
           {error}
         </div>
       )}
 
       {/* Spacious, integrated horizontal search panel */}
-      <div className="w-full max-w-4xl mx-auto rounded-2xl border border-border/40 bg-surface/80 backdrop-blur-md p-6 shadow-xl relative group hover:border-primary/20 transition-all duration-500">
+      <div className="w-full max-w-4xl mx-auto rounded-2xl border border-border/40 bg-card/80 backdrop-blur-md p-6 shadow-xl relative group hover:border-primary/20 transition-all duration-500">
         
         {/* Glow Blobs within Panel */}
         <div className="absolute -top-12 -left-12 w-28 h-28 bg-primary/5 rounded-full blur-2xl pointer-events-none group-hover:bg-primary/8 transition-all duration-500" />
@@ -175,7 +175,7 @@ export default function ParentSearchWizard() {
           
           {/* Step 1: Kelas */}
           <div className="md:col-span-3 space-y-2">
-            <label htmlFor="class-select" className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">
+            <label htmlFor="class-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
               1. Pilih Kelas
             </label>
             <Combobox
@@ -195,11 +195,11 @@ export default function ParentSearchWizard() {
 
           {/* Step 2: Kelompok */}
           <div className="md:col-span-3 space-y-2">
-            <label htmlFor="group-select" className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">
+            <label htmlFor="group-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
               2. Pilih Halaqah
             </label>
             {loadingGroups ? (
-              <div className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-card/40 text-xs text-text-muted">
+              <div className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-card/40 text-xs text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin mr-2 text-primary" />
                 Memuat halaqah...
               </div>
@@ -222,11 +222,11 @@ export default function ParentSearchWizard() {
 
           {/* Step 3: Santri */}
           <div className="md:col-span-4 space-y-2">
-            <label htmlFor="student-select" className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">
+            <label htmlFor="student-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
               3. Pilih Santri
             </label>
             {loadingStudents ? (
-              <div className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-card/40 text-xs text-text-muted">
+              <div className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-card/40 text-xs text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin mr-2 text-primary" />
                 Memuat santri...
               </div>

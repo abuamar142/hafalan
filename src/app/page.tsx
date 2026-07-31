@@ -7,7 +7,7 @@ import { BookOpen, LogIn, School, Users, FileBarChart, Sparkles } from 'lucide-r
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen bg-background text-text flex flex-col justify-between overflow-hidden">
+    <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between overflow-hidden">
       {/* Repeating Islamic Geometric Pattern */}
       <div className="absolute inset-0 text-primary/10 opacity-[0.04] pointer-events-none">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -38,8 +38,8 @@ export default function LandingPage() {
             className="w-9 h-9 rounded-lg object-cover shadow-sm ring-1 ring-black/5"
           />
           <div>
-            <h1 className="text-sm font-bold leading-tight text-text">SMA Islam Bunga Bangsa</h1>
-            <p className="text-[10px] text-text-muted">E-Raport Tahfidz</p>
+            <h1 className="text-sm font-bold leading-tight text-foreground">SMA Islam Bunga Bangsa</h1>
+            <p className="text-[10px] text-muted-foreground">E-Raport Tahfidz</p>
           </div>
         </div>
         <Link href="/login">
@@ -58,11 +58,11 @@ export default function LandingPage() {
             <BookOpen className="w-4 h-4" />
             <span>Portal Wali Murid</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-text leading-[1.15]">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]">
             Sistem Informasi <br/>
             <span className="bg-gradient-to-r from-primary to-primary-medium bg-clip-text text-transparent">Hafalan & Raport Santri</span>
           </h2>
-          <p className="text-sm sm:text-base text-text-secondary max-w-lg mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
             Pantau progres hafalan Quran ananda secara berkala, transparan, dan lengkap langsung dari rumah.
           </p>
         </div>
@@ -79,46 +79,46 @@ export default function LandingPage() {
               <Sparkles className="w-3.5 h-3.5 animate-bounce" />
               Petunjuk Pencarian
             </div>
-            <h3 className="text-lg font-extrabold text-text">Panduan Cek Rapor</h3>
+            <h3 className="text-lg font-extrabold text-foreground">Panduan Cek Rapor</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <Card className="border-border/30 bg-surface/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            <Card className="border-border/30 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
               <CardContent className="p-5 flex gap-4 items-start">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
                   <School className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-text mb-1">1. Pilih Kelas</h4>
-                  <p className="text-xs text-text-muted leading-relaxed">
+                  <h4 className="text-sm font-bold text-foreground mb-1">1. Pilih Kelas</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     Pilih kelas aktif ananda dari daftar dropdown langkah pertama.
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-border/30 bg-surface/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            <Card className="border-border/30 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
               <CardContent className="p-5 flex gap-4 items-start">
                 <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center font-bold shrink-0">
                   <Users className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-text mb-1">2. Pilih Halaqah</h4>
-                  <p className="text-xs text-text-muted leading-relaxed">
+                  <h4 className="text-sm font-bold text-foreground mb-1">2. Pilih Halaqah</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     Tentukan nama ustadz pembina atau kelompok halaqah ananda.
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-border/30 bg-surface/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            <Card className="border-border/30 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
               <CardContent className="p-5 flex gap-4 items-start">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
                   <FileBarChart className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-text mb-1">3. Lihat Raport</h4>
-                  <p className="text-xs text-text-muted leading-relaxed">
+                  <h4 className="text-sm font-bold text-foreground mb-1">3. Lihat Raport</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     Pilih nama ananda, lalu tekan tombol untuk menampilkan raport hafalan lengkap.
                   </p>
                 </div>
@@ -130,7 +130,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="relative w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 border-t border-border/20 text-center z-10">
-        <p className="text-[11px] font-medium text-text-muted">
+        <p className="text-[11px] font-medium text-muted-foreground">
           &copy; {new Date().getFullYear()} SMA Islam Bunga Bangsa. Hak Cipta Dilindungi Undang-Undang.
         </p>
       </footer>

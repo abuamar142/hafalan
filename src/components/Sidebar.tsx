@@ -101,11 +101,11 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
               className="w-10 h-10 rounded-lg object-cover shadow-sm"
             />
             <div className="min-w-0">
-              <h1 className="text-base font-semibold leading-tight text-text truncate">
+              <h1 className="text-base font-semibold leading-tight text-foreground truncate">
                 SMA Islam Bunga Bangsa
               </h1>
               {userName && (
-                <p className="mt-0.5 text-xs text-text-muted font-medium leading-tight truncate">
+                <p className="mt-0.5 text-xs text-muted-foreground font-medium leading-tight truncate">
                   {userName}
                 </p>
               )}
@@ -145,16 +145,16 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
                   className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                     isActive
                       ? 'bg-primary/10 text-primary'
-                      : 'text-text-secondary hover:bg-card hover:text-text'
+                      : 'text-muted-foreground hover:bg-card hover:text-foreground'
                   }`}
                 >
-                  <span className={`${isActive ? 'text-primary' : 'text-text-muted group-hover:text-text'}`}>
+                  <span className={`${isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`}>
                     {item.icon}
                   </span>
                   <span className="flex-1 text-left">{item.label}</span>
                   {hasChildren && (
                     <ChevronRight
-                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''} ${isActive ? 'text-primary' : 'text-text-muted'}`}
+                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''} ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
                       onClick={(e) => {
                         e.stopPropagation()
                         if (isExpanded) {
@@ -182,7 +182,7 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
                           className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-[13px] font-medium transition-all ${
                             isChildActive
                               ? 'bg-primary/5 text-primary'
-                              : 'text-text-secondary hover:bg-card hover:text-text'
+                              : 'text-muted-foreground hover:bg-card hover:text-foreground'
                           }`}
                         >
                           {child.label}
@@ -204,16 +204,16 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
               onOpenSettings()
               setMobileOpen(false)
             }}
-            className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary transition-all hover:bg-card hover:text-text"
+            className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-card hover:text-foreground"
           >
-            <Settings className="w-5 h-5 text-text-muted group-hover:text-text" />
+            <Settings className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
             Pengaturan
           </button>
           <button
             onClick={handleLogout}
-            className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary transition-all hover:bg-red/10 hover:text-red"
+            className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
           >
-            <LogOut className="w-5 h-5 text-text-muted group-hover:text-red" />
+            <LogOut className="w-5 h-5 text-muted-foreground group-hover:text-destructive" />
             Keluar
           </button>
         </div>
@@ -226,7 +226,7 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
       {/* Mobile hamburger button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-0 left-0 z-50 flex h-14 w-14 items-center justify-center bg-surface text-text md:hidden border-b border-r border-border"
+        className="fixed top-0 left-0 z-50 flex h-14 w-14 items-center justify-center bg-card text-foreground md:hidden border-b border-r border-border"
         aria-label="Buka menu"
       >
         <Menu className="w-5 h-5" />
@@ -242,7 +242,7 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
 
       {/* Mobile sidebar drawer */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-surface border-r border-border transition-transform duration-300 md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-card border-r border-border transition-transform duration-300 md:hidden ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -252,7 +252,7 @@ export default function Sidebar({ userName, onOpenSettings }: SidebarProps) {
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:w-[260px] md:flex-shrink-0 md:flex-col bg-surface border-r border-border">
+      <aside className="hidden md:flex md:w-[260px] md:flex-shrink-0 md:flex-col bg-card border-r border-border">
         <div className="flex h-screen flex-col overflow-y-auto sticky top-0">
           <SidebarContent />
         </div>

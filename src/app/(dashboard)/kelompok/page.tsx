@@ -205,8 +205,8 @@ export default function KelompokPage() {
       {/* Top Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-text">Manajemen Kelompok</h2>
-          <p className="text-sm text-text-muted mt-1">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">Manajemen Kelompok</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Kelola kelompok halaqah, asosiasi kelas, dan penugasan ustadz pengampu.
           </p>
         </div>
@@ -222,7 +222,7 @@ export default function KelompokPage() {
 
       {/* Search */}
       <div className="relative mb-4 max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <Input
           type="text"
           value={searchQuery}
@@ -233,21 +233,21 @@ export default function KelompokPage() {
       </div>
 
       {/* Main Table */}
-      <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
+      <Card className="border-border/40 shadow-sm overflow-hidden bg-card">
         <CardContent className="p-0">
           {state.groups.length === 0 ? (
-            <div className="py-16 text-center text-sm text-text-muted border-dashed">
+            <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
               Belum ada kelompok yang didaftarkan.
             </div>
           ) : filtered.length === 0 ? (
-            <div className="py-16 text-center text-sm text-text-muted border-dashed">
+            <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
               Tidak ada kelompok yang sesuai dengan pencarian.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
+                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
                     <th className="py-3.5 px-4 w-16 text-center">No</th>
                     <th className="py-3.5 px-4">Nama Kelompok</th>
                     <th className="py-3.5 px-4">Kelas</th>
@@ -264,26 +264,26 @@ export default function KelompokPage() {
 
                     return (
                       <tr key={group.id} className="hover:bg-card/30 transition-colors">
-                        <td className="py-3.5 px-4 text-center font-medium text-text-muted">
+                        <td className="py-3.5 px-4 text-center font-medium text-muted-foreground">
                           {(page - 1) * ITEMS_PER_PAGE + index + 1}
                         </td>
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-text">{group.name}</span>
+                            <span className="font-semibold text-foreground">{group.name}</span>
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 text-text-secondary font-medium">
+                        <td className="py-3.5 px-4 text-muted-foreground font-medium">
                           {className !== 'Tanpa Kelas' ? (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
                               {className}
                             </span>
                           ) : (
-                            <span className="text-xs text-text-muted italic">{className}</span>
+                            <span className="text-xs text-muted-foreground italic">{className}</span>
                           )}
                         </td>
                         <td className="py-3.5 px-4">
                           {assignedTeachers.length === 0 ? (
-                            <span className="text-xs text-text-muted italic">Belum ditugaskan</span>
+                            <span className="text-xs text-muted-foreground italic">Belum ditugaskan</span>
                           ) : (
                             <div className="flex flex-wrap gap-1">
                               {assignedTeachers.map((gt) => {
@@ -291,7 +291,7 @@ export default function KelompokPage() {
                                 return (
                                   <span
                                     key={gt.id}
-                                    className="inline-flex items-center px-2 py-0.5 rounded bg-background border border-border/50 text-xs font-medium text-text-secondary"
+                                    className="inline-flex items-center px-2 py-0.5 rounded bg-background border border-border/50 text-xs font-medium text-muted-foreground"
                                   >
                                     {name}
                                   </span>
@@ -306,7 +306,7 @@ export default function KelompokPage() {
                               variant="ghost"
                               size="icon"
                               onClick={() => openDetailModal(group)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
+                              className="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-card rounded-lg"
                               title="Detail"
                             >
                               <Eye className="w-4 h-4" />
@@ -316,7 +316,7 @@ export default function KelompokPage() {
                               variant="ghost"
                               size="icon"
                               onClick={() => openEditModal(group)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                              className="h-8.5 w-8.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
                               title="Edit"
                             >
                               <Edit className="w-4 h-4" />
@@ -325,7 +325,7 @@ export default function KelompokPage() {
                               variant="ghost"
                               size="icon"
                               onClick={() => handleDeleteGroup(group.id, group.name)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
+                              className="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
                               title="Hapus"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -380,14 +380,14 @@ export default function KelompokPage() {
       {/* Add Modal */}
       <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Buat Kelompok Baru">
         {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
             {error}
           </div>
         )}
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Nama Kelompok / Halaqah <span className="text-red">*</span>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Nama Kelompok / Halaqah <span className="text-destructive">*</span>
             </label>
             <Input
               type="text"
@@ -412,15 +412,15 @@ export default function KelompokPage() {
       {/* Edit Modal */}
       <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Kelompok">
         {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
             {error}
           </div>
         )}
         {selectedGroup && (
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                Nama Kelompok <span className="text-red">*</span>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Nama Kelompok <span className="text-destructive">*</span>
               </label>
               <Input
                 type="text"
@@ -432,7 +432,7 @@ export default function KelompokPage() {
             </div>
 
             <div>
-              <label htmlFor="edit-class-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              <label htmlFor="edit-class-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Kelas
               </label>
               <Combobox
@@ -446,11 +446,11 @@ export default function KelompokPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Pilih Ustadz Pengampu
               </label>
               {Object.keys(allTeachers).length === 0 ? (
-                <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+                <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
                   Tidak ada guru terdaftar.
                 </p>
               ) : (
@@ -458,7 +458,7 @@ export default function KelompokPage() {
                   {Object.entries(allTeachers).map(([tid, name]) => (
                     <label
                       key={tid}
-                      className="flex items-center gap-2.5 text-sm text-text-secondary hover:text-text cursor-pointer"
+                      className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
                     >
                       <input
                         type="checkbox"
@@ -491,22 +491,22 @@ export default function KelompokPage() {
           <div className="space-y-4">
             <div className="bg-background rounded-lg p-4 border border-border space-y-3">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Nama Kelompok</label>
-                <div className="text-base font-bold text-text mt-0.5">{selectedGroup.name}</div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama Kelompok</label>
+                <div className="text-base font-bold text-foreground mt-0.5">{selectedGroup.name}</div>
               </div>
               
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Kelas</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Kelas</label>
                 <div className="text-sm font-semibold text-primary mt-0.5">
                   {selectedGroup.class_name || state.classes.find(c => c.id === selectedGroup.class_id)?.name || (
-                    <span className="text-text-muted font-normal italic">Tanpa Kelas</span>
+                    <span className="text-muted-foreground font-normal italic">Tanpa Kelas</span>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Tanggal Dibuat</label>
-                <div className="text-xs font-medium text-text-muted mt-0.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tanggal Dibuat</label>
+                <div className="text-xs font-medium text-muted-foreground mt-0.5">
                   {new Date(selectedGroup.created_at).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'long',
@@ -517,11 +517,11 @@ export default function KelompokPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 Ustadz Pengampu
               </label>
               {state.groupTeachers.filter((gt) => gt.group_id === selectedGroup.id).length === 0 ? (
-                <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+                <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
                   Belum ada ustadz ditugaskan ke kelompok ini.
                 </p>
               ) : (
@@ -533,7 +533,7 @@ export default function KelompokPage() {
                       return (
                         <div
                           key={gt.id}
-                          className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-text-secondary"
+                          className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-muted-foreground"
                         >
                           <User className="w-4 h-4 text-primary shrink-0" />
                           <span className="truncate">{name}</span>

@@ -15,10 +15,10 @@ export default function GlobalError({
 
   return (
     <html lang="id">
-      <body className="bg-background text-text">
+      <body className="bg-background text-foreground">
         <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-surface border border-border rounded-[var(--radius-lg)] p-8 shadow-xl text-center space-y-6">
-            <div className="mx-auto w-16 h-16 bg-red/10 text-red rounded-full flex items-center justify-center">
+          <div className="w-full max-w-md bg-card border border-border rounded-[var(--radius-lg)] p-8 shadow-xl text-center space-y-6">
+            <div className="mx-auto w-16 h-16 bg-destructive/10 text-destructive rounded-full flex items-center justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -35,8 +35,8 @@ export default function GlobalError({
               </svg>
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-bold text-text">Kesalahan Fatal</h2>
-              <p className="text-sm text-text-secondary leading-relaxed">
+              <h2 className="text-xl font-bold text-foreground">Kesalahan Fatal</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Aplikasi mengalami kesalahan fatal. Silakan klik tombol di bawah untuk mencoba memuat kembali.
               </p>
             </div>

@@ -25,7 +25,6 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from '@/components/ui/pagination'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import Modal from '@/components/Modal'
 import { Combobox } from '@/components/ui/Combobox'
@@ -278,8 +277,8 @@ export default function SantriPage() {
       {/* Top Bar */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-text">Manajemen Siswa</h2>
-          <p className="text-sm text-text-muted mt-1 flex items-center gap-1.5">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">Manajemen Siswa</h2>
+          <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
             <Users className="w-4 h-4" />
             {state.students.length} siswa terdaftar
           </p>
@@ -296,7 +295,7 @@ export default function SantriPage() {
 
       {/* Search */}
       <div className="relative mb-4 max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <Input
           type="text"
           value={searchQuery}
@@ -308,18 +307,18 @@ export default function SantriPage() {
 
       {/* Main Table */}
       {state.students.length === 0 ? (
-        <div className="py-16 text-center text-sm text-text-muted border-dashed">
+        <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
           Belum ada siswa yang didaftarkan.
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-16 text-center text-sm text-text-muted border-dashed">
+        <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
           Tidak ada siswa yang sesuai dengan pencarian.
         </div>
       ) : (
         <>
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
+              <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
                 <TableHead className="py-3.5 px-4 w-16 text-center">No</TableHead>
                 <TableHead className="py-3.5 px-4">Nama Siswa</TableHead>
                 <TableHead className="py-3.5 px-4">Kelompok</TableHead>
@@ -337,41 +336,34 @@ export default function SantriPage() {
 
                 return (
                   <TableRow key={s.id} className="hover:bg-card/30 transition-colors">
-                    <TableCell className="py-3.5 px-4 text-center font-medium text-text-muted">
+                    <TableCell className="py-3.5 px-4 text-center font-medium text-muted-foreground">
                       {(page - 1) * ITEMS_PER_PAGE + index + 1}
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2.5">
-                        <Avatar size="sm">
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
-                            {s.nama?.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-semibold text-text">{s.nama}</span>
-                      </div>
+                      <span className="font-semibold text-foreground">{s.nama}</span>
                     </TableCell>
-                    <TableCell className="py-3.5 px-4 text-text-secondary font-medium">
+                    <TableCell className="py-3.5 px-4 text-muted-foreground font-medium">
                       {groupName !== 'Tanpa Kelompok' ? (
                         <Badge variant="secondary" className="gap-1.5 font-medium">
                           <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
                           {groupName}
                         </Badge>
                       ) : (
-                        <span className="text-xs text-text-muted italic">{groupName}</span>
+                        <span className="text-xs text-muted-foreground italic">{groupName}</span>
                       )}
                     </TableCell>
-                    <TableCell className="py-3.5 px-4 text-text-secondary font-medium">
+                    <TableCell className="py-3.5 px-4 text-muted-foreground font-medium">
                       {className !== 'Tanpa Kelas' ? (
                         <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
                           {className}
                         </Badge>
                       ) : (
-                        <span className="text-xs text-text-muted italic">{className}</span>
+                        <span className="text-xs text-muted-foreground italic">{className}</span>
                       )}
                     </TableCell>
                     <TableCell className="py-3.5 px-4">
                       <div className="flex items-center justify-center gap-3 max-w-[120px] mx-auto">
-                        <span className="text-xs font-bold text-text-secondary w-9 text-right">{p}%</span>
+                        <span className="text-xs font-bold text-muted-foreground w-9 text-right">{p}%</span>
                         <div className="flex-1 h-2 bg-border/40 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full bg-primary transition-all duration-500"
@@ -386,7 +378,7 @@ export default function SantriPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => openDetailModal(s)}
-                          className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
+                          className="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-card rounded-lg"
                           title="Progres Hafalan"
                         >
                           <Eye className="w-4 h-4" />
@@ -395,7 +387,7 @@ export default function SantriPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => openEditModal(s)}
-                          className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                          className="h-8.5 w-8.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
                           title="Edit"
                         >
                           <Edit className="w-4 h-4" />
@@ -404,7 +396,7 @@ export default function SantriPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDelete(s.id, s.nama)}
-                          className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
+                          className="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
                           title="Hapus"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -458,14 +450,14 @@ export default function SantriPage() {
       {/* Add Modal */}
       <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Tambah Siswa Baru">
         {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
             {error}
           </div>
         )}
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Nama Lengkap <span className="text-red">*</span>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Nama Lengkap <span className="text-destructive">*</span>
             </label>
             <Input
               type="text"
@@ -477,8 +469,8 @@ export default function SantriPage() {
           </div>
 
           <div>
-            <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Kelompok Halaqah <span className="text-red">*</span>
+            <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Kelompok Halaqah <span className="text-destructive">*</span>
             </label>
             <Combobox
               id="add-group-select"
@@ -505,14 +497,14 @@ export default function SantriPage() {
       {/* Edit Modal */}
       <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Siswa">
         {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
             {error}
           </div>
         )}
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Nama Lengkap <span className="text-red">*</span>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Nama Lengkap <span className="text-destructive">*</span>
             </label>
             <Input
               type="text"
@@ -524,8 +516,8 @@ export default function SantriPage() {
           </div>
 
           <div>
-            <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Kelompok Halaqah <span className="text-red">*</span>
+            <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Kelompok Halaqah <span className="text-destructive">*</span>
             </label>
             <Combobox
               id="edit-group-select"
@@ -556,8 +548,8 @@ export default function SantriPage() {
             {/* Header info */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-background p-4 rounded-lg border border-border/50">
               <div className="min-w-0 text-center sm:text-left">
-                <h4 className="text-lg font-bold text-text">{selectedStudent.nama}</h4>
-                <div className="text-xs text-text-muted mt-1 font-medium flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
+                <h4 className="text-lg font-bold text-foreground">{selectedStudent.nama}</h4>
+                <div className="text-xs text-muted-foreground mt-1 font-medium flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
                   <span className="bg-card px-2 py-0.5 rounded border border-border/50">
                     {state.groups.find(g => g.id === selectedStudent.group_id)?.name || 'Tanpa Kelompok'}
                   </span>
@@ -571,18 +563,18 @@ export default function SantriPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-6 shrink-0 bg-surface px-4 py-2.5 rounded-lg border border-border/40 shadow-sm">
+              <div className="flex items-center gap-6 shrink-0 bg-card px-4 py-2.5 rounded-lg border border-border/40 shadow-sm">
                 <div className="text-center">
-                  <div className="text-sm font-bold text-text">{hafalCount}</div>
-                  <div className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Surah</div>
+                  <div className="text-sm font-bold text-foreground">{hafalCount}</div>
+                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Surah</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm font-bold text-text">{juzSelesai}</div>
-                  <div className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Juz Selesai</div>
+                  <div className="text-sm font-bold text-foreground">{juzSelesai}</div>
+                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Juz Selesai</div>
                 </div>
                 <div className="text-center">
                   <div className="text-sm font-bold text-primary">{pct}%</div>
-                  <div className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Progress</div>
+                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Progress</div>
                 </div>
               </div>
             </div>
@@ -598,8 +590,8 @@ export default function SantriPage() {
                         <ArrowLeft className="w-4 h-4" />
                       </Button>
                       <div>
-                        <h5 className="font-bold text-text text-sm">Juz {selectedJuz}</h5>
-                        <p className="text-[11px] font-semibold text-text-muted mt-0.5">
+                        <h5 className="font-bold text-foreground text-sm">Juz {selectedJuz}</h5>
+                        <p className="text-[11px] font-semibold text-muted-foreground mt-0.5">
                           {juzHafalCount} dari {juzSurahs.length} surah dihafal
                         </p>
                       </div>
@@ -618,7 +610,7 @@ export default function SantriPage() {
                             <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
                               status === 1 ? 'bg-primary/10 text-primary border border-primary/20' : 
                               status === 2 ? 'bg-accent/10 text-accent border border-accent/20' : 
-                              'bg-background text-text-muted border border-border group-hover:border-border-hover'
+                              'bg-background text-muted-foreground border border-border group-hover:border-border-hover'
                             }`}>
                               {status === 1 ? (
                                 <CheckCircle2 className="w-4 h-4" />
@@ -630,11 +622,11 @@ export default function SantriPage() {
                             </div>
 
                             <div className="min-w-0 flex-1">
-                              <div className="text-xs font-bold text-text truncate">{s.no}. {s.nama}</div>
-                              <div className="text-[10px] font-semibold text-text-muted mt-0.5">{s.ayat} ayat</div>
+                              <div className="text-xs font-bold text-foreground truncate">{s.no}. {s.nama}</div>
+                              <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">{s.ayat} ayat</div>
                             </div>
                             
-                            <div className="shrink-0 text-sm text-text-muted font-arabic pr-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                            <div className="shrink-0 text-sm text-muted-foreground font-arabic pr-1 opacity-50 group-hover:opacity-100 transition-opacity">
                               {s.arab}
                             </div>
                           </button>
@@ -645,8 +637,8 @@ export default function SantriPage() {
                 ) : (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h5 className="font-bold text-text text-sm">Pencapaian Juz</h5>
-                      <span className="text-[10px] font-semibold text-text-muted">Pilih Juz untuk detail</span>
+                      <h5 className="font-bold text-foreground text-sm">Pencapaian Juz</h5>
+                      <span className="text-[10px] font-semibold text-muted-foreground">Pilih Juz untuk detail</span>
                     </div>
                     <div className="grid grid-cols-5 gap-2">
                       {[...Array(30)].map((_, i) => {
@@ -661,7 +653,7 @@ export default function SantriPage() {
                                 ? 'bg-primary text-white shadow-sm shadow-primary/20'
                                 : p > 0
                                   ? 'bg-accent/10 text-accent border border-accent/20'
-                                  : 'bg-surface border border-border text-text-muted'
+                                  : 'bg-card border border-border text-muted-foreground'
                             }`}
                           >
                             <div className="text-[13px] font-bold">{j}</div>
@@ -685,12 +677,12 @@ export default function SantriPage() {
               <div className="lg:col-span-2 space-y-4">
                 <div className="flex items-center gap-2 border-b border-border/30 pb-3">
                   <FileText className="w-4 h-4 text-primary shrink-0" />
-                  <h5 className="font-bold text-text text-sm">Riwayat Setoran</h5>
+                  <h5 className="font-bold text-foreground text-sm">Riwayat Setoran</h5>
                 </div>
 
                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                   {studentSubmissions.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-text-muted italic border border-dashed border-border/50 bg-background rounded-lg">
+                    <div className="py-8 text-center text-xs text-muted-foreground italic border border-dashed border-border/50 bg-background rounded-lg">
                       Belum ada setoran dicatat
                     </div>
                   ) : (
@@ -699,10 +691,10 @@ export default function SantriPage() {
                         <div className="w-1 bg-primary/20 mr-2.5 shrink-0 rounded-full"></div>
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-start justify-between gap-2">
-                            <span className="font-bold text-text truncate">
+                            <span className="font-bold text-foreground truncate">
                               {getSurahNama(sub.surah_no)}
                               {sub.ayat_start && sub.ayat_end ? (
-                                <span className="text-text-muted font-semibold ml-1">
+                                <span className="text-muted-foreground font-semibold ml-1">
                                   :{sub.ayat_start}{sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}
                                 </span>
                               ) : null}
@@ -712,12 +704,12 @@ export default function SantriPage() {
                             </span>
                           </div>
                           
-                          <div className="text-[10px] text-text-muted font-medium">
+                          <div className="text-[10px] text-muted-foreground font-medium">
                             {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}
                           </div>
 
                           {sub.catatan && (
-                            <div className="text-xs text-text-secondary bg-background rounded p-1.5 border border-border/40 mt-1 truncate">
+                            <div className="text-xs text-muted-foreground bg-background rounded p-1.5 border border-border/40 mt-1 truncate">
                               {sub.catatan}
                             </div>
                           )}

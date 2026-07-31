@@ -190,8 +190,8 @@ export default function KelasPage() {
       {/* Top Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-text">Manajemen Kelas</h2>
-          <p className="text-sm text-text-muted mt-1">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">Manajemen Kelas</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Kelola jenjang kelas dan kelompok halaqah yang tergabung di dalamnya.
           </p>
         </div>
@@ -207,7 +207,7 @@ export default function KelasPage() {
 
       {/* Search */}
       <div className="relative mb-4 max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <Input
           type="text"
           value={searchQuery}
@@ -218,21 +218,21 @@ export default function KelasPage() {
       </div>
 
       {/* Main Table */}
-      <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
+      <Card className="border-border/40 shadow-sm overflow-hidden bg-card">
         <CardContent className="p-0">
           {state.classes.length === 0 ? (
-            <div className="py-16 text-center text-sm text-text-muted border-dashed">
+            <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
               Belum ada kelas yang didaftarkan.
             </div>
           ) : filtered.length === 0 ? (
-            <div className="py-16 text-center text-sm text-text-muted border-dashed">
+            <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
               Tidak ada kelas yang sesuai dengan pencarian.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
+                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
                     <th className="py-3.5 px-4 w-16 text-center">No</th>
                     <th className="py-3.5 px-4">Nama Kelas</th>
                     <th className="py-3.5 px-4">Kelompok di Dalamnya</th>
@@ -244,15 +244,15 @@ export default function KelasPage() {
                     const groups = state.groups.filter((g) => g.class_id === c.id)
                     return (
                       <tr key={c.id} className="hover:bg-card/30 transition-colors">
-                        <td className="py-3.5 px-4 text-center font-medium text-text-muted">
+                        <td className="py-3.5 px-4 text-center font-medium text-muted-foreground">
                           {(page - 1) * ITEMS_PER_PAGE + index + 1}
                         </td>
-                        <td className="py-3.5 px-4 font-semibold text-text">
+                        <td className="py-3.5 px-4 font-semibold text-foreground">
                           {c.name}
                         </td>
                         <td className="py-3.5 px-4">
                           {groups.length === 0 ? (
-                            <span className="text-xs text-text-muted italic">Tidak ada kelompok</span>
+                            <span className="text-xs text-muted-foreground italic">Tidak ada kelompok</span>
                           ) : (
                             <div className="flex flex-wrap gap-1.5">
                               {groups.map((g) => (
@@ -272,7 +272,7 @@ export default function KelasPage() {
                               variant="ghost"
                               size="icon"
                               onClick={() => openDetailModal(c)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
+                              className="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-card rounded-lg"
                               title="Detail"
                             >
                               <Eye className="w-4 h-4" />
@@ -281,7 +281,7 @@ export default function KelasPage() {
                               variant="ghost"
                               size="icon"
                               onClick={() => openEditModal(c)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                              className="h-8.5 w-8.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
                               title="Edit"
                             >
                               <Edit className="w-4 h-4" />
@@ -290,7 +290,7 @@ export default function KelasPage() {
                               variant="ghost"
                               size="icon"
                               onClick={() => handleDeleteClass(c.id, c.name)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
+                              className="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
                               title="Hapus"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -345,14 +345,14 @@ export default function KelasPage() {
       {/* Add Modal */}
       <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Tambah Kelas Baru">
         {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
             {error}
           </div>
         )}
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Nama Kelas <span className="text-red">*</span>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Nama Kelas <span className="text-destructive">*</span>
             </label>
             <Input
               type="text"
@@ -364,11 +364,11 @@ export default function KelasPage() {
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Pilih Kelompok Halaqah
             </label>
             {visibleGroupsForAdd.length === 0 ? (
-              <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+              <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
                 Semua kelompok sudah terdistribusi ke kelas lain. Buat kelompok baru terlebih dahulu jika diperlukan.
               </p>
             ) : (
@@ -376,7 +376,7 @@ export default function KelasPage() {
                 {visibleGroupsForAdd.map((g) => (
                   <label
                     key={g.id}
-                    className="flex items-center gap-2.5 text-sm text-text-secondary hover:text-text cursor-pointer"
+                    className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
                   >
                     <input
                       type="checkbox"
@@ -405,14 +405,14 @@ export default function KelasPage() {
       {/* Edit Modal */}
       <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Kelas">
         {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-red/10 px-3 py-2.5 text-sm text-red font-medium">
+          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
             {error}
           </div>
         )}
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Nama Kelas <span className="text-red">*</span>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Nama Kelas <span className="text-destructive">*</span>
             </label>
             <Input
               type="text"
@@ -424,11 +424,11 @@ export default function KelasPage() {
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Pilih Kelompok Halaqah
             </label>
             {visibleGroupsForEdit.length === 0 ? (
-              <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+              <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
                 Tidak ada kelompok yang tersedia.
               </p>
             ) : (
@@ -436,7 +436,7 @@ export default function KelasPage() {
                 {visibleGroupsForEdit.map((g) => (
                   <label
                     key={g.id}
-                    className="flex items-center gap-2.5 text-sm text-text-secondary hover:text-text cursor-pointer"
+                    className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
                   >
                     <input
                       type="checkbox"
@@ -468,12 +468,12 @@ export default function KelasPage() {
           <div className="space-y-4">
             <div className="bg-background rounded-lg p-4 border border-border space-y-3">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Nama Kelas</label>
-                <div className="text-base font-bold text-text mt-0.5">{selectedClass.name}</div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama Kelas</label>
+                <div className="text-base font-bold text-foreground mt-0.5">{selectedClass.name}</div>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted">Tanggal Dibuat</label>
-                <div className="text-sm font-medium text-text-secondary mt-0.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tanggal Dibuat</label>
+                <div className="text-sm font-medium text-muted-foreground mt-0.5">
                   {new Date(selectedClass.created_at).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'long',
@@ -484,11 +484,11 @@ export default function KelasPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 Daftar Kelompok Halaqah
               </label>
               {state.groups.filter((g) => g.class_id === selectedClass.id).length === 0 ? (
-                <p className="text-xs text-text-muted italic bg-background p-3 rounded-lg border border-border">
+                <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
                   Tidak ada kelompok di dalam kelas ini.
                 </p>
               ) : (
@@ -498,7 +498,7 @@ export default function KelasPage() {
                     .map((g) => (
                       <div
                         key={g.id}
-                        className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-text-secondary"
+                        className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-muted-foreground"
                       >
                         <Layers className="w-4 h-4 text-primary shrink-0" />
                         <span className="truncate">{g.name}</span>
