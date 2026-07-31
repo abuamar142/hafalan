@@ -6,7 +6,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { SidebarInset } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/app-sidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import Modal from '@/components/Modal'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useAppState, QK } from '@/hooks/useAppState'
 import { createClient } from '@/lib/supabase/client'
 import type { SantriWithCount, Memorization } from '@/lib/types'
@@ -106,33 +106,34 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </SidebarInset>
       </SidebarProvider>
 
-      {/* Settings Modal */}
-      <Modal
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        title="Pengaturan"
-      >
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs text-muted-foreground">
-            Nama Ustadz / Guru
-          </label>
-          <input
-            type="text"
-            value={guruInput}
-            onChange={(e) => setGuruInput(e.target.value)}
-            placeholder="Ustadz Ahmad..."
-            className="w-full rounded-lg border-[1.5px] border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
-          />
-        </div>
-        <div className="mt-3.5 flex justify-end">
-          <button
-            onClick={handleSaveGuru}
-            className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity"
-          >
-            Simpan
-          </button>
-        </div>
-      </Modal>
+      {/* Settings Dialog */}
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Pengaturan</DialogTitle>
+          </DialogHeader>
+          <div className="mb-3">
+            <label className="mb-1.5 block text-xs text-muted-foreground">
+              Nama Ustadz / Guru
+            </label>
+            <input
+              type="text"
+              value={guruInput}
+              onChange={(e) => setGuruInput(e.target.value)}
+              placeholder="Ustadz Ahmad..."
+              className="w-full rounded-lg border-[1.5px] border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+            />
+          </div>
+          <div className="mt-3.5 flex justify-end">
+            <button
+              onClick={handleSaveGuru}
+              className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity"
+            >
+              Simpan
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardContext.Provider>
   )
 }

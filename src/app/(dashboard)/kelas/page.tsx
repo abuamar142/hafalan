@@ -10,7 +10,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
-import Modal from '@/components/Modal'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import ConfirmDialog from '@/components/ConfirmDialog'
 import {
   Pagination,
   PaginationContent,
@@ -60,6 +61,7 @@ export default function KelasPage() {
   
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
 
   // Groups that do not belong to any class yet (unassigned)
   const unassignedGroups = state.groups.filter((g) => !g.class_id)
@@ -146,11 +148,16 @@ export default function KelasPage() {
     }
   }
 
-  async function handleDeleteClass(id: number, name: string) {
-    if (!confirm(`Hapus kelas "${name}"? Kelompok di dalamnya akan kembali menjadi "Tanpa Kelas".`)) return
+  function handleDeleteClass(id: number, name: string) {
+    setDeleteTarget({ id, name })
+  }
+
+  async function handleDeleteClassConfirmed() {
+    if (!deleteTarget) return
     setSaving(true)
     try {
-      await deleteClassAction(id)
+      await deleteClassAction(deleteTarget.id)
+      setDeleteTarget(null)
       await refreshClasses()
       toast('Kelas berhasil dihapus!')
     } catch (e: unknown) {
@@ -339,180 +346,205 @@ export default function KelasPage() {
         </>
       )}
 
-      {/* Add Modal */}
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Tambah Kelas Baru">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Nama Kelas <span className="text-destructive">*</span>
-            </label>
-            <Input
-              type="text"
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
-              placeholder="Misal: Kelas VII A, Kelas VIII B"
-              disabled={saving}
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Pilih Kelompok Halaqah
-            </label>
-            {visibleGroupsForAdd.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
-                Semua kelompok sudah terdistribusi ke kelas lain. Buat kelompok baru terlebih dahulu jika diperlukan.
-              </p>
-            ) : (
-              <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
-                {visibleGroupsForAdd.map((g) => (
-                  <label
-                    key={g.id}
-                    className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedGroupIds.includes(g.id)}
-                      onChange={() => toggleGroupSelection(g.id)}
-                      className="rounded border-border text-primary focus:ring-primary w-4 h-4"
-                    />
-                    <span>{g.name}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleAddClass} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan Kelas'}
-          </Button>
-        </div>
-      </Modal>
-
-      {/* Edit Modal */}
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Kelas">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Nama Kelas <span className="text-destructive">*</span>
-            </label>
-            <Input
-              type="text"
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
-              placeholder="Misal: Kelas VII A"
-              disabled={saving}
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Pilih Kelompok Halaqah
-            </label>
-            {visibleGroupsForEdit.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
-                Tidak ada kelompok yang tersedia.
-              </p>
-            ) : (
-              <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
-                {visibleGroupsForEdit.map((g) => (
-                  <label
-                    key={g.id}
-                    className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedGroupIds.includes(g.id)}
-                      onChange={() => toggleGroupSelection(g.id)}
-                      className="rounded border-border text-primary focus:ring-primary w-4 h-4"
-                    />
-                    <span>{g.name}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleEditClass} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Perbarui Kelas'}
-          </Button>
-        </div>
-      </Modal>
-
-      {/* Detail Modal */}
-      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Detail Kelas">
-        {selectedClass && (
+      {/* Add Dialog */}
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tambah Kelas Baru</DialogTitle>
+          </DialogHeader>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+              {error}
+            </div>
+          )}
           <div className="space-y-4">
-            <div className="bg-background rounded-lg p-4 border border-border space-y-3">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama Kelas</label>
-                <div className="text-base font-bold text-foreground mt-0.5">{selectedClass.name}</div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tanggal Dibuat</label>
-                <div className="text-sm font-medium text-muted-foreground mt-0.5">
-                  {new Date(selectedClass.created_at).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </div>
-              </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Nama Kelas <span className="text-destructive">*</span>
+              </label>
+              <Input
+                type="text"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+                placeholder="Misal: Kelas VII A, Kelas VIII B"
+                disabled={saving}
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                Daftar Kelompok Halaqah
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Pilih Kelompok Halaqah
               </label>
-              {state.groups.filter((g) => g.class_id === selectedClass.id).length === 0 ? (
+              {visibleGroupsForAdd.length === 0 ? (
                 <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
-                  Tidak ada kelompok di dalam kelas ini.
+                  Semua kelompok sudah terdistribusi ke kelas lain. Buat kelompok baru terlebih dahulu jika diperlukan.
                 </p>
               ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  {state.groups
-                    .filter((g) => g.class_id === selectedClass.id)
-                    .map((g) => (
-                      <div
-                        key={g.id}
-                        className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-muted-foreground"
-                      >
-                        <Layers className="w-4 h-4 text-primary shrink-0" />
-                        <span className="truncate">{g.name}</span>
-                      </div>
-                    ))}
+                <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
+                  {visibleGroupsForAdd.map((g) => (
+                    <label
+                      key={g.id}
+                      className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedGroupIds.includes(g.id)}
+                        onChange={() => toggleGroupSelection(g.id)}
+                        className="rounded border-border text-primary focus:ring-primary w-4 h-4"
+                      />
+                      <span>{g.name}</span>
+                    </label>
+                  ))}
                 </div>
               )}
             </div>
+          </div>
 
-            <div className="mt-6 flex justify-end">
-              <Button onClick={() => setDetailOpen(false)}>
-                Tutup
-              </Button>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
+              Batal
+            </Button>
+            <Button onClick={handleAddClass} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Simpan Kelas'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Kelas</DialogTitle>
+          </DialogHeader>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+              {error}
+            </div>
+          )}
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Nama Kelas <span className="text-destructive">*</span>
+              </label>
+              <Input
+                type="text"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+                placeholder="Misal: Kelas VII A"
+                disabled={saving}
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Pilih Kelompok Halaqah
+              </label>
+              {visibleGroupsForEdit.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
+                  Tidak ada kelompok yang tersedia.
+                </p>
+              ) : (
+                <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
+                  {visibleGroupsForEdit.map((g) => (
+                    <label
+                      key={g.id}
+                      className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedGroupIds.includes(g.id)}
+                        onChange={() => toggleGroupSelection(g.id)}
+                        className="rounded border-border text-primary focus:ring-primary w-4 h-4"
+                      />
+                      <span>{g.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-        )}
-      </Modal>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
+              Batal
+            </Button>
+            <Button onClick={handleEditClass} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Perbarui Kelas'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Detail Dialog */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Detail Kelas</DialogTitle>
+          </DialogHeader>
+          {selectedClass && (
+            <div className="space-y-4">
+              <div className="bg-background rounded-lg p-4 border border-border space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama Kelas</label>
+                  <div className="text-base font-bold text-foreground mt-0.5">{selectedClass.name}</div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tanggal Dibuat</label>
+                  <div className="text-sm font-medium text-muted-foreground mt-0.5">
+                    {new Date(selectedClass.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Daftar Kelompok Halaqah
+                </label>
+                {state.groups.filter((g) => g.class_id === selectedClass.id).length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
+                    Tidak ada kelompok di dalam kelas ini.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {state.groups
+                      .filter((g) => g.class_id === selectedClass.id)
+                      .map((g) => (
+                        <div
+                          key={g.id}
+                          className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-muted-foreground"
+                        >
+                          <Layers className="w-4 h-4 text-primary shrink-0" />
+                          <span className="truncate">{g.name}</span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button onClick={() => setDetailOpen(false)}>
+                  Tutup
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        title="Hapus Kelas?"
+        description={`Hapus kelas "${deleteTarget?.name}"? Kelompok di dalamnya akan kembali menjadi "Tanpa Kelas".`}
+        confirmText="Hapus"
+        onConfirm={handleDeleteClassConfirmed}
+      />
     </div>
   )
 }

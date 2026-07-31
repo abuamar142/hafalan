@@ -40,6 +40,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 interface NavItem {
   label: string
@@ -144,6 +145,7 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
   const supabase = createClient()
   const { setOpenMobile } = useSidebar()
   const [dark, setDark] = useState(false)
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem('theme')
@@ -161,8 +163,11 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
     localStorage.setItem('theme', next ? 'dark' : 'light')
   }
 
-  async function handleLogout() {
-    if (!confirm('Yakin ingin keluar?')) return
+  function handleLogout() {
+    setLogoutConfirmOpen(true)
+  }
+
+  async function handleLogoutConfirm() {
     await supabase.auth.signOut()
     router.push('/login')
   }
@@ -282,6 +287,15 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        onOpenChange={setLogoutConfirmOpen}
+        title="Keluar?"
+        description="Yakin ingin keluar dari akun Anda?"
+        confirmText="Keluar"
+        onConfirm={handleLogoutConfirm}
+      />
     </Sidebar>
   )
 }

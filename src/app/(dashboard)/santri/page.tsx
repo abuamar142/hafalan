@@ -26,7 +26,8 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import { Badge } from '@/components/ui/badge'
-import Modal from '@/components/Modal'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import ConfirmDialog from '@/components/ConfirmDialog'
 import { Combobox } from '@/components/ui/Combobox'
 import { useToast } from '@/components/ui/Toast'
 import {
@@ -84,6 +85,7 @@ export default function SantriPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
 
   const [selectedStudent, setSelectedStudent] = useState<typeof state.students[number] | null>(null)
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
@@ -208,11 +210,16 @@ export default function SantriPage() {
     }
   }
 
-  async function handleDelete(id: number, name: string) {
-    if (!confirm(`Hapus siswa "${name}"? Semua riwayat setoran & hafalan akan dihapus permanen.`)) return
+  function handleDelete(id: number, name: string) {
+    setDeleteTarget({ id, name })
+  }
+
+  async function handleDeleteConfirmed() {
+    if (!deleteTarget) return
     setSaving(true)
     try {
-      await deleteStudentAction(id)
+      await deleteStudentAction(deleteTarget.id)
+      setDeleteTarget(null)
       await refreshStudents()
       toast('Siswa berhasil dihapus!')
     } catch (e: unknown) {
@@ -448,285 +455,308 @@ export default function SantriPage() {
       )}
 
       {/* Add Modal */}
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Tambah Siswa Baru">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Nama Lengkap <span className="text-destructive">*</span>
-            </label>
-            <Input
-              type="text"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              placeholder="Masukkan nama lengkap"
-              disabled={saving}
-            />
-          </div>
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tambah Siswa Baru</DialogTitle>
+          </DialogHeader>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+              {error}
+            </div>
+          )}
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Nama Lengkap <span className="text-destructive">*</span>
+              </label>
+              <Input
+                type="text"
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                placeholder="Masukkan nama lengkap"
+                disabled={saving}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Kelompok Halaqah <span className="text-destructive">*</span>
-            </label>
-            <Combobox
-              id="add-group-select"
-              options={groupOptions}
-              value={groupId}
-              onChange={setGroupId}
-              placeholder="Pilih Kelompok..."
-              searchPlaceholder="Cari kelompok..."
-              emptyText="Kelompok tidak ditemukan"
-            />
+            <div>
+              <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Kelompok Halaqah <span className="text-destructive">*</span>
+              </label>
+              <Combobox
+                id="add-group-select"
+                options={groupOptions}
+                value={groupId}
+                onChange={setGroupId}
+                placeholder="Pilih Kelompok..."
+                searchPlaceholder="Cari kelompok..."
+                emptyText="Kelompok tidak ditemukan"
+              />
+            </div>
           </div>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleAdd} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan Siswa'}
-          </Button>
-        </div>
-      </Modal>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
+              Batal
+            </Button>
+            <Button onClick={handleAdd} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Simpan Siswa'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Modal */}
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Siswa">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Nama Lengkap <span className="text-destructive">*</span>
-            </label>
-            <Input
-              type="text"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              placeholder="Masukkan nama lengkap"
-              disabled={saving}
-            />
-          </div>
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Siswa</DialogTitle>
+          </DialogHeader>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+              {error}
+            </div>
+          )}
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Nama Lengkap <span className="text-destructive">*</span>
+              </label>
+              <Input
+                type="text"
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                placeholder="Masukkan nama lengkap"
+                disabled={saving}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Kelompok Halaqah <span className="text-destructive">*</span>
-            </label>
-            <Combobox
-              id="edit-group-select"
-              options={groupOptions}
-              value={groupId}
-              onChange={setGroupId}
-              placeholder="Pilih Kelompok..."
-              searchPlaceholder="Cari kelompok..."
-              emptyText="Kelompok tidak ditemukan"
-            />
+            <div>
+              <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Kelompok Halaqah <span className="text-destructive">*</span>
+              </label>
+              <Combobox
+                id="edit-group-select"
+                options={groupOptions}
+                value={groupId}
+                onChange={setGroupId}
+                placeholder="Pilih Kelompok..."
+                searchPlaceholder="Cari kelompok..."
+                emptyText="Kelompok tidak ditemukan"
+              />
+            </div>
           </div>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleEdit} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Perbarui Siswa'}
-          </Button>
-        </div>
-      </Modal>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
+              Batal
+            </Button>
+            <Button onClick={handleEdit} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Perbarui Siswa'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Interactive Detail Modal (with Juz Grid and Setoran History) */}
-      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Detail & Progres Siswa" className="max-w-4xl">
-        {selectedStudent && (
-          <div className="space-y-6">
-            {/* Header info */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-background p-4 rounded-lg border border-border/50">
-              <div className="min-w-0 text-center sm:text-left">
-                <h4 className="text-lg font-bold text-foreground">{selectedStudent.nama}</h4>
-                <div className="text-xs text-muted-foreground mt-1 font-medium flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
-                  <span className="bg-card px-2 py-0.5 rounded border border-border/50">
-                    {state.groups.find(g => g.id === selectedStudent.group_id)?.name || 'Tanpa Kelompok'}
-                  </span>
-                  <span>•</span>
-                  <span>
-                    {(() => {
-                      const group = state.groups.find(g => g.id === selectedStudent.group_id)
-                      return group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
-                    })()}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-6 shrink-0 bg-card px-4 py-2.5 rounded-lg border border-border/40 shadow-sm">
-                <div className="text-center">
-                  <div className="text-sm font-bold text-foreground">{hafalCount}</div>
-                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Surah</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-sm font-bold text-foreground">{juzSelesai}</div>
-                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Juz Selesai</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-sm font-bold text-primary">{pct}%</div>
-                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Progress</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Layout with Juz on Left and History on Right */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-              {/* Juz Grid Column */}
-              <div className="lg:col-span-3 space-y-4">
-                {selectedJuz ? (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                    <div className="flex items-center gap-3 border-b border-border/30 pb-3">
-                      <Button variant="outline" size="sm" onClick={() => setSelectedJuz(null)} className="h-8 px-2">
-                        <ArrowLeft className="w-4 h-4" />
-                      </Button>
-                      <div>
-                        <h5 className="font-bold text-foreground text-sm">Juz {selectedJuz}</h5>
-                        <p className="text-[11px] font-semibold text-muted-foreground mt-0.5">
-                          {juzHafalCount} dari {juzSurahs.length} surah dihafal
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
-                      {juzSurahs.map((s) => {
-                        const status = hafalan[s.no] || 0
-                        return (
-                          <button
-                            key={s.no}
-                            onClick={() => toggleSurah(s.no)}
-                            disabled={toggling}
-                            className="group flex w-full items-center gap-3 rounded-lg p-2 text-left border border-transparent hover:bg-card hover:border-border/40 disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
-                          >
-                            <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
-                              status === 1 ? 'bg-primary/10 text-primary border border-primary/20' : 
-                              status === 2 ? 'bg-accent/10 text-accent border border-accent/20' : 
-                              'bg-background text-muted-foreground border border-border group-hover:border-border-hover'
-                            }`}>
-                              {status === 1 ? (
-                                <CheckCircle2 className="w-4 h-4" />
-                              ) : status === 2 ? (
-                                <RotateCcw className="w-4 h-4" />
-                              ) : (
-                                <Circle className="w-4 h-4 opacity-40" />
-                              )}
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <div className="text-xs font-bold text-foreground truncate">{s.no}. {s.nama}</div>
-                              <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">{s.ayat} ayat</div>
-                            </div>
-                            
-                            <div className="shrink-0 text-sm text-muted-foreground font-arabic pr-1 opacity-50 group-hover:opacity-100 transition-opacity">
-                              {s.arab}
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </div>
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Detail & Progres Siswa</DialogTitle>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-6">
+              {/* Header info */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-background p-4 rounded-lg border border-border/50">
+                <div className="min-w-0 text-center sm:text-left">
+                  <h4 className="text-lg font-bold text-foreground">{selectedStudent.nama}</h4>
+                  <div className="text-xs text-muted-foreground mt-1 font-medium flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
+                    <span className="bg-card px-2 py-0.5 rounded border border-border/50">
+                      {state.groups.find(g => g.id === selectedStudent.group_id)?.name || 'Tanpa Kelompok'}
+                    </span>
+                    <span>•</span>
+                    <span>
+                      {(() => {
+                        const group = state.groups.find(g => g.id === selectedStudent.group_id)
+                        return group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
+                      })()}
+                    </span>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h5 className="font-bold text-foreground text-sm">Pencapaian Juz</h5>
-                      <span className="text-[10px] font-semibold text-muted-foreground">Pilih Juz untuk detail</span>
-                    </div>
-                    <div className="grid grid-cols-5 gap-2">
-                      {[...Array(30)].map((_, i) => {
-                        const j = i + 1
-                         const p = juzPcts[i] ?? 0
-                        return (
-                          <button
-                            key={j}
-                            onClick={() => setSelectedJuz(j)}
-                            className={`group relative flex flex-col items-center justify-center rounded-lg p-2 text-center transition-all hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                              p === 100
-                                ? 'bg-primary text-white shadow-sm shadow-primary/20'
-                                : p > 0
-                                  ? 'bg-accent/10 text-accent border border-accent/20'
-                                  : 'bg-card border border-border text-muted-foreground'
-                            }`}
-                          >
-                            <div className="text-[13px] font-bold">{j}</div>
-                            {p > 0 && p < 100 && (
-                              <div className="text-[8px] font-bold mt-0.5 bg-accent/20 px-1 py-0.2 rounded text-accent-dark">{p}%</div>
-                            )}
-                            {p === 100 && (
-                              <div className="absolute top-0.5 right-0.5">
-                                <CheckCircle2 className="w-2.5 h-2.5 text-white/70" />
-                              </div>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* History Column */}
-              <div className="lg:col-span-2 space-y-4">
-                <div className="flex items-center gap-2 border-b border-border/30 pb-3">
-                  <FileText className="w-4 h-4 text-primary shrink-0" />
-                  <h5 className="font-bold text-foreground text-sm">Riwayat Setoran</h5>
                 </div>
 
-                <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-                  {studentSubmissions.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-muted-foreground italic border border-dashed border-border/50 bg-background rounded-lg">
-                      Belum ada setoran dicatat
-                    </div>
-                  ) : (
-                    studentSubmissions.map((sub) => (
-                      <div key={sub.id} className="bg-card rounded-lg p-3 border border-border/50 text-[13px] relative overflow-hidden flex">
-                        <div className="w-1 bg-primary/20 mr-2.5 shrink-0 rounded-full"></div>
-                        <div className="min-w-0 flex-1 space-y-1">
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-bold text-foreground truncate">
-                              {getSurahNama(sub.surah_no)}
-                              {sub.ayat_start && sub.ayat_end ? (
-                                <span className="text-muted-foreground font-semibold ml-1">
-                                  :{sub.ayat_start}{sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}
-                                </span>
-                              ) : null}
-                            </span>
-                            <span className="shrink-0 bg-primary/10 text-primary border border-primary/20 text-[10px] font-bold px-1.5 py-0.2 rounded">
-                              {sub.nilai}
-                            </span>
-                          </div>
-                          
-                          <div className="text-[10px] text-muted-foreground font-medium">
-                            {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}
-                          </div>
+                <div className="flex items-center gap-6 shrink-0 bg-card px-4 py-2.5 rounded-lg border border-border/40 shadow-sm">
+                  <div className="text-center">
+                    <div className="text-sm font-bold text-foreground">{hafalCount}</div>
+                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Surah</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm font-bold text-foreground">{juzSelesai}</div>
+                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Juz Selesai</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm font-bold text-primary">{pct}%</div>
+                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Progress</div>
+                  </div>
+                </div>
+              </div>
 
-                          {sub.catatan && (
-                            <div className="text-xs text-muted-foreground bg-background rounded p-1.5 border border-border/40 mt-1 truncate">
-                              {sub.catatan}
-                            </div>
-                          )}
+              {/* Layout with Juz on Left and History on Right */}
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                {/* Juz Grid Column */}
+                <div className="lg:col-span-3 space-y-4">
+                  {selectedJuz ? (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                      <div className="flex items-center gap-3 border-b border-border/30 pb-3">
+                        <Button variant="outline" size="sm" onClick={() => setSelectedJuz(null)} className="h-8 px-2">
+                          <ArrowLeft className="w-4 h-4" />
+                        </Button>
+                        <div>
+                          <h5 className="font-bold text-foreground text-sm">Juz {selectedJuz}</h5>
+                          <p className="text-[11px] font-semibold text-muted-foreground mt-0.5">
+                            {juzHafalCount} dari {juzSurahs.length} surah dihafal
+                          </p>
                         </div>
                       </div>
-                    ))
+
+                      <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+                        {juzSurahs.map((s) => {
+                          const status = hafalan[s.no] || 0
+                          return (
+                            <button
+                              key={s.no}
+                              onClick={() => toggleSurah(s.no)}
+                              disabled={toggling}
+                              className="group flex w-full items-center gap-3 rounded-lg p-2 text-left border border-transparent hover:bg-card hover:border-border/40 disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+                            >
+                              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                                status === 1 ? 'bg-primary/10 text-primary border border-primary/20' : 
+                                status === 2 ? 'bg-accent/10 text-accent border border-accent/20' : 
+                                'bg-background text-muted-foreground border border-border group-hover:border-border-hover'
+                              }`}>
+                                {status === 1 ? (
+                                  <CheckCircle2 className="w-4 h-4" />
+                                ) : status === 2 ? (
+                                  <RotateCcw className="w-4 h-4" />
+                                ) : (
+                                  <Circle className="w-4 h-4 opacity-40" />
+                                )}
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <div className="text-xs font-bold text-foreground truncate">{s.no}. {s.nama}</div>
+                                <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">{s.ayat} ayat</div>
+                              </div>
+                              
+                              <div className="shrink-0 text-sm text-muted-foreground font-arabic pr-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                                {s.arab}
+                              </div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h5 className="font-bold text-foreground text-sm">Pencapaian Juz</h5>
+                        <span className="text-[10px] font-semibold text-muted-foreground">Pilih Juz untuk detail</span>
+                      </div>
+                      <div className="grid grid-cols-5 gap-2">
+                        {[...Array(30)].map((_, i) => {
+                          const j = i + 1
+                           const p = juzPcts[i] ?? 0
+                          return (
+                            <button
+                              key={j}
+                              onClick={() => setSelectedJuz(j)}
+                              className={`group relative flex flex-col items-center justify-center rounded-lg p-2 text-center transition-all hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                                p === 100
+                                  ? 'bg-primary text-white shadow-sm shadow-primary/20'
+                                  : p > 0
+                                    ? 'bg-accent/10 text-accent border border-accent/20'
+                                    : 'bg-card border border-border text-muted-foreground'
+                              }`}
+                            >
+                              <div className="text-[13px] font-bold">{j}</div>
+                              {p > 0 && p < 100 && (
+                                <div className="text-[8px] font-bold mt-0.5 bg-accent/20 px-1 py-0.2 rounded text-accent-dark">{p}%</div>
+                              )}
+                              {p === 100 && (
+                                <div className="absolute top-0.5 right-0.5">
+                                  <CheckCircle2 className="w-2.5 h-2.5 text-white/70" />
+                                </div>
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            <div className="mt-4 border-t border-border pt-4 flex justify-end">
-              <Button onClick={() => setDetailOpen(false)}>Tutup</Button>
+                {/* History Column */}
+                <div className="lg:col-span-2 space-y-4">
+                  <div className="flex items-center gap-2 border-b border-border/30 pb-3">
+                    <FileText className="w-4 h-4 text-primary shrink-0" />
+                    <h5 className="font-bold text-foreground text-sm">Riwayat Setoran</h5>
+                  </div>
+
+                  <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                    {studentSubmissions.length === 0 ? (
+                      <div className="py-8 text-center text-xs text-muted-foreground italic border border-dashed border-border/50 bg-background rounded-lg">
+                        Belum ada setoran dicatat
+                      </div>
+                    ) : (
+                      studentSubmissions.map((sub) => (
+                        <div key={sub.id} className="bg-card rounded-lg p-3 border border-border/50 text-[13px] relative overflow-hidden flex">
+                          <div className="w-1 bg-primary/20 mr-2.5 shrink-0 rounded-full"></div>
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="font-bold text-foreground truncate">
+                                {getSurahNama(sub.surah_no)}
+                                {sub.ayat_start && sub.ayat_end ? (
+                                  <span className="text-muted-foreground font-semibold ml-1">
+                                    :{sub.ayat_start}{sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}
+                                  </span>
+                                ) : null}
+                              </span>
+                              <span className="shrink-0 bg-primary/10 text-primary border border-primary/20 text-[10px] font-bold px-1.5 py-0.2 rounded">
+                                {sub.nilai}
+                              </span>
+                            </div>
+                            
+                            <div className="text-[10px] text-muted-foreground font-medium">
+                              {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}
+                            </div>
+
+                            {sub.catatan && (
+                              <div className="text-xs text-muted-foreground bg-background rounded p-1.5 border border-border/40 mt-1 truncate">
+                                {sub.catatan}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button onClick={() => setDetailOpen(false)}>Tutup</Button>
+              </DialogFooter>
             </div>
-          </div>
-        )}
-      </Modal>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        title="Hapus Siswa?"
+        description={`Hapus siswa "${deleteTarget?.name}"? Semua riwayat setoran & hafalan akan dihapus permanen.`}
+        confirmText="Hapus"
+        onConfirm={handleDeleteConfirmed}
+      />
     </div>
   )
 }

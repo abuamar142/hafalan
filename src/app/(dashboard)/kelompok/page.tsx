@@ -11,7 +11,8 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
-import Modal from '@/components/Modal'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import ConfirmDialog from '@/components/ConfirmDialog'
 import {
   Pagination,
   PaginationContent,
@@ -65,6 +66,7 @@ export default function KelompokPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
 
   const [selectedGroup, setSelectedGroup] = useState<typeof state.groups[number] | null>(null)
   
@@ -161,11 +163,16 @@ export default function KelompokPage() {
     }
   }
 
-  async function handleDeleteGroup(id: number, name: string) {
-    if (!confirm(`Hapus kelompok "${name}"? Semua siswa di dalamnya akan kehilangan kelompok.`)) return
+  function handleDeleteGroup(id: number, name: string) {
+    setDeleteTarget({ id, name })
+  }
+
+  async function handleDeleteGroupConfirmed() {
+    if (!deleteTarget) return
     setSaving(true)
     try {
-      await deleteGroupAction(id)
+      await deleteGroupAction(deleteTarget.id)
+      setDeleteTarget(null)
       await refreshClasses()
       toast('Kelompok berhasil dihapus!')
     } catch (e: unknown) {
@@ -374,181 +381,203 @@ export default function KelompokPage() {
         </>
       )}
 
-      {/* Add Modal */}
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Buat Kelompok Baru">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Nama Kelompok / Halaqah <span className="text-destructive">*</span>
-            </label>
-            <Input
-              type="text"
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-              placeholder="Misal: Halaqah Abu Bakar, Kelompok A"
-              disabled={saving}
-            />
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleAddGroup} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan Kelompok'}
-          </Button>
-        </div>
-      </Modal>
-
-      {/* Edit Modal */}
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Kelompok">
-        {error && (
-          <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
-            {error}
-          </div>
-        )}
-        {selectedGroup && (
+      {/* Add Dialog */}
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Buat Kelompok Baru</DialogTitle>
+          </DialogHeader>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+              {error}
+            </div>
+          )}
           <div className="space-y-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Nama Kelompok <span className="text-destructive">*</span>
+                Nama Kelompok / Halaqah <span className="text-destructive">*</span>
               </label>
               <Input
                 type="text"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                placeholder="Misal: Halaqah Abu Bakar"
+                placeholder="Misal: Halaqah Abu Bakar, Kelompok A"
                 disabled={saving}
               />
             </div>
-
-            <div>
-              <label htmlFor="edit-class-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Kelas
-              </label>
-              <Combobox
-                id="edit-class-select"
-                options={classOptions}
-                value={selectedClassId === null ? '' : selectedClassId}
-                onChange={(val) => setSelectedClassId(val === '' ? null : Number(val))}
-                placeholder="Pilih Kelas..."
-                searchPlaceholder="Cari kelas..."
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Pilih Ustadz Pengampu
-              </label>
-              {Object.keys(allTeachers).length === 0 ? (
-                <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
-                  Tidak ada guru terdaftar.
-                </p>
-              ) : (
-                <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
-                  {Object.entries(allTeachers).map(([tid, name]) => (
-                    <label
-                      key={tid}
-                      className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedTeacherIds.includes(tid)}
-                        onChange={() => toggleTeacherSelection(tid)}
-                        className="rounded border-border text-primary focus:ring-primary w-4 h-4"
-                      />
-                      <span>{name}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
-        )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
+              Batal
+            </Button>
+            <Button onClick={handleAddGroup} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Simpan Kelompok'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-        <div className="mt-6 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
-            Batal
-          </Button>
-          <Button onClick={handleEditGroup} disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Perbarui Kelompok'}
-          </Button>
-        </div>
-      </Modal>
-
-      {/* Detail Modal */}
-      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Detail Kelompok">
-        {selectedGroup && (
-          <div className="space-y-4">
-            <div className="bg-background rounded-lg p-4 border border-border space-y-3">
+      {/* Edit Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Kelompok</DialogTitle>
+          </DialogHeader>
+          {error && (
+            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+              {error}
+            </div>
+          )}
+          {selectedGroup && (
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama Kelompok</label>
-                <div className="text-base font-bold text-foreground mt-0.5">{selectedGroup.name}</div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Nama Kelompok <span className="text-destructive">*</span>
+                </label>
+                <Input
+                  type="text"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  placeholder="Misal: Halaqah Abu Bakar"
+                  disabled={saving}
+                />
               </div>
-              
+
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Kelas</label>
-                <div className="text-sm font-semibold text-primary mt-0.5">
-                  {selectedGroup.class_name || state.classes.find(c => c.id === selectedGroup.class_id)?.name || (
-                    <span className="text-muted-foreground font-normal italic">Tanpa Kelas</span>
-                  )}
-                </div>
+                <label htmlFor="edit-class-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Kelas
+                </label>
+                <Combobox
+                  id="edit-class-select"
+                  options={classOptions}
+                  value={selectedClassId === null ? '' : selectedClassId}
+                  onChange={(val) => setSelectedClassId(val === '' ? null : Number(val))}
+                  placeholder="Pilih Kelas..."
+                  searchPlaceholder="Cari kelas..."
+                />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tanggal Dibuat</label>
-                <div className="text-xs font-medium text-muted-foreground mt-0.5">
-                  {new Date(selectedGroup.created_at).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </div>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Pilih Ustadz Pengampu
+                </label>
+                {Object.keys(allTeachers).length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
+                    Tidak ada guru terdaftar.
+                  </p>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2 bg-background">
+                    {Object.entries(allTeachers).map(([tid, name]) => (
+                      <label
+                        key={tid}
+                        className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedTeacherIds.includes(tid)}
+                          onChange={() => toggleTeacherSelection(tid)}
+                          className="rounded border-border text-primary focus:ring-primary w-4 h-4"
+                        />
+                        <span>{name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
+              Batal
+            </Button>
+            <Button onClick={handleEditGroup} disabled={saving}>
+              {saving ? 'Menyimpan...' : 'Perbarui Kelompok'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                Ustadz Pengampu
-              </label>
-              {state.groupTeachers.filter((gt) => gt.group_id === selectedGroup.id).length === 0 ? (
-                <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
-                  Belum ada ustadz ditugaskan ke kelompok ini.
-                </p>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  {state.groupTeachers
-                    .filter((gt) => gt.group_id === selectedGroup.id)
-                    .map((gt) => {
-                      const name = allTeachers[gt.teacher_id] || 'Ustadz'
-                      return (
-                        <div
-                          key={gt.id}
-                          className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-muted-foreground"
-                        >
-                          <User className="w-4 h-4 text-primary shrink-0" />
-                          <span className="truncate">{name}</span>
-                        </div>
-                      )
+      {/* Detail Dialog */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Detail Kelompok</DialogTitle>
+          </DialogHeader>
+          {selectedGroup && (
+            <div className="space-y-4">
+              <div className="bg-background rounded-lg p-4 border border-border space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama Kelompok</label>
+                  <div className="text-base font-bold text-foreground mt-0.5">{selectedGroup.name}</div>
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Kelas</label>
+                  <div className="text-sm font-semibold text-primary mt-0.5">
+                    {selectedGroup.class_name || state.classes.find(c => c.id === selectedGroup.class_id)?.name || (
+                      <span className="text-muted-foreground font-normal italic">Tanpa Kelas</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tanggal Dibuat</label>
+                  <div className="text-xs font-medium text-muted-foreground mt-0.5">
+                    {new Date(selectedGroup.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
                     })}
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            <div className="mt-6 flex justify-end">
-              <Button onClick={() => setDetailOpen(false)}>
-                Tutup
-              </Button>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Ustadz Pengampu
+                </label>
+                {state.groupTeachers.filter((gt) => gt.group_id === selectedGroup.id).length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic bg-background p-3 rounded-lg border border-border">
+                    Belum ada ustadz ditugaskan ke kelompok ini.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {state.groupTeachers
+                      .filter((gt) => gt.group_id === selectedGroup.id)
+                      .map((gt) => {
+                        const name = allTeachers[gt.teacher_id] || 'Ustadz'
+                        return (
+                          <div
+                            key={gt.id}
+                            className="flex items-center gap-2 p-2.5 rounded-lg border border-border/50 bg-background text-sm font-medium text-muted-foreground"
+                          >
+                            <User className="w-4 h-4 text-primary shrink-0" />
+                            <span className="truncate">{name}</span>
+                          </div>
+                        )
+                      })}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </Modal>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setDetailOpen(false)}>
+              Tutup
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        title="Hapus Kelompok?"
+        description={`Hapus kelompok "${deleteTarget?.name}"? Semua siswa di dalamnya akan kehilangan kelompok.`}
+        confirmText="Hapus"
+        onConfirm={handleDeleteGroupConfirmed}
+      />
     </div>
   )
 }

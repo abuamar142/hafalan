@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { useToast } from '@/components/ui/Toast'
 import { ArrowLeft, Trash2, CheckCircle2, RotateCcw, Circle } from 'lucide-react'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 export default function ProfilPage({
   params,
@@ -37,6 +38,7 @@ export default function ProfilPage({
   const [studentId, setStudentId] = useState<number | null>(null)
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
   const [toggling] = useState(false)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 
   // Unwrap async params
   useEffect(() => {
@@ -119,9 +121,13 @@ export default function ProfilPage({
     }
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     if (!student || studentId == null) return
-    if (!confirm(`Hapus santri "${student.nama}"? Semua data terkait akan dihapus.`)) return
+    setDeleteConfirmOpen(true)
+  }
+
+  async function handleDeleteConfirmed() {
+    if (!student || studentId == null) return
     try {
       await deleteStudentAction(studentId)
       await refreshStudents()
@@ -159,6 +165,7 @@ export default function ProfilPage({
     : 0
 
   return (
+    <>
     <div className="max-w-4xl pb-10">
       {/* Back button */}
       <Button
@@ -377,5 +384,15 @@ export default function ProfilPage({
         </div>
       )}
     </div>
+
+    <ConfirmDialog
+      open={deleteConfirmOpen}
+      onOpenChange={setDeleteConfirmOpen}
+      title="Hapus Santri?"
+      description={`Hapus santri "${student?.nama}"? Semua data terkait akan dihapus.`}
+      confirmText="Hapus"
+      onConfirm={handleDeleteConfirmed}
+    />
+    </>
   )
 }
