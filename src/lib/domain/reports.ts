@@ -311,3 +311,161 @@ export function generateIndividualReport(
         </div>
       </div>`
 }
+
+// ── Development Report ──
+
+export interface DevelopmentReportInput {
+  students: SantriWithCount[]
+  fullMemorization: Record<number, Record<number, number>>
+}
+
+/**
+ * Generate HTML for the development (perkembangan) report —
+ * a pivot table showing how many students per class have completed each Juz.
+ */
+export function generateDevelopmentReport(
+  input: DevelopmentReportInput,
+): string {
+  const { students, fullMemorization } = input
+
+  // 1. Group students by kelas
+  const classMap = new Map<string, SantriWithCount[]>()
+  for (const s of students) {
+    const kelas = s.kelas || 'Tanpa Kelas'
+    if (!classMap.has(kelas)) classMap.set(kelas, [])
+    classMap.get(kelas)!.push(s)
+  }
+
+  // 2. For each student, determine which Juz are 100 % complete
+  //    studentJuzSet: student id → Set of juz numbers at 100 %
+  const studentJuzSet = new Map<number, Set<number>>()
+  for (const s of students) {
+    const hf = fullMemorization[s.id] || {}
+    const juzSet = new Set<number>()
+    for (let j = 1; j <= 30; j++) {
+      if (getJuzSurahsFromHafalan(hf, j) === 100) juzSet.add(j)
+    }
+    studentJuzSet.set(s.id, juzSet)
+  }
+
+  // 3. Find Juz columns that have ≥ 1 student anywhere
+  const allUsedJuz = new Set<number>()
+  for (const juzSet of Array.from(studentJuzSet.values())) {
+    for (const j of Array.from(juzSet)) allUsedJuz.add(j)
+  }
+  const juzColumns = Array.from(allUsedJuz).sort((a, b) => a - b)
+
+  // 4. Sort class rows alphabetically
+  const sortedClasses = Array.from(classMap.keys()).sort((a, b) => a.localeCompare(b, 'id'))
+
+  // 5. Build pivot data: class → juz → count
+  const pivotData = new Map<string, Map<number, number>>()
+  for (const kelas of sortedClasses) {
+    const juzCounts = new Map<number, number>()
+    for (const j of juzColumns) juzCounts.set(j, 0)
+      for (const s of classMap.get(kelas)!) {
+      const juzSet = studentJuzSet.get(s.id)!
+      for (const j of Array.from(juzSet)) {
+        if (juzCounts.has(j)) juzCounts.set(j, juzCounts.get(j)! + 1)
+      }
+    }
+    pivotData.set(kelas, juzCounts)
+  }
+
+  // 6. Compute totals
+  const juzTotals = new Map<number, number>()
+  for (const j of juzColumns) juzTotals.set(j, 0)
+  let grandTotal = 0
+  for (const kelas of sortedClasses) {
+    const juzCounts = pivotData.get(kelas)!
+    for (const j of juzColumns) {
+      const c = juzCounts.get(j)!
+      juzTotals.set(j, juzTotals.get(j)! + c)
+      grandTotal += c
+    }
+  }
+
+  // 7. Header / metadata
+  const now = new Date()
+  const bulan = now.toLocaleDateString('id-ID', { month: 'long' })
+  const year = now.getFullYear()
+  const monthIdx = now.getMonth() + 1 // 1-12
+  const tahunAjaran =
+    monthIdx >= 7 ? `${year}/${year + 1}` : `${year - 1}/${year}`
+  const totalCols = 1 + juzColumns.length + 1 // Kelas + juz + Jml. Siswa
+
+  // 8. Build HTML
+  const monthHeaderRow = `
+      <tr style="background:#F1EFE8">
+        <th colspan="${totalCols}" style="padding:8px;font-weight:600">${escapeHtml(bulan)}</th>
+      </tr>`
+
+  const subHeaderCells = [
+    `<th style="padding:8px;font-weight:600;text-align:left;border-right:1px solid #e5e5e5">Kelas</th>`,
+    ...juzColumns.map(
+      (j) =>
+        `<th style="padding:8px;font-weight:600;border-right:1px solid #e5e5e5">${j}</th>`,
+    ),
+    `<th style="padding:8px;font-weight:600;border-left:1px solid #e5e5e5">Jml. Siswa</th>`,
+  ].join('\n        ')
+  const subHeaderRow = `
+      <tr style="background:#F1EFE8">
+        ${subHeaderCells}
+      </tr>`
+
+  const dataRows = sortedClasses
+    .map((kelas) => {
+      const juzCounts = pivotData.get(kelas)!
+      const kelasTotal = juzColumns.reduce(
+        (sum, j) => sum + (juzCounts.get(j) || 0),
+        0,
+      )
+      const cells = juzColumns
+        .map((j) => {
+          const c = juzCounts.get(j)!
+          return `<td style="padding:8px;border-bottom:1px solid #e5e5e5;border-right:1px solid #e5e5e5">${c === 0 ? '' : c}</td>`
+        })
+        .join('\n          ')
+      return `
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #e5e5e5;text-align:left;font-weight:500;border-right:1px solid #e5e5e5">${escapeHtml(kelas)}</td>
+          ${cells}
+          <td style="padding:8px;border-bottom:1px solid #e5e5e5;font-weight:500;border-left:1px solid #e5e5e5">${kelasTotal}</td>
+        </tr>`
+    })
+    .join('')
+
+  const footerCells = juzColumns
+    .map(
+      (j) =>
+        `<td style="padding:8px;border-right:1px solid #e5e5e5">${juzTotals.get(j) || 0}</td>`,
+    )
+    .join('\n        ')
+  const footerRow = `
+      <tr style="background:#F1EFE8;font-weight:600">
+        <td style="padding:8px 12px;border-right:1px solid #e5e5e5">Jml</td>
+        ${footerCells}
+        <td style="padding:8px;border-left:1px solid #e5e5e5">${grandTotal}</td>
+      </tr>`
+
+  return `
+<div style="font-family:system-ui,sans-serif;color:#2C2C2A;max-width:900px;margin:0 auto">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:18px;font-weight:700">SMA Islam Bunga Bangsa</div>
+    <div style="font-size:14px;color:#5F5E5A;margin-top:4px">Rekap Hasil Perkembangan Tahfidz</div>
+    <div style="font-size:13px;color:#5F5E5A;margin-top:2px">Siswa dan Siswi SMA Islam Bunga Bangsa</div>
+    <div style="font-size:12px;color:#888780;margin-top:2px">${escapeHtml(tahunAjaran)}</div>
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;font-size:13px;text-align:center">
+    <thead>
+      ${monthHeaderRow}
+      ${subHeaderRow}
+    </thead>
+    <tbody>
+      ${dataRows}
+      ${footerRow}
+    </tbody>
+  </table>
+</div>`
+}

@@ -13,7 +13,7 @@ import { computeRanking } from '@/lib/domain/statistics'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
-import { FileText, Printer, Users, User } from 'lucide-react'
+import { FileText, Printer, Users, User, BarChart3 } from 'lucide-react'
 
 export default function LaporanPage() {
   const { state } = useDashboard()
@@ -136,6 +136,25 @@ export default function LaporanPage() {
     }
   }
 
+  // ── Development Report ──
+  async function cetakPerkembangan() {
+    setIsGenerating(true)
+    try {
+      const fullSantri = await fetchAllMemorization()
+
+      const { generateDevelopmentReport } = await import('@/lib/domain/reports')
+      const html = generateDevelopmentReport({
+        students: sorted,
+        fullMemorization: fullSantri,
+      })
+
+      setPrintHtml(html)
+      setTimeout(() => window.print(), 400)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   return (
     <div className="max-w-5xl">
       {/* Title */}
@@ -145,7 +164,7 @@ export default function LaporanPage() {
       </div>
 
       {/* Report options */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Collective */}
         <Card className="border-border/40 shadow-sm flex flex-col">
           <CardHeader className="pb-4 border-b border-border/30">
@@ -211,6 +230,34 @@ export default function LaporanPage() {
             >
               <FileText className="w-4 h-4" />
               {isGenerating ? 'Menyiapkan...' : 'Cetak Rapor Santri'}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Perkembangan Tahfidz */}
+        <Card className="border-border/40 shadow-sm flex flex-col">
+          <CardHeader className="pb-4 border-b border-border/30">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 p-2.5 rounded-lg text-primary">
+                <BarChart3 className="w-5 h-5" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Perkembangan Tahfidz</CardTitle>
+                <CardDescription className="text-[13px] mt-0.5">Rekap level juz per kelas</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6 flex-1 flex flex-col justify-between gap-6">
+            <div className="text-sm text-muted-foreground leading-relaxed bg-card border border-border/50 rounded-lg p-4">
+              Laporan ini menampilkan rekapitulasi pencapaian level juz untuk setiap kelas. Berguna untuk melihat distribusi hafalan santri secara keseluruhan.
+            </div>
+            <Button 
+              onClick={cetakPerkembangan}
+              disabled={isGenerating}
+              className="w-full gap-2 shadow-sm"
+            >
+              <Printer className="w-4 h-4" />
+              {isGenerating ? 'Menyiapkan...' : 'Cetak Rekap Perkembangan'}
             </Button>
           </CardContent>
         </Card>
