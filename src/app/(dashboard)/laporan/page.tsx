@@ -12,7 +12,7 @@ import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Button } from '@/components/ui/button'
-import { Combobox } from '@/components/ui/Combobox'
+import { Combobox } from '@/components/ui/combobox'
 import { FileText, Printer, Users, User } from 'lucide-react'
 
 export default function LaporanPage() {

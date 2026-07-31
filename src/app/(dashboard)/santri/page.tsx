@@ -28,7 +28,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import { Combobox } from '@/components/ui/Combobox'
+import { Combobox } from '@/components/ui/combobox'
 import { useToast } from '@/components/ui/Toast'
 import {
   Plus,

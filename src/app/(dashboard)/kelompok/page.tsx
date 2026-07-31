@@ -22,7 +22,7 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from '@/components/ui/pagination'
-import { Combobox } from '@/components/ui/Combobox'
+import { Combobox } from '@/components/ui/combobox'
 import { useToast } from '@/components/ui/Toast'
 import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
 

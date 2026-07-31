@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Save, BookOpen, History } from 'lucide-react'
 import { getColor, initials, getPct, getTotalHafal, formatWaktu, getSurahNama } from '@/lib/helpers'
-import { Combobox } from '@/components/ui/Combobox'
+import { Combobox } from '@/components/ui/combobox'
 import { useToast } from '@/components/ui/Toast'
 
 function toLocalDatetimeString(d: Date) {
