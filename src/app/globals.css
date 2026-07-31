@@ -146,12 +146,13 @@
   border-radius: 12px;
 }
 
-/* ── Print (window.open handles main print; this is fallback) ── */
+/* ── Print (window.open handles laporan; this covers raport + fallback) ── */
 @media print {
-  body > *:not(#print-area):not(#print-area *):not(script):not(style) {
+  body > *:not(#print-area):not(#raport-print-area):not(#print-area *):not(#raport-print-area *):not(script):not(style) {
     display: none !important;
   }
-  #print-area {
+  #print-area,
+  #raport-print-area {
     background: white !important;
     color: #2C2C2A !important;
     padding: 0 !important;
