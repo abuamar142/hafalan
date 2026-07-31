@@ -7,7 +7,6 @@ import {
   deleteClassAction,
   updateClassAction,
 } from '@/lib/actions/classes'
-import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
@@ -219,92 +218,89 @@ export default function KelasPage() {
       </div>
 
       {/* Main Table */}
-      <Card className="border-border/40 shadow-sm overflow-hidden bg-card">
-        <CardContent className="p-0">
-          {state.classes.length === 0 ? (
-            <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
-              Belum ada kelas yang didaftarkan.
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
-              Tidak ada kelas yang sesuai dengan pencarian.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    <TableHead className="py-3.5 px-4 w-16 text-center">No</TableHead>
-                    <TableHead className="py-3.5 px-4">Nama Kelas</TableHead>
-                    <TableHead className="py-3.5 px-4">Kelompok di Dalamnya</TableHead>
-                    <TableHead className="py-3.5 px-4 w-40 text-center">Aksi</TableHead>
+      {state.classes.length === 0 ? (
+        <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
+          Belum ada kelas yang didaftarkan.
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
+          Tidak ada kelas yang sesuai dengan pencarian.
+        </div>
+      ) : (
+        <>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <TableHead className="py-3.5 px-4 w-16 text-center">No</TableHead>
+                <TableHead className="py-3.5 px-4">Nama Kelas</TableHead>
+                <TableHead className="py-3.5 px-4">Kelompok di Dalamnya</TableHead>
+                <TableHead className="py-3.5 px-4 w-40 text-center">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-border/30 text-sm">
+              {paginated.map((c, index) => {
+                const groups = state.groups.filter((g) => g.class_id === c.id)
+                return (
+                  <TableRow key={c.id} className="hover:bg-card/30 transition-colors">
+                    <TableCell className="py-3.5 px-4 text-center font-medium text-muted-foreground">
+                      {(page - 1) * ITEMS_PER_PAGE + index + 1}
+                    </TableCell>
+                    <TableCell className="py-3.5 px-4 font-semibold text-foreground">
+                      {c.name}
+                    </TableCell>
+                    <TableCell className="py-3.5 px-4">
+                      {groups.length === 0 ? (
+                        <span className="text-xs text-muted-foreground italic">Tidak ada kelompok</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1.5">
+                          {groups.map((g) => (
+                            <span
+                              key={g.id}
+                              className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+                            >
+                              {g.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="py-3.5 px-4 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openDetailModal(c)}
+                          className="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-card rounded-lg"
+                          title="Detail"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openEditModal(c)}
+                          className="h-8.5 w-8.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
+                          title="Edit"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteClass(c.id, c.name)}
+                          className="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                          title="Hapus"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody className="divide-y divide-border/30 text-sm">
-                  {paginated.map((c, index) => {
-                    const groups = state.groups.filter((g) => g.class_id === c.id)
-                    return (
-                      <TableRow key={c.id} className="hover:bg-card/30 transition-colors">
-                        <TableCell className="py-3.5 px-4 text-center font-medium text-muted-foreground">
-                          {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                        </TableCell>
-                        <TableCell className="py-3.5 px-4 font-semibold text-foreground">
-                          {c.name}
-                        </TableCell>
-                        <TableCell className="py-3.5 px-4">
-                          {groups.length === 0 ? (
-                            <span className="text-xs text-muted-foreground italic">Tidak ada kelompok</span>
-                          ) : (
-                            <div className="flex flex-wrap gap-1.5">
-                              {groups.map((g) => (
-                                <span
-                                  key={g.id}
-                                  className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20"
-                                >
-                                  {g.name}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell className="py-3.5 px-4 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openDetailModal(c)}
-                              className="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-card rounded-lg"
-                              title="Detail"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openEditModal(c)}
-                              className="h-8.5 w-8.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
-                              title="Edit"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteClass(c.id, c.name)}
-                              className="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
-                              title="Hapus"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+                )
+              })}
+            </TableBody>
+          </Table>
+
           {totalPages > 1 && (
             <Pagination className="mt-4">
               <PaginationContent>
@@ -340,8 +336,8 @@ export default function KelasPage() {
               </PaginationContent>
             </Pagination>
           )}
-        </CardContent>
-      </Card>
+        </>
+      )}
 
       {/* Add Modal */}
       <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Tambah Kelas Baru">
