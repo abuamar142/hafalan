@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { useDashboard } from '../../layout'
 import { getSurahNama, formatWaktu } from '@/lib/helpers'
 import type { SetoranItem } from '@/lib/types'
+import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { Edit } from 'lucide-react'
@@ -208,13 +209,14 @@ export default function RiwayatSetoranPage() {
               {/* Right: nilai, ustadz, tanggal, edit */}
               <div className="mt-3 flex flex-row items-center gap-3 sm:mt-0 sm:flex-col sm:items-end sm:gap-1.5 shrink-0">
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
                     onClick={() => setEditingSubmission(item)}
-                    className="p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded transition-colors cursor-pointer"
                     title="Edit Setoran"
                   >
                     <Edit className="w-3.5 h-3.5" />
-                  </button>
+                  </Button>
                   <span className="shrink-0 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[11px] font-bold text-primary animate-in fade-in">
                     {item.nilai}
                   </span>
@@ -236,33 +238,35 @@ export default function RiwayatSetoranPage() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-6 flex items-center justify-center gap-2">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safePage <= 1}
-            className="rounded-md border border-border bg-card px-3 py-1.5 text-[13px] text-muted-foreground hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
           >
             Sebelumnya
-          </button>
+          </Button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
+            <Button
               key={p}
+              variant={p === safePage ? 'default' : 'ghost'}
+              size="sm"
               onClick={() => setPage(p)}
-              className={`min-w-[32px] rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors cursor-pointer ${
-                p === safePage
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-muted-foreground hover:bg-card border border-transparent hover:border-border/50'
+              className={`min-w-[32px] px-2 ${
+                p !== safePage ? 'border border-transparent hover:border-border/50' : ''
               }`}
             >
               {p}
-            </button>
+            </Button>
           ))}
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={safePage >= totalPages}
-            className="rounded-md border border-border bg-card px-3 py-1.5 text-[13px] text-muted-foreground hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 transition-colors cursor-pointer"
           >
             Selanjutnya
-          </button>
+          </Button>
         </div>
       )}
 

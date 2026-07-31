@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Combobox } from '@/components/ui/combobox'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast-wrapper'
 import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { updateSubmissionAction } from '@/lib/actions/submissions'
@@ -241,13 +242,13 @@ export default function EditSubmissionModal({
               <label htmlFor="edit-modal-catatan" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                 Catatan (Opsional)
               </label>
-              <textarea
+              <Textarea
                 id="edit-modal-catatan"
                 value={catatan}
                 onChange={(e) => setCatatan(e.target.value)}
                 placeholder="Evaluasi tajwid atau kelancaran..."
                 rows={3}
-                className="flex w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors resize-none text-foreground focus:border-primary font-sans"
+                className="resize-none"
               />
             </div>
 

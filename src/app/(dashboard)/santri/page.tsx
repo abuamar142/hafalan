@@ -620,11 +620,12 @@ export default function SantriPage() {
                         {juzSurahs.map((s) => {
                           const status = hafalan[s.no] || 0
                           return (
-                            <button
+                            <Button
+                              variant="ghost"
                               key={s.no}
                               onClick={() => toggleSurah(s.no)}
                               disabled={toggling}
-                              className="group flex w-full items-center gap-3 rounded-lg p-2 text-left border border-transparent hover:bg-card hover:border-border/40 disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+                              className="group flex w-full items-center gap-3 p-2 text-left border border-transparent hover:bg-card hover:border-border/40 justify-start"
                             >
                               <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
                                 status === 1 ? 'bg-primary/10 text-primary border border-primary/20' : 
@@ -648,7 +649,7 @@ export default function SantriPage() {
                               <div className="shrink-0 text-sm text-muted-foreground font-arabic pr-1 opacity-50 group-hover:opacity-100 transition-opacity">
                                 {s.arab}
                               </div>
-                            </button>
+                            </Button>
                           )
                         })}
                       </div>
@@ -664,10 +665,10 @@ export default function SantriPage() {
                           const j = i + 1
                            const p = juzPcts[i] ?? 0
                           return (
-                            <button
+                            <Button
                               key={j}
                               onClick={() => setSelectedJuz(j)}
-                              className={`group relative flex flex-col items-center justify-center rounded-lg p-2 text-center transition-all hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                              className={`group relative flex flex-col items-center justify-center p-2 text-center hover:-translate-y-0.5 justify-center ${
                                 p === 100
                                   ? 'bg-primary text-white shadow-sm shadow-primary/20'
                                   : p > 0
@@ -684,7 +685,7 @@ export default function SantriPage() {
                                   <CheckCircle2 className="w-2.5 h-2.5 text-white/70" />
                                 </div>
                               )}
-                            </button>
+                            </Button>
                           )
                         })}
                       </div>

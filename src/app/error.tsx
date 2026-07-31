@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { Button } from '@/components/ui/button'
 
 export default function ErrorPage({
   error,
@@ -39,12 +40,12 @@ export default function ErrorPage({
           </p>
         </div>
         <div>
-          <button
+          <Button
             onClick={() => reset()}
-            className="w-full bg-primary hover:bg-primary/95 text-white font-medium text-sm py-2.5 px-4 rounded-lg shadow-sm transition-all"
+            className="w-full"
           >
             Coba Lagi
-          </button>
+          </Button>
         </div>
       </div>
     </div>

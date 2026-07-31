@@ -7,6 +7,7 @@ import { SidebarInset } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/app-sidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { useAppState, QK } from '@/hooks/useAppState'
 import { createClient } from '@/lib/supabase/client'
 import type { SantriWithCount, Memorization } from '@/lib/types'
@@ -116,12 +117,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             <label className="mb-1.5 block text-xs text-muted-foreground">
               Nama Ustadz / Guru
             </label>
-            <input
+            <Input
               type="text"
               value={guruInput}
               onChange={(e) => setGuruInput(e.target.value)}
               placeholder="Ustadz Ahmad..."
-              className="w-full rounded-md border-[1.5px] border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
             />
           </div>
           <div className="mt-3.5 flex justify-end">

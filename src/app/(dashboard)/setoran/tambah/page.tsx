@@ -6,6 +6,7 @@ import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { addSubmissionAction } from '@/lib/actions/submissions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Save, BookOpen, History } from 'lucide-react'
 import { getColor, initials, getPct, getTotalHafal, formatWaktu, getSurahNama } from '@/lib/helpers'
@@ -191,16 +192,17 @@ export default function TambahSetoranPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-semibold text-muted-foreground">Rentang Ayat</label>
-                        <button
+                        <Button
+                          variant="link"
+                          size="sm"
                           type="button"
                           onClick={() => {
                             setAyatStart(1)
                             setAyatEnd(selectedSurah.ayat)
                           }}
-                          className="text-xs font-medium text-primary hover:underline cursor-pointer"
                         >
                           Set Semua Ayat (1 - {selectedSurah.ayat})
-                        </button>
+                        </Button>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex-1">
@@ -242,18 +244,19 @@ export default function TambahSetoranPage() {
                     {NILAI_OPTIONS.map((n) => {
                       const isSelected = nilai === n
                       return (
-                        <button
+                        <Button
                           key={n}
+                          variant={isSelected ? 'default' : 'outline'}
                           type="button"
                           onClick={() => setNilai(n)}
-                          className={`px-3 py-2.5 rounded-md text-xs font-semibold border transition-all text-center cursor-pointer ${
+                          className={`px-3 py-2.5 text-xs font-semibold text-center justify-center ${
                             isSelected
-                              ? 'bg-primary border-primary text-white shadow-sm ring-2 ring-primary/20'
-                              : 'border-border bg-card text-muted-foreground hover:bg-card/65'
+                              ? 'shadow-sm ring-2 ring-primary/20'
+                              : ''
                           }`}
                         >
                           {n}
-                        </button>
+                        </Button>
                       )
                     })}
                   </div>
@@ -273,13 +276,12 @@ export default function TambahSetoranPage() {
                 {/* Catatan */}
                 <div className="space-y-1.5 md:col-span-2">
                   <label htmlFor="catatan-textarea" className="block text-sm font-medium text-muted-foreground">Catatan (Opsional)</label>
-                  <textarea
+                  <Textarea
                     id="catatan-textarea"
                     value={catatan}
                     onChange={(e) => setCatatan(e.target.value)}
                     placeholder="Tuliskan evaluasi tajwid atau kelancaran..."
                     rows={3}
-                    className="flex w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors resize-none text-foreground focus:border-primary font-sans"
                   />
                 </div>
 

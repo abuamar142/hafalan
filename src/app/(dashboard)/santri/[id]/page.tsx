@@ -248,11 +248,12 @@ export default function ProfilPage({
               {juzSurahs.map((s) => {
                 const status = hafalan[s.no] || 0
                 return (
-                  <button
+                  <Button
+                    variant="ghost"
                     key={s.no}
                     onClick={() => toggleSurah(s.no)}
                     disabled={toggling}
-                    className="group flex w-full items-center gap-4 rounded-md p-3 text-left transition-all hover:bg-card border border-transparent hover:border-border/50 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    className="group flex w-full items-center gap-4 p-3 text-left hover:bg-card border border-transparent hover:border-border/50 justify-start"
                   >
                     {/* Status Toggle */}
                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
@@ -281,7 +282,7 @@ export default function ProfilPage({
                     <div className="shrink-0 text-xl text-muted-foreground font-arabic pr-2 opacity-60 group-hover:opacity-100 transition-opacity">
                       {s.arab}
                     </div>
-                  </button>
+                  </Button>
                 )
               })}
             </div>
@@ -299,15 +300,15 @@ export default function ProfilPage({
                 const j = i + 1
                 const p = juzPcts[i] ?? 0
                 return (
-                  <button
+                  <Button
                     key={j}
                     onClick={() => setSelectedJuz(j)}
-                    className={`group relative flex flex-col items-center justify-center rounded-[var(--radius)] p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                    className={`group relative flex flex-col items-center justify-center p-3 text-center hover:-translate-y-0.5 justify-center ${
                       p === 100
-                        ? 'bg-primary text-white shadow-md shadow-primary/20 hover:bg-primary/90 hover:-translate-y-0.5'
+                        ? 'bg-primary text-white shadow-md shadow-primary/20 hover:bg-primary/90'
                         : p > 0
-                          ? 'bg-accent/10 text-accent border border-accent/20 hover:bg-accent/15 hover:-translate-y-0.5'
-                          : 'bg-card border border-border text-muted-foreground hover:border-text-muted/30 hover:text-muted-foreground hover:-translate-y-0.5'
+                          ? 'bg-accent/10 text-accent border border-accent/20 hover:bg-accent/15'
+                          : 'bg-card border border-border text-muted-foreground hover:border-text-muted/30 hover:text-muted-foreground'
                     }`}
                   >
                     <div className="text-[15px] font-bold">{j}</div>
@@ -319,8 +320,8 @@ export default function ProfilPage({
                         <CheckCircle2 className="w-3 h-3 text-white/70" />
                       </div>
                     )}
-                  </button>
-                )
+                    </Button>
+                  )
               })}
             </div>
           </div>
