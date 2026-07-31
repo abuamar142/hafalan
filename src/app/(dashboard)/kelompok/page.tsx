@@ -12,7 +12,15 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Modal from '@/components/Modal'
-import Pagination from '@/components/Pagination'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from '@/components/ui/pagination'
 import { Combobox } from '@/components/ui/Combobox'
 import { useToast } from '@/components/ui/Toast'
 import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
@@ -176,6 +184,22 @@ export default function KelompokPage() {
     )
   }
 
+  function getPageNumbers(): (number | 'ellipsis')[] {
+    const pages: (number | 'ellipsis')[] = []
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i)
+      return pages
+    }
+    pages.push(1)
+    if (page > 3) pages.push('ellipsis')
+    const start = Math.max(2, page - 1)
+    const end = Math.min(totalPages - 1, page + 1)
+    for (let i = start; i <= end; i++) pages.push(i)
+    if (page < totalPages - 2) pages.push('ellipsis')
+    pages.push(totalPages)
+    return pages
+  }
+
   return (
     <div className="max-w-6xl pb-10">
       {/* Top Header */}
@@ -315,11 +339,41 @@ export default function KelompokPage() {
               </table>
             </div>
           )}
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
+          {totalPages > 1 && (
+            <Pagination className="mt-4">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={(e) => { e.preventDefault(); if (page > 1) setPage(page - 1) }}
+                    className={page === 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                {getPageNumbers().map((p, i) =>
+                  p === 'ellipsis' ? (
+                    <PaginationItem key={`e-${i}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={p}>
+                      <PaginationLink
+                        isActive={p === page}
+                        onClick={(e) => { e.preventDefault(); setPage(p) }}
+                        className="cursor-pointer"
+                      >
+                        {p}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={(e) => { e.preventDefault(); if (page < totalPages) setPage(page + 1) }}
+                    className={page === totalPages ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
         </CardContent>
       </Card>
 

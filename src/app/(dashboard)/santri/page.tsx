@@ -13,11 +13,21 @@ import {
   formatWaktu,
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
-import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from '@/components/ui/pagination'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import Modal from '@/components/Modal'
-import Pagination from '@/components/Pagination'
 import { Combobox } from '@/components/ui/Combobox'
 import { useToast } from '@/components/ui/Toast'
 import {
@@ -237,6 +247,32 @@ export default function SantriPage() {
     ? juzSurahs.filter((s) => hafalan[s.no] === 1).length
     : 0
 
+  function getPageNumbers(): (number | 'ellipsis')[] {
+    const pages: (number | 'ellipsis')[] = []
+
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i)
+      return pages
+    }
+
+    pages.push(1)
+
+    if (page > 3) pages.push('ellipsis')
+
+    const start = Math.max(2, page - 1)
+    const end = Math.min(totalPages - 1, page + 1)
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i)
+    }
+
+    if (page < totalPages - 2) pages.push('ellipsis')
+
+    pages.push(totalPages)
+
+    return pages
+  }
+
   return (
     <div className="max-w-6xl pb-10">
       {/* Top Bar */}
@@ -271,119 +307,153 @@ export default function SantriPage() {
       </div>
 
       {/* Main Table */}
-      <Card className="border-border/40 shadow-sm overflow-hidden bg-surface">
-        <CardContent className="p-0">
-          {state.students.length === 0 ? (
-            <div className="py-16 text-center text-sm text-text-muted border-dashed">
-              Belum ada siswa yang didaftarkan.
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="py-16 text-center text-sm text-text-muted border-dashed">
-              Tidak ada siswa yang sesuai dengan pencarian.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
-                    <th className="py-3.5 px-4 w-16 text-center">No</th>
-                    <th className="py-3.5 px-4">Nama Siswa</th>
-                    <th className="py-3.5 px-4">Kelompok</th>
-                    <th className="py-3.5 px-4">Kelas</th>
-                    <th className="py-3.5 px-4 text-center">Progress</th>
-                    <th className="py-3.5 px-4 w-44 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/30 text-sm">
-                  {paginated.map((s, index) => {
-                    const group = state.groups.find((g) => g.id === s.group_id)
-                    const groupName = group?.name || 'Tanpa Kelompok'
-                    const className = group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
-                    const p = getPct(s)
+      {state.students.length === 0 ? (
+        <div className="py-16 text-center text-sm text-text-muted border-dashed">
+          Belum ada siswa yang didaftarkan.
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="py-16 text-center text-sm text-text-muted border-dashed">
+          Tidak ada siswa yang sesuai dengan pencarian.
+        </div>
+      ) : (
+        <>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-text-secondary uppercase tracking-wider">
+                <TableHead className="py-3.5 px-4 w-16 text-center">No</TableHead>
+                <TableHead className="py-3.5 px-4">Nama Siswa</TableHead>
+                <TableHead className="py-3.5 px-4">Kelompok</TableHead>
+                <TableHead className="py-3.5 px-4">Kelas</TableHead>
+                <TableHead className="py-3.5 px-4 text-center">Progress</TableHead>
+                <TableHead className="py-3.5 px-4 w-44 text-center">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-border/30 text-sm">
+              {paginated.map((s, index) => {
+                const group = state.groups.find((g) => g.id === s.group_id)
+                const groupName = group?.name || 'Tanpa Kelompok'
+                const className = group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
+                const p = getPct(s)
 
-                    return (
-                      <tr key={s.id} className="hover:bg-card/30 transition-colors">
-                        <td className="py-3.5 px-4 text-center font-medium text-text-muted">
-                          {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                        </td>
-                        <td className="py-3.5 px-4 font-semibold text-text">
-                          {s.nama}
-                        </td>
-                        <td className="py-3.5 px-4 text-text-secondary font-medium">
-                          {groupName !== 'Tanpa Kelompok' ? (
-                            <span className="inline-flex items-center gap-1.5">
-                              <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
-                              {groupName}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-text-muted italic">{groupName}</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-text-secondary font-medium">
-                          {className !== 'Tanpa Kelas' ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                              {className}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-text-muted italic">{className}</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center justify-center gap-3 max-w-[120px] mx-auto">
-                            <span className="text-xs font-bold text-text-secondary w-9 text-right">{p}%</span>
-                            <div className="flex-1 h-2 bg-border/40 rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full bg-primary transition-all duration-500"
-                                style={{ width: `${p}%` }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openDetailModal(s)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
-                              title="Progres Hafalan"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openEditModal(s)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
-                              title="Edit"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDelete(s.id, s.nama)}
-                              className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
-                              title="Hapus"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                return (
+                  <TableRow key={s.id} className="hover:bg-card/30 transition-colors">
+                    <TableCell className="py-3.5 px-4 text-center font-medium text-text-muted">
+                      {(page - 1) * ITEMS_PER_PAGE + index + 1}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2.5">
+                        <Avatar size="sm">
+                          <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                            {s.nama?.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-semibold text-text">{s.nama}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3.5 px-4 text-text-secondary font-medium">
+                      {groupName !== 'Tanpa Kelompok' ? (
+                        <Badge variant="secondary" className="gap-1.5 font-medium">
+                          <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
+                          {groupName}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-text-muted italic">{groupName}</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="py-3.5 px-4 text-text-secondary font-medium">
+                      {className !== 'Tanpa Kelas' ? (
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
+                          {className}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-text-muted italic">{className}</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="py-3.5 px-4">
+                      <div className="flex items-center justify-center gap-3 max-w-[120px] mx-auto">
+                        <span className="text-xs font-bold text-text-secondary w-9 text-right">{p}%</span>
+                        <div className="flex-1 h-2 bg-border/40 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-primary transition-all duration-500"
+                            style={{ width: `${p}%` }}
+                          />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3.5 px-4 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openDetailModal(s)}
+                          className="h-8.5 w-8.5 text-text-muted hover:text-text hover:bg-card rounded-lg"
+                          title="Progres Hafalan"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openEditModal(s)}
+                          className="h-8.5 w-8.5 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg"
+                          title="Edit"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(s.id, s.nama)}
+                          className="h-8.5 w-8.5 text-text-muted hover:text-red hover:bg-red/10 rounded-lg"
+                          title="Hapus"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+
+          {totalPages > 1 && (
+            <Pagination className="mt-4">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={(e: React.MouseEvent) => { e.preventDefault(); if (page > 1) setPage(page - 1) }}
+                    className={page === 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                {getPageNumbers().map((p, i) =>
+                  p === 'ellipsis' ? (
+                    <PaginationItem key={`e-${i}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={p}>
+                      <PaginationLink
+                        isActive={p === page}
+                        onClick={(e: React.MouseEvent) => { e.preventDefault(); setPage(p) }}
+                        className="cursor-pointer"
+                      >
+                        {p}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={(e: React.MouseEvent) => { e.preventDefault(); if (page < totalPages) setPage(page + 1) }}
+                    className={page === totalPages ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           )}
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-        </CardContent>
-      </Card>
+        </>
+      )}
 
       {/* Add Modal */}
       <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Tambah Siswa Baru">
