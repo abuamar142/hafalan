@@ -159,7 +159,7 @@ export default function ParentSearchWizard() {
   return (
     <div className="w-full space-y-4">
       {error && (
-        <div className="max-w-4xl mx-auto rounded-lg border-l-[3px] border-red bg-destructive/10 px-4 py-2.5 text-xs text-destructive font-semibold animate-in fade-in duration-200">
+        <div className="max-w-4xl mx-auto rounded-lg border-l-[3px] border-destructive bg-destructive/10 px-4 py-2.5 text-xs text-destructive font-semibold animate-in fade-in duration-200">
           {error}
         </div>
       )}

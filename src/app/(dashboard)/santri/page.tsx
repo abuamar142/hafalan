@@ -461,7 +461,7 @@ export default function SantriPage() {
             <DialogTitle>Tambah Siswa Baru</DialogTitle>
           </DialogHeader>
           {error && (
-            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+            <div className="mb-4 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
               {error}
             </div>
           )}
@@ -512,7 +512,7 @@ export default function SantriPage() {
             <DialogTitle>Edit Siswa</DialogTitle>
           </DialogHeader>
           {error && (
-            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+            <div className="mb-4 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
               {error}
             </div>
           )}

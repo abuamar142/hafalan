@@ -172,7 +172,7 @@ export default function ReportDetailClient({
       }
     }
     return {
-      bg: 'bg-destructive/10 border-red/30 text-destructive',
+      bg: 'bg-destructive/10 border-destructive/30 text-destructive',
       label: 'Perlu Ulang',
       icon: null
     }

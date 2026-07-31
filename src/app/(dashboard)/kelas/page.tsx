@@ -353,7 +353,7 @@ export default function KelasPage() {
             <DialogTitle>Tambah Kelas Baru</DialogTitle>
           </DialogHeader>
           {error && (
-            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+            <div className="mb-4 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
               {error}
             </div>
           )}
@@ -418,7 +418,7 @@ export default function KelasPage() {
             <DialogTitle>Edit Kelas</DialogTitle>
           </DialogHeader>
           {error && (
-            <div className="mb-4 rounded-md border-l-[3px] border-red bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+            <div className="mb-4 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
               {error}
             </div>
           )}
