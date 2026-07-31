@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import Modal from '@/components/Modal'
 import {
   Pagination,
@@ -245,17 +246,17 @@ export default function KelompokPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    <th className="py-3.5 px-4 w-16 text-center">No</th>
-                    <th className="py-3.5 px-4">Nama Kelompok</th>
-                    <th className="py-3.5 px-4">Kelas</th>
-                    <th className="py-3.5 px-4">Ustadz Pengampu</th>
-                    <th className="py-3.5 px-4 w-44 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/30 text-sm">
+              <Table className="w-full border-collapse text-left">
+                <TableHeader>
+                  <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    <TableHead className="py-3.5 px-4 w-16 text-center">No</TableHead>
+                    <TableHead className="py-3.5 px-4">Nama Kelompok</TableHead>
+                    <TableHead className="py-3.5 px-4">Kelas</TableHead>
+                    <TableHead className="py-3.5 px-4">Ustadz Pengampu</TableHead>
+                    <TableHead className="py-3.5 px-4 w-44 text-center">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="divide-y divide-border/30 text-sm">
                   {paginated.map((group, index) => {
                     const assignedTeachers = state.groupTeachers.filter(
                       (gt) => gt.group_id === group.id
@@ -263,16 +264,16 @@ export default function KelompokPage() {
                     const className = group.class_name || state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas'
 
                     return (
-                      <tr key={group.id} className="hover:bg-card/30 transition-colors">
-                        <td className="py-3.5 px-4 text-center font-medium text-muted-foreground">
+                      <TableRow key={group.id} className="hover:bg-card/30 transition-colors">
+                        <TableCell className="py-3.5 px-4 text-center font-medium text-muted-foreground">
                           {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                        </td>
-                        <td className="py-3.5 px-4">
+                        </TableCell>
+                        <TableCell className="py-3.5 px-4">
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-foreground">{group.name}</span>
                           </div>
-                        </td>
-                        <td className="py-3.5 px-4 text-muted-foreground font-medium">
+                        </TableCell>
+                        <TableCell className="py-3.5 px-4 text-muted-foreground font-medium">
                           {className !== 'Tanpa Kelas' ? (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
                               {className}
@@ -280,8 +281,8 @@ export default function KelompokPage() {
                           ) : (
                             <span className="text-xs text-muted-foreground italic">{className}</span>
                           )}
-                        </td>
-                        <td className="py-3.5 px-4">
+                        </TableCell>
+                        <TableCell className="py-3.5 px-4">
                           {assignedTeachers.length === 0 ? (
                             <span className="text-xs text-muted-foreground italic">Belum ditugaskan</span>
                           ) : (
@@ -299,8 +300,8 @@ export default function KelompokPage() {
                               })}
                             </div>
                           )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
+                        </TableCell>
+                        <TableCell className="py-3.5 px-4 text-center">
                           <div className="flex items-center justify-center gap-1.5">
                             <Button
                               variant="ghost"
@@ -331,12 +332,12 @@ export default function KelompokPage() {
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     )
                   })}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           )}
           {totalPages > 1 && (

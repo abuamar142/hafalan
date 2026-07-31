@@ -10,6 +10,7 @@ import {
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import Modal from '@/components/Modal'
 import {
   Pagination,
@@ -230,27 +231,27 @@ export default function KelasPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    <th className="py-3.5 px-4 w-16 text-center">No</th>
-                    <th className="py-3.5 px-4">Nama Kelas</th>
-                    <th className="py-3.5 px-4">Kelompok di Dalamnya</th>
-                    <th className="py-3.5 px-4 w-40 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/30 text-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    <TableHead className="py-3.5 px-4 w-16 text-center">No</TableHead>
+                    <TableHead className="py-3.5 px-4">Nama Kelas</TableHead>
+                    <TableHead className="py-3.5 px-4">Kelompok di Dalamnya</TableHead>
+                    <TableHead className="py-3.5 px-4 w-40 text-center">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="divide-y divide-border/30 text-sm">
                   {paginated.map((c, index) => {
                     const groups = state.groups.filter((g) => g.class_id === c.id)
                     return (
-                      <tr key={c.id} className="hover:bg-card/30 transition-colors">
-                        <td className="py-3.5 px-4 text-center font-medium text-muted-foreground">
+                      <TableRow key={c.id} className="hover:bg-card/30 transition-colors">
+                        <TableCell className="py-3.5 px-4 text-center font-medium text-muted-foreground">
                           {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                        </td>
-                        <td className="py-3.5 px-4 font-semibold text-foreground">
+                        </TableCell>
+                        <TableCell className="py-3.5 px-4 font-semibold text-foreground">
                           {c.name}
-                        </td>
-                        <td className="py-3.5 px-4">
+                        </TableCell>
+                        <TableCell className="py-3.5 px-4">
                           {groups.length === 0 ? (
                             <span className="text-xs text-muted-foreground italic">Tidak ada kelompok</span>
                           ) : (
@@ -265,8 +266,8 @@ export default function KelasPage() {
                               ))}
                             </div>
                           )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
+                        </TableCell>
+                        <TableCell className="py-3.5 px-4 text-center">
                           <div className="flex items-center justify-center gap-1.5">
                             <Button
                               variant="ghost"
@@ -296,12 +297,12 @@ export default function KelasPage() {
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     )
                   })}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           )}
           {totalPages > 1 && (
