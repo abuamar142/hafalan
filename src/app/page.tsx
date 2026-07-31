@@ -60,7 +60,7 @@ export default function LandingPage() {
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]">
             Sistem Informasi <br/>
-            <span className="bg-gradient-to-r from-primary to-primary-medium bg-clip-text text-transparent">Hafalan & Raport Santri</span>
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Hafalan & Raport Santri</span>
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
             Pantau progres hafalan Quran ananda secara berkala, transparan, dan lengkap langsung dari rumah.

@@ -558,7 +558,7 @@ export default function SantriPage() {
 
       {/* Interactive Detail Modal (with Juz Grid and Setoran History) */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-5xl">
+        <DialogContent className="sm:max-w-5xl">
           <DialogHeader>
             <DialogTitle>Detail & Progres Siswa</DialogTitle>
           </DialogHeader>

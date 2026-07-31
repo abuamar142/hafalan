@@ -458,7 +458,7 @@ export default function ReportDetailClient({
               ) : (
                 <div className="relative pl-6 ml-3 space-y-6">
                   {/* Premium Gradient Line Connector */}
-                  <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-primary-medium/50 to-border/30 print:bg-black/25" />
+                  <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-primary/30 to-border/30 print:bg-black/25" />
 
                   {submissions.map((sub) => {
                     const surah = ALL_SURAHS.find((s) => s.no === sub.surah_no)
