@@ -7,8 +7,11 @@ import type { SetoranItem } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
-import { Edit } from 'lucide-react'
+import { Edit, Trash2 } from 'lucide-react'
 import EditSubmissionModal from '@/components/EditSubmissionModal'
+import { deleteSubmissionAction } from '@/lib/actions/submissions'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import { useToast } from '@/components/ui/toast-wrapper'
 
 const PAGE_SIZE = 20
 
@@ -23,11 +26,31 @@ export default function RiwayatSetoranPage() {
   // Edit Submission state
   const [editingSubmission, setEditingSubmission] = useState<SetoranItem | null>(null)
 
+  // Delete Submission state
+  const [deleteTarget, setDeleteTarget] = useState<SetoranItem | null>(null)
+  const { toast } = useToast()
+
   // Reset to page 1 when filters change
   function applyKelasFilter(val: string) { setKelasFilter(val); setKelompokFilter(''); setPage(1) }
   function applyKelompokFilter(val: string) { setKelompokFilter(val); setPage(1) }
   function applyGuruFilter(val: string) { setGuruFilter(val); setPage(1) }
   function applySearch(val: string) { setSearch(val); setPage(1) }
+
+  function handleDelete(item: SetoranItem) {
+    setDeleteTarget(item)
+  }
+
+  async function handleDeleteConfirmed() {
+    if (!deleteTarget) return
+    try {
+      await deleteSubmissionAction(deleteTarget.id)
+      setDeleteTarget(null)
+      await refreshSubmissions()
+      toast('Setoran berhasil dihapus!')
+    } catch (e: any) {
+      toast('Gagal menghapus setoran: ' + (e?.message || 'Unknown error'), 'error')
+    }
+  }
 
   // Map santri_id -> { group_id, group_name, class_name }
   const studentLookup = useMemo(() => {
@@ -217,6 +240,15 @@ export default function RiwayatSetoranPage() {
                   >
                     <Edit className="w-3.5 h-3.5" />
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => handleDelete(item)}
+                    title="Hapus Setoran"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
                   <span className="shrink-0 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[11px] font-bold text-primary animate-in fade-in">
                     {item.nilai}
                   </span>
@@ -276,6 +308,15 @@ export default function RiwayatSetoranPage() {
         isOpen={!!editingSubmission}
         onClose={() => setEditingSubmission(null)}
         onSuccess={refreshSubmissions}
+      />
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        title="Hapus Setoran?"
+        description={`Hapus setoran ${deleteTarget ? getSurahNama(deleteTarget.surah_no) + ' oleh ' + deleteTarget.santri_nama : ''}? Data yang dihapus tidak dapat dikembalikan.`}
+        confirmText="Hapus"
+        onConfirm={handleDeleteConfirmed}
       />
     </div>
   )

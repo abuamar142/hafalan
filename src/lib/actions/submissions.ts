@@ -82,3 +82,24 @@ export async function updateSubmissionAction(formData: FormData) {
 
   revalidatePath('/setoran')
 }
+
+export async function deleteSubmissionAction(submissionId: number) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  if (!submissionId) {
+    throw new Error('ID Setoran harus valid')
+  }
+
+  const { error } = await supabase
+    .from('submissions')
+    .delete()
+    .eq('id', submissionId)
+
+  if (error) throw error
+
+  revalidatePath('/setoran')
+}
