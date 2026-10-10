@@ -1,127 +1,120 @@
 # Hafalan
 
-Web app untuk melacak hafalan & setoran santri — SMA Islam Bunga Bangsa.
+Portal Wali Murid — sistem informasi hafalan & raport santri, SMA Islam Bunga Bangsa.
 
-## Setup
-
-```bash
-cp .env.local.example .env.local   # isi NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY
-npm install
-npm run dev                         # → http://localhost:3000
-```
+Aplikasi **fullstack mandiri**: Next.js 15 (App Router) + PostgreSQL lokal,
+tanpa layanan pihak ketiga.
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 (App Router) + TypeScript
-- **Styling:** Tailwind CSS v4
-- **Database:** Supabase (PostgreSQL + Auth + RLS)
-- **Auth:** Supabase Auth (email/password)
-- **Node:** v22.x
+- **Framework:** Next.js 15 (App Router) + React 19 + TypeScript
+- **Styling:** Tailwind CSS v4 + shadcn/ui (Base UI)
+- **Database:** PostgreSQL 17 (Drizzle ORM)
+- **Auth:** sendiri — bcrypt (`bcryptjs`) + JWT HS256 (`jose`) di cookie httpOnly
+- **Package manager:** bun
+- **Runtime:** Docker (Next.js standalone)
 
-## Deployment
-
-| Branch | Environment | URL | Trigger |
-|--------|------------|-----|---------|
-| `master` | Production | `hafalan.abuamar.online` | Push/merge |
-| `staging` | Preview | `hafalan.staging.abuamar.online` | Push/merge |
-| Other | — | Tidak deploy | — |
-
-- **Vercel project:** `hafalan` (framework: Next.js)
-- **DNS:** Cloudflare (`abuamar.online`)
-- Preview deployments disabled globally — hanya branch `staging` yang deploy
+## Setup (lokal)
 
 ```bash
-# Deploy ke production
-git checkout master && git push
-
-# Deploy ke staging
-git checkout staging && git merge master && git push
+cp .env.example .env      # isi POSTGRES_*, DATABASE_URL, JWT_SECRET
+bun install
+bun run dev               # → http://localhost:3000
 ```
 
-## Architecture
+Untuk menjalankan sekaligus DB + app:
 
-Layered architecture — separasi concerns antara data, domain logic, dan presentasi.
+```bash
+docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+## Arsitektur
 
 ```
 src/
 ├── app/
+│   ├── api/                  # REST API (route handlers)
+│   │   ├── auth/             # login, register, logout, me, profile
+│   │   ├── classes/ groups/ teachers/ students/ submissions/ memorization/
+│   │   └── public/           # tanpa login: classes, groups, students, report
 │   ├── (auth)/               # login, register
-│   │   └── auth/callback/    # OAuth callback
-│   └── (dashboard)/          # all authenticated pages
-│       ├── page.tsx          # dashboard (home)
-│       ├── santri/           # student list + detail
-│       ├── setoran/          # tambah + riwayat
-│       └── laporan/          # reports (collective + individual)
+│   ├── (dashboard)/          # halaman ber-login: dashboard, santri, setoran, laporan, kelas, kelompok
+│   └── raport/[id]/          # raport publik (untuk wali murid)
 ├── components/
-│   ├── Modal.tsx
-│   ├── SantriCard.tsx
-│   └── Sidebar.tsx
+│   ├── app/                  # design system (PageHeader, StatCard, SectionCard, …)
+│   ├── public/               # ParentSearchWizard, ReportDetailClient
+│   └── ui/                   # primitif shadcn/Base UI
 ├── hooks/
-│   └── useAppState.ts        # central read-only data hook (context provider)
+│   └── useAppState.ts        # data hook terpusat (React Query)
 ├── lib/
-│   ├── types.ts              # TypeScript interfaces
-│   ├── constants.ts          # ALL_SURAHS, NILAI_OPTIONS, AVATAR_COLORS
-│   ├── helpers.ts            # pure utility functions
-│   ├── supabase/
-│   │   ├── client.ts         # browser client (createBrowserClient)
-│   │   └── server.ts         # server client (createServerClient, cookie-based)
-│   ├── data/                 # data access layer (Supabase queries)
-│   │   ├── students.ts
-│   │   ├── memorization.ts
-│   │   ├── submissions.ts
-│   │   └── settings.ts
-│   ├── domain/               # pure business logic (no side effects)
-│   │   ├── hafalan.ts        # computeHafalCounts, toggleSurahCycle
-│   │   ├── statistics.ts     # computeDashboardStats, computeRanking
-│   │   └── reports.ts        # generateCollectiveReport, generateIndividualReport
-│   └── actions/              # server actions (mutations)
-│       ├── students.ts
-│       ├── memorization.ts
-│       ├── submissions.ts
-│       └── settings.ts
-├── middleware.ts              # auth session refresh + redirect
-└── globals.css
-supabase/
-    migrations/               # SQL migrations
+│   ├── auth/                 # password (bcrypt), jwt, session (cookie)
+│   ├── db/                   # schema.ts (Drizzle) + index.ts (koneksi)
+│   ├── data/                 # data access — fetch ke /api/*
+│   ├── actions/              # server actions — Drizzle langsung + revalidatePath
+│   ├── domain/               # logika bisnis murni (hafalan, statistics, reports)
+│   ├── api-client.ts         # helper fetch untuk client component
+│   └── api-utils.ts          # helper respons API
+└── middleware.ts             # verifikasi sesi JWT (edge)
 ```
 
-### Layer Responsibilities
-
-| Layer | Location | Responsibility |
-|-------|----------|---------------|
-| **Data** | `src/lib/data/` | Centralized Supabase queries — one function per operation |
-| **Domain** | `src/lib/domain/` | Pure business logic — no supabase/next/react imports |
-| **Actions** | `src/lib/actions/` | Server actions — auth check + mutation + revalidatePath |
-| **Presentation** | `src/app/` + `src/components/` | UI rendering — consumes data via `useDashboard()` context |
-
-### Data Flow
+### Alur Data
 
 ```
-page.tsx (reads via useDashboard context)
-  └── useAppState.ts (fetches data via lib/data/)
-       └── lib/data/*.ts (Supabase queries)
-
-page.tsx (mutations via server actions)
-  └── lib/actions/*.ts (auth + Supabase mutation + revalidatePath)
+Client component  →  lib/data/*  →  fetch /api/*  →  Drizzle  →  PostgreSQL
+Server action     →  lib/actions/*  →  Drizzle  →  PostgreSQL
 ```
+
+- **Halaman ber-login** memakai `useAppState()` (React Query) yang memanggil
+  `lib/data/*`; mutasi lewat **server action** di `lib/actions/*`.
+- **Halaman publik** (landing & raport) memakai endpoint `/api/public/*`
+  yang tidak memerlukan sesi.
+
+### Autentikasi
+
+- Login dengan **username + password** (bukan email).
+- Password di-hash bcrypt; sesi berupa JWT HS256 di cookie
+  `hafalan_session` (httpOnly, `sameSite=lax`, 7 hari).
+- `middleware.ts` memverifikasi JWT di edge:
+  - halaman tanpa sesi → redirect `/login`
+  - request `/api/*` tanpa sesi → **401 JSON**
 
 ## Database
 
-Tabel utama:
-
-| Table | Purpose |
-|-------|---------|
+| Tabel | Isi |
+|-------|-----|
+| `users` | Akun ustadz (username, password_hash, nama) |
+| `classes` | Jenjang kelas (X, XI, XII) |
+| `groups` | Kelompok halaqah (terkait kelas) |
+| `group_teachers` | Pengampu tiap kelompok |
 | `students` | Data santri |
-| `memorization` | Status hafalan per surah |
-| `submissions` | Catatan setoran (dengan guru_id, waktu timestamptz) |
-| `settings` | Pengaturan user (key-value) |
+| `memorization` | Status hafalan per surah per santri |
+| `submissions` | Catatan setoran (nilai, ayat, waktu, guru) |
 
-RLS aktif di semua tabel — setiap user hanya bisa akses data sendiri (`auth.uid() = user_id`).
+### Migrasi
 
-### Migrations
+Skema dikelola Drizzle di `src/lib/db/schema.ts`:
 
 ```bash
-./supabase/migrate.sh
+# Setelah mengubah schema.ts, generate file SQL migrasi:
+bunx drizzle-kit generate
+
+# Terapkan ke DB (host-side):
+docker exec -i hafalan-db psql -U hafalan -d hafalan-db < drizzle/0000_*.sql
 ```
 
-Buat migration baru: tambah file di `supabase/migrations/YYYYMMDDHHMMSS_description.sql`, lalu jalankan `./supabase/migrate.sh`.
+Seed data awal (3 kelas, 12 kelompok, 4 ustadz, 165 santri) ada di `seed.sql`.
+Seed hanya dijalankan **sekali** saat inisialisasi DB.
+
+## Deployment
+
+Produksi berjalan di VPS sebagai container Docker:
+
+| Layanan | Container | Host port | Domain |
+|---------|-----------|-----------|--------|
+| App | `hafalan-app` | 127.0.0.1:3013 | `hafalan.abuamar.online` |
+| DB | `hafalan-db` | 127.0.0.1:5440 | — |
+
+- Repo di VPS: `/opt/hafalan` (branch `master`)
+- Deploy: `/opt/ops/bin/deploy-hafalan.sh master`
+- Reverse proxy & TLS: nginx + Let's Encrypt (Cloudflare proxied, mode Full)
+- Backup harian: `~/backups/<tanggal>/hafalan-prod.sql.gz`
