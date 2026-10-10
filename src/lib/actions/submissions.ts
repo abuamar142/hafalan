@@ -1,14 +1,13 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { requireSession } from '@/lib/auth/session'
+import { db } from '@/lib/db'
+import { submissions } from '@/lib/db/schema'
 
 export async function addSubmissionAction(formData: FormData) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  const session = await requireSession()
 
   const studentId = Number(formData.get('student_id'))
   const surahNo = Number(formData.get('surah_no'))
@@ -22,31 +21,23 @@ export async function addSubmissionAction(formData: FormData) {
     throw new Error('Santri dan Surah harus dipilih')
   }
 
-  const wDate = new Date(waktu)
-
-  const { error } = await supabase.from('submissions').insert({
-    student_id: studentId,
-    surah_no: surahNo,
+  await db.insert(submissions).values({
+    studentId,
+    surahNo,
     nilai,
     catatan,
-    waktu: wDate.toISOString(),
-    guru_id: user.id,
-    guru_name: (user.user_metadata?.name as string) || '',
-    ayat_start: ayatStart,
-    ayat_end: ayatEnd,
+    waktu: waktu ? new Date(waktu) : new Date(),
+    guruId: session.sub,
+    guruName: session.name || '',
+    ayatStart,
+    ayatEnd,
   })
-
-  if (error) throw error
 
   revalidatePath('/setoran')
 }
 
 export async function updateSubmissionAction(formData: FormData) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  const session = await requireSession()
 
   const submissionId = Number(formData.get('id'))
   const surahNo = Number(formData.get('surah_no'))
@@ -60,45 +51,28 @@ export async function updateSubmissionAction(formData: FormData) {
     throw new Error('ID Setoran dan Surah harus valid')
   }
 
-  const wDate = new Date(waktu)
-
-  const { error } = await supabase
-    .from('submissions')
-    .update({
-      surah_no: surahNo,
+  await db
+    .update(submissions)
+    .set({
+      surahNo,
       nilai,
       catatan,
-      waktu: wDate.toISOString(),
-      updated_at: new Date().toISOString(),
-      updated_by: user.id,
-      updated_by_name: (user.user_metadata?.name as string) || '',
-      ayat_start: ayatStart,
-      ayat_end: ayatEnd,
+      waktu: waktu ? new Date(waktu) : new Date(),
+      updatedAt: new Date(),
+      updatedBy: session.sub,
+      updatedByName: session.name || '',
+      ayatStart,
+      ayatEnd,
     })
-    .eq('id', submissionId)
-
-  if (error) throw error
+    .where(eq(submissions.id, submissionId))
 
   revalidatePath('/setoran')
 }
 
 export async function deleteSubmissionAction(submissionId: number) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  await requireSession()
+  if (!submissionId) throw new Error('ID Setoran harus valid')
 
-  if (!submissionId) {
-    throw new Error('ID Setoran harus valid')
-  }
-
-  const { error } = await supabase
-    .from('submissions')
-    .delete()
-    .eq('id', submissionId)
-
-  if (error) throw error
-
+  await db.delete(submissions).where(eq(submissions.id, submissionId))
   revalidatePath('/setoran')
 }

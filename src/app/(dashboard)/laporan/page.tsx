@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useDashboard } from '../layout'
-import { createClient } from '@/lib/supabase/client'
+import { apiGet } from '@/lib/api-client'
 import type { SetoranItem } from '@/lib/types'
 import {
   getStudentMemorization,
@@ -45,10 +45,9 @@ export default function LaporanPage() {
   }, [state.students])
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
-      setCurrentUserName((data.user?.user_metadata?.name as string) || '')
-    })
+    apiGet<{ user: { name: string } | null }>('/api/auth/me')
+      .then((data) => setCurrentUserName(data.user?.name || ''))
+      .catch(() => {})
   }, [])
 
   const sorted = useMemo(

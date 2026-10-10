@@ -1,63 +1,63 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { and, eq, inArray } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { requireSession } from '@/lib/auth/session'
+import { db } from '@/lib/db'
+import { groupTeachers, groups, users } from '@/lib/db/schema'
+
+function revalidateGroupPaths() {
+  revalidatePath('/kelompok')
+  revalidatePath('/kelas')
+  revalidatePath('/santri')
+}
 
 export async function createGroupAction(formData: FormData) {
+  await requireSession()
   const name = (formData.get('name') as string)?.trim()
   if (!name) throw new Error('Nama kelompok wajib diisi')
 
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-
-  const { error } = await supabase
-    .from('groups')
-    .insert({ name })
-    .select('id')
-    .single()
-
-  if (error) throw error
-
-  revalidatePath('/kelompok')
+  await db.insert(groups).values({ name })
+  revalidateGroupPaths()
 }
 
 export async function deleteGroupAction(groupId: number) {
-  const supabase = await createClient()
-  const { error } = await supabase.from('groups').delete().eq('id', groupId)
-  if (error) throw error
-  revalidatePath('/kelompok')
+  await requireSession()
+  await db.delete(groups).where(eq(groups.id, groupId))
+  revalidateGroupPaths()
 }
 
 export async function addTeacherAction(groupId: number, teacherId: string) {
-  const supabase = await createClient()
-  const { data: teachers } = await supabase.rpc('get_all_teachers')
-  const teacher = (teachers as Array<{user_id: string, name: string}> | null)?.find(t => t.user_id === teacherId)
-  const teacherName = teacher?.name || ''
-  const { error } = await supabase
-    .from('group_teachers')
-    .insert({
-      group_id: groupId,
-      teacher_id: teacherId,
-      teacher_name: teacherName,
-    })
+  await requireSession()
+  const tid = Number(teacherId)
+  if (!tid) throw new Error('Ustadz tidak valid')
 
-  if (error) throw error
-  revalidatePath('/kelompok')
+  const [teacher] = await db
+    .select({ name: users.name })
+    .from(users)
+    .where(eq(users.id, tid))
+    .limit(1)
+
+  await db
+    .insert(groupTeachers)
+    .values({ groupId, teacherId: tid, teacherName: teacher?.name || '' })
+    .onConflictDoNothing()
+
+  revalidateGroupPaths()
 }
 
 export async function removeTeacherAction(groupId: number, teacherId: string) {
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from('group_teachers')
-    .delete()
-    .eq('group_id', groupId)
-    .eq('teacher_id', teacherId)
+  await requireSession()
+  const tid = Number(teacherId)
+  if (!tid) return
 
-  if (error) throw error
-  revalidatePath('/kelompok')
+  await db
+    .delete(groupTeachers)
+    .where(
+      and(eq(groupTeachers.groupId, groupId), eq(groupTeachers.teacherId, tid))
+    )
+
+  revalidateGroupPaths()
 }
 
 export async function updateGroupAction(
@@ -66,48 +66,34 @@ export async function updateGroupAction(
   classId: number | null,
   teacherIds: string[]
 ) {
+  await requireSession()
   if (!name.trim()) throw new Error('Nama kelompok wajib diisi')
 
-  const supabase = await createClient()
+  // 1. Nama & kelas.
+  await db
+    .update(groups)
+    .set({ name: name.trim(), classId })
+    .where(eq(groups.id, groupId))
 
-  // 1. Update name and class_id
-  const { error: groupError } = await supabase
-    .from('groups')
-    .update({ name: name.trim(), class_id: classId })
-    .eq('id', groupId)
+  // 2. Ganti daftar pengampu (hapus lalu pasang ulang beserta namanya).
+  await db.delete(groupTeachers).where(eq(groupTeachers.groupId, groupId))
 
-  if (groupError) throw groupError
+  const ids = teacherIds.map(Number).filter((n) => !Number.isNaN(n) && n > 0)
+  if (ids.length > 0) {
+    const rows = await db
+      .select({ id: users.id, name: users.name })
+      .from(users)
+      .where(inArray(users.id, ids))
+    const nameMap = new Map(rows.map((r) => [r.id, r.name]))
 
-  // 2. Update teachers (delete existing, insert new list with names)
-  const { error: deleteTeachersError } = await supabase
-    .from('group_teachers')
-    .delete()
-    .eq('group_id', groupId)
-
-  if (deleteTeachersError) throw deleteTeachersError
-
-  if (teacherIds.length > 0) {
-    // Fetch teacher names
-    const { data: teachers } = await supabase.rpc('get_all_teachers')
-    const teacherMap: Record<string, string> = {}
-    for (const t of (teachers as Array<{user_id: string, name: string}> | null) ?? []) {
-      teacherMap[t.user_id] = t.name
-    }
-
-    const { error: insertTeachersError } = await supabase
-      .from('group_teachers')
-      .insert(
-        teacherIds.map((tid) => ({
-          group_id: groupId,
-          teacher_id: tid,
-          teacher_name: teacherMap[tid] || '',
-        }))
-      )
-
-    if (insertTeachersError) throw insertTeachersError
+    await db.insert(groupTeachers).values(
+      ids.map((tid) => ({
+        groupId,
+        teacherId: tid,
+        teacherName: nameMap.get(tid) || '',
+      }))
+    )
   }
 
-  revalidatePath('/kelompok')
-  revalidatePath('/kelas')
-  revalidatePath('/santri')
+  revalidateGroupPaths()
 }

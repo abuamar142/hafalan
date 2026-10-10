@@ -1,0 +1,12 @@
+# Production override — docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+services:
+  db:
+    container_name: hafalan-db
+    ports:
+      # Loopback only — DB tidak pernah terekspos ke internet.
+      - "127.0.0.1:5440:5432"
+
+  app:
+    container_name: hafalan-app
+    ports:
+      - "127.0.0.1:3013:3000"

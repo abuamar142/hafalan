@@ -1,25 +1,24 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { requireSession } from '@/lib/auth/session'
+import { db } from '@/lib/db'
+import { memorization } from '@/lib/db/schema'
 
 export async function toggleMemorizationAction(
   studentId: number,
   surahNo: number,
   status: number
 ) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  await requireSession()
 
-  const { error } = await supabase.from('memorization').upsert(
-    { student_id: studentId, surah_no: surahNo, status },
-    { onConflict: 'student_id,surah_no' }
-  )
-
-  if (error) throw error
+  await db
+    .insert(memorization)
+    .values({ studentId, surahNo, status })
+    .onConflictDoUpdate({
+      target: [memorization.studentId, memorization.surahNo],
+      set: { status },
+    })
 
   revalidatePath(`/santri/${studentId}`)
 }

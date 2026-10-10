@@ -7,7 +7,7 @@ import {
   deleteGroupAction,
   updateGroupAction,
 } from '@/lib/actions/groups'
-import { createClient } from '@/lib/supabase/client'
+import { apiGet } from '@/lib/api-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
@@ -85,14 +85,15 @@ export default function KelompokPage() {
 
   // Load all teachers/gurus
   useEffect(() => {
-    const supabase = createClient()
-    supabase.rpc('get_all_teachers').then(({ data }) => {
-      const map: Record<string, string> = {}
-      for (const t of (data as Array<{user_id: string, name: string}> | null) ?? []) {
-        map[t.user_id] = t.name
-      }
-      setAllTeachers(map)
-    })
+    apiGet<{ id: number; name: string; username: string }[]>('/api/teachers')
+      .then((data) => {
+        const map: Record<string, string> = {}
+        for (const t of data ?? []) {
+          map[String(t.id)] = t.name
+        }
+        setAllTeachers(map)
+      })
+      .catch(() => {})
   }, [])
 
   function openAddModal() {

@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useAppState, QK } from '@/hooks/useAppState'
-import { createClient } from '@/lib/supabase/client'
+import { apiGet, apiPatch } from '@/lib/api-client'
 import type { SantriWithCount, Memorization } from '@/lib/types'
 import { ToastProvider } from '@/components/ui/toast-wrapper'
 import { Loader2 } from 'lucide-react'
@@ -58,10 +58,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const [savingName, setSavingName] = useState(false)
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
-      setUserName((data.user?.user_metadata?.name as string) || '')
-    })
+    apiGet<{ user: { name: string } | null }>('/api/auth/me')
+      .then((data) => setUserName(data.user?.name || ''))
+      .catch(() => {})
   }, [])
 
   function openSettings() {
@@ -72,8 +71,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   async function handleSaveGuru() {
     setSavingName(true)
     try {
-      const supabase = createClient()
-      await supabase.auth.updateUser({ data: { name: guruInput.trim() } })
+      await apiPatch('/api/auth/profile', { name: guruInput.trim() })
       setUserName(guruInput.trim())
       setSettingsOpen(false)
     } finally {

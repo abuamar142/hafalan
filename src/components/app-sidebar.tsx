@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { apiPost } from '@/lib/api-client'
 import { cn } from '@/lib/utils'
 import { SCHOOL_NAME } from '@/lib/constants'
 import {
@@ -157,12 +157,11 @@ export default function AppSidebar({
 }: AppSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = useMemo(() => createClient(), [])
   const { setOpenMobile } = useSidebar()
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   async function handleLogoutConfirm() {
-    await supabase.auth.signOut()
+    await apiPost('/api/auth/logout', {})
     router.push('/login')
   }
 

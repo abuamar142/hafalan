@@ -1,87 +1,99 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { asc, desc, eq } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import {
+  classes,
+  groups,
+  memorization,
+  students,
+  submissions,
+} from '@/lib/db/schema'
 
 export async function getPublicClassesAction() {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('classes')
-    .select('id, nama:name')
-    .order('name', { ascending: true })
-
-  if (error) throw error
-  return data || []
+  return db
+    .select({ id: classes.id, nama: classes.name })
+    .from(classes)
+    .orderBy(asc(classes.name))
 }
 
 export async function getPublicGroupsAction(kelasId: number) {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('groups')
-    .select('id, nama:name')
-    .eq('class_id', kelasId)
-    .order('name', { ascending: true })
-
-  if (error) throw error
-  return data || []
+  return db
+    .select({ id: groups.id, nama: groups.name })
+    .from(groups)
+    .where(eq(groups.classId, kelasId))
+    .orderBy(asc(groups.name))
 }
 
 export async function getPublicStudentsAction(groupId: number) {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('students')
-    .select('id, nama, color')
-    .eq('group_id', groupId)
-    .order('nama', { ascending: true })
-
-  if (error) throw error
-  return data || []
+  return db
+    .select({ id: students.id, nama: students.nama, color: students.color })
+    .from(students)
+    .where(eq(students.groupId, groupId))
+    .orderBy(asc(students.nama))
 }
 
 export async function getPublicStudentReportAction(studentId: number) {
-  const supabase = await createClient()
+  const [row] = await db
+    .select({
+      id: students.id,
+      nama: students.nama,
+      color: students.color,
+      groupId: groups.id,
+      groupName: groups.name,
+      classId: classes.id,
+      className: classes.name,
+    })
+    .from(students)
+    .leftJoin(groups, eq(students.groupId, groups.id))
+    .leftJoin(classes, eq(groups.classId, classes.id))
+    .where(eq(students.id, studentId))
+    .limit(1)
 
-  // Fetch student info with class & group names
-  const { data: student, error: studentError } = await supabase
-    .from('students')
-    .select(`
-      id,
-      nama,
-      color,
-      group:groups (
-        id,
-        nama:name,
-        class:classes (
-          id,
-          nama:name
-        )
-      )
-    `)
-    .eq('id', studentId)
-    .single()
+  if (!row) throw new Error('Santri tidak ditemukan')
 
-  if (studentError) throw studentError
-  if (!student) throw new Error('Santri tidak ditemukan')
+  const subs = await db
+    .select()
+    .from(submissions)
+    .where(eq(submissions.studentId, studentId))
+    .orderBy(desc(submissions.waktu))
 
-  // Fetch submissions (history)
-  const { data: submissions, error: subError } = await supabase
-    .from('submissions')
-    .select('*')
-    .eq('student_id', studentId)
-    .order('waktu', { ascending: false })
-
-  if (subError) throw subError
-
-  // Fetch memorized status
-  const { data: memorizations, error: memError } = await supabase
-    .from('memorization')
-    .select('surah_no, status')
-    .eq('student_id', studentId)
-
-  if (memError) throw memError
+  const memos = await db
+    .select({ surahNo: memorization.surahNo, status: memorization.status })
+    .from(memorization)
+    .where(eq(memorization.studentId, studentId))
 
   return {
-    student,
-    submissions: submissions || [],
-    memorizations: memorizations || []
+    student: {
+      id: row.id,
+      nama: row.nama,
+      color: row.color,
+      group: row.groupId
+        ? {
+            id: row.groupId,
+            nama: row.groupName || '',
+            class: row.classId
+              ? { id: row.classId, nama: row.className || '' }
+              : null,
+          }
+        : null,
+    },
+    submissions: subs.map((s) => ({
+      id: s.id,
+      student_id: s.studentId,
+      surah_no: s.surahNo,
+      nilai: s.nilai || '',
+      catatan: s.catatan || '',
+      waktu: s.waktu ? s.waktu.toISOString() : '',
+      ayat_start: s.ayatStart,
+      ayat_end: s.ayatEnd,
+      guru_nama: s.guruName,
+      updated_at: s.updatedAt ? s.updatedAt.toISOString() : null,
+      updated_by_name: s.updatedByName,
+    })),
+    memorizations: memos.map((m) => ({
+      surah_no: m.surahNo,
+      status: m.status ?? 0,
+    })),
   }
 }

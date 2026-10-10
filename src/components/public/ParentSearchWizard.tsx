@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { apiGet } from '@/lib/api-client'
 import { Combobox } from '@/components/ui/combobox'
 import { Button } from '@/components/ui/button'
 import { Alert } from '@/components/app/alert'
@@ -32,7 +32,6 @@ const STEPS = [
 
 export default function ParentSearchWizard() {
   const router = useRouter()
-  const supabase = useMemo(() => createClient(), [])
 
   // Pilihan
   const [classId, setClassId] = useState('')
@@ -53,19 +52,14 @@ export default function ParentSearchWizard() {
     async function loadClasses() {
       setError('')
       try {
-        const { data, error } = await supabase
-          .from('classes')
-          .select('id, nama:name')
-          .order('name', { ascending: true })
-
-        if (error) throw error
+        const data = await apiGet<ClassData[]>('/api/public/classes')
         setClasses(data || [])
       } catch {
         setError('Gagal memuat data kelas.')
       }
     }
     loadClasses()
-  }, [supabase])
+  }, [])
 
   const classOptions = useMemo(
     () =>
@@ -108,13 +102,9 @@ export default function ParentSearchWizard() {
       setLoadingGroups(true)
       setError('')
       try {
-        const { data, error } = await supabase
-          .from('groups')
-          .select('id, nama:name')
-          .eq('class_id', Number(classId))
-          .order('name', { ascending: true })
-
-        if (error) throw error
+        const data = await apiGet<GroupData[]>(
+          `/api/public/groups?classId=${Number(classId)}`
+        )
         setGroups(data || [])
         setGroupId('')
       } catch {
@@ -125,7 +115,7 @@ export default function ParentSearchWizard() {
     }
 
     loadGroups()
-  }, [classId, supabase])
+  }, [classId])
 
   useEffect(() => {
     if (!groupId) {
@@ -138,13 +128,9 @@ export default function ParentSearchWizard() {
       setLoadingStudents(true)
       setError('')
       try {
-        const { data, error } = await supabase
-          .from('students')
-          .select('id, nama, color')
-          .eq('group_id', Number(groupId))
-          .order('nama', { ascending: true })
-
-        if (error) throw error
+        const data = await apiGet<StudentData[]>(
+          `/api/public/students?groupId=${Number(groupId)}`
+        )
         setStudents(data || [])
         setStudentId('')
       } catch {
@@ -155,7 +141,7 @@ export default function ParentSearchWizard() {
     }
 
     loadStudents()
-  }, [groupId, supabase])
+  }, [groupId])
 
   function handleGoToReport() {
     if (studentId) router.push(`/raport/${studentId}`)

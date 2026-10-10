@@ -1,62 +1,37 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth/jwt'
 
-async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+export default async function middleware(request: NextRequest) {
+  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value
+  const session = token ? await verifySessionToken(token) : null
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
+  const { pathname } = request.nextUrl
+  const isPublic =
+    pathname === '/' ||
+    pathname.startsWith('/raport') ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register') ||
+    pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/api/public')
+
+  if (!session && !isPublic) {
+    // API: balas JSON 401, jangan redirect (klien fetch tidak menangani redirect HTML).
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Belum login' }, { status: 401 })
     }
-  )
-
-  // IMPORTANT: Do not write code between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard
-  // to debug issues with users being randomly logged out.
-
-  let user = null
-  try {
-    const {
-      data: { user: u },
-    } = await supabase.auth.getUser()
-    user = u
-  } catch {
-    // Refresh token invalid/expired — treat as unauthenticated
-  }
-
-  if (
-    !user &&
-    request.nextUrl.pathname !== '/' &&
-    !request.nextUrl.pathname.startsWith('/raport') &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/register') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  return supabaseResponse
-}
+  // Sudah login tapi membuka halaman auth → arahkan ke dashboard.
+  if (session && (pathname === '/login' || pathname === '/register')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/santri'
+    return NextResponse.redirect(url)
+  }
 
-export default async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  return NextResponse.next()
 }
 
 export const config = {

@@ -1,41 +1,38 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { eq, sql } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { requireSession } from '@/lib/auth/session'
 import { AVATAR_COLORS } from '@/lib/constants'
+import { db } from '@/lib/db'
+import { students } from '@/lib/db/schema'
 
 export async function addStudentAction(formData: FormData) {
+  await requireSession()
+
   const nama = (formData.get('nama') as string)?.trim()
   if (!nama) throw new Error('Nama wajib diisi')
 
   const groupId = Number(formData.get('groupId'))
-  if (isNaN(groupId) || groupId <= 0) throw new Error('Kelompok wajib dipilih')
+  if (Number.isNaN(groupId) || groupId <= 0)
+    throw new Error('Kelompok wajib dipilih')
 
-  const supabase = await createClient()
+  // Warna avatar bergilir sesuai jumlah santri yang ada.
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(students)
+  const colorIndex = (row?.count ?? 0) % AVATAR_COLORS.length
 
-  // Count current students to assign color index
-  const { data: students, error: fetchError } = await supabase
-    .from('students')
-    .select('id')
-
-  if (fetchError) throw fetchError
-  const colorIndex = (students?.length ?? 0) % AVATAR_COLORS.length
-
-  const { error: insertError } = await supabase.from('students').insert({
-    group_id: groupId,
-    nama,
-    color: AVATAR_COLORS[colorIndex],
-  })
-
-  if (insertError) throw insertError
+  await db
+    .insert(students)
+    .values({ groupId, nama, color: AVATAR_COLORS[colorIndex] })
 
   revalidatePath('/santri')
 }
 
 export async function deleteStudentAction(studentId: number) {
-  const supabase = await createClient()
-  const { error } = await supabase.from('students').delete().eq('id', studentId)
-  if (error) throw error
+  await requireSession()
+  await db.delete(students).where(eq(students.id, studentId))
   revalidatePath('/santri')
 }
 
@@ -44,19 +41,15 @@ export async function updateStudentAction(
   nama: string,
   groupId: number
 ) {
+  await requireSession()
   if (!nama.trim()) throw new Error('Nama wajib diisi')
-  if (isNaN(groupId) || groupId <= 0) throw new Error('Kelompok wajib dipilih')
+  if (Number.isNaN(groupId) || groupId <= 0)
+    throw new Error('Kelompok wajib dipilih')
 
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from('students')
-    .update({
-      nama: nama.trim(),
-      group_id: groupId,
-    })
-    .eq('id', studentId)
-
-  if (error) throw error
+  await db
+    .update(students)
+    .set({ nama: nama.trim(), groupId })
+    .where(eq(students.id, studentId))
 
   revalidatePath('/santri')
 }

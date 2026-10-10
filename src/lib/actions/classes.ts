@@ -1,53 +1,50 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { eq, inArray } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { requireSession } from '@/lib/auth/session'
+import { db } from '@/lib/db'
+import { classes, groups } from '@/lib/db/schema'
 
-export async function createClassAction(formData: FormData) {
-  const name = (formData.get('name') as string)?.trim()
-  if (!name) throw new Error('Nama kelas wajib diisi')
+function parseGroupIds(raw: FormDataEntryValue | null): number[] {
+  if (typeof raw !== 'string' || !raw) return []
+  return raw
+    .split(',')
+    .map(Number)
+    .filter((id) => !Number.isNaN(id) && id > 0)
+}
 
-  const groupIdsRaw = formData.get('groupIds') as string
-  const groupIds = groupIdsRaw ? groupIdsRaw.split(',').map(Number).filter(id => !isNaN(id) && id > 0) : []
-
-  const supabase = await createClient()
-
-  // Create the class
-  const { data: newClass, error: insertError } = await supabase
-    .from('classes')
-    .insert({ name })
-    .select('*')
-    .single()
-
-  if (insertError) throw insertError
-
-  // Assign groups to the class
-  if (groupIds.length > 0) {
-    const { error: assignError } = await supabase
-      .from('groups')
-      .update({ class_id: newClass.id })
-      .in('id', groupIds)
-
-    if (assignError) throw assignError
-  }
-
+function revalidateClassPaths() {
   revalidatePath('/kelas')
   revalidatePath('/kelompok')
   revalidatePath('/santri')
 }
 
+export async function createClassAction(formData: FormData) {
+  await requireSession()
+
+  const name = (formData.get('name') as string)?.trim()
+  if (!name) throw new Error('Nama kelas wajib diisi')
+
+  const groupIds = parseGroupIds(formData.get('groupIds'))
+
+  const [created] = await db.insert(classes).values({ name }).returning()
+  if (!created) throw new Error('Gagal membuat kelas')
+
+  if (groupIds.length > 0) {
+    await db
+      .update(groups)
+      .set({ classId: created.id })
+      .where(inArray(groups.id, groupIds))
+  }
+
+  revalidateClassPaths()
+}
+
 export async function deleteClassAction(classId: number) {
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from('classes')
-    .delete()
-    .eq('id', classId)
-
-  if (error) throw error
-
-  revalidatePath('/kelas')
-  revalidatePath('/kelompok')
-  revalidatePath('/santri')
+  await requireSession()
+  await db.delete(classes).where(eq(classes.id, classId))
+  revalidateClassPaths()
 }
 
 export async function updateClassAction(
@@ -55,35 +52,24 @@ export async function updateClassAction(
   name: string,
   groupIds: number[]
 ) {
+  await requireSession()
   if (!name.trim()) throw new Error('Nama kelas wajib diisi')
 
-  const supabase = await createClient()
-  const { error: classError } = await supabase
-    .from('classes')
-    .update({ name: name.trim() })
-    .eq('id', classId)
+  await db
+    .update(classes)
+    .set({ name: name.trim() })
+    .where(eq(classes.id, classId))
 
-  if (classError) throw classError
+  // 1. Lepas semua kelompok yang sebelumnya di kelas ini.
+  await db.update(groups).set({ classId: null }).where(eq(groups.classId, classId))
 
-  // 1. Clear class_id of other groups that were previously in this class
-  const { error: clearError } = await supabase
-    .from('groups')
-    .update({ class_id: null })
-    .eq('class_id', classId)
-
-  if (clearError) throw clearError
-
-  // 2. Assign class_id to new group list
+  // 2. Pasang daftar kelompok yang baru.
   if (groupIds.length > 0) {
-    const { error: assignError } = await supabase
-      .from('groups')
-      .update({ class_id: classId })
-      .in('id', groupIds)
-
-    if (assignError) throw assignError
+    await db
+      .update(groups)
+      .set({ classId })
+      .where(inArray(groups.id, groupIds))
   }
 
-  revalidatePath('/kelas')
-  revalidatePath('/kelompok')
-  revalidatePath('/santri')
+  revalidateClassPaths()
 }

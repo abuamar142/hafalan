@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, use } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { apiGet } from '@/lib/api-client'
 import ReportDetailClient from '@/components/public/ReportDetailClient'
 import { Loader2 } from 'lucide-react'
 
@@ -20,7 +20,6 @@ export default function RaportDetailPage({
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const supabase = createClient()
     if (isNaN(studentId)) {
       setError('ID Santri tidak valid')
       setLoading(false)
@@ -29,46 +28,15 @@ export default function RaportDetailPage({
 
     async function fetchData() {
       try {
-        const [studentRes, submissionsRes, memorizationsRes] = await Promise.all([
-          supabase
-            .from('students')
-            .select(`
-              id,
-              nama,
-              color,
-              group:groups (
-                id,
-                nama:name,
-                class:classes (
-                  id,
-                  nama:name
-                )
-              )
-            `)
-            .eq('id', studentId)
-            .single(),
-          supabase
-            .from('submissions')
-            .select('*')
-            .eq('student_id', studentId)
-            .order('waktu', { ascending: false }),
-          supabase
-            .from('memorization')
-            .select('surah_no, status')
-            .eq('student_id', studentId)
-        ])
+        const data = await apiGet<{
+          student: any
+          submissions: any[]
+          memorizations: any[]
+        }>(`/api/public/report/${studentId}`)
 
-        if (studentRes.error) throw studentRes.error
-        if (submissionsRes.error) throw submissionsRes.error
-        if (memorizationsRes.error) throw memorizationsRes.error
-
-        if (!studentRes.data) {
-          throw new Error('Data santri tidak ditemukan')
-        }
-
-        setStudent(studentRes.data)
-        setSubmissions(submissionsRes.data || [])
-        setMemorizations(memorizationsRes.data || [])
+        setStudent(data.student)
+        setSubmissions(data.submissions || [])
+        setMemorizations(data.memorizations || [])
       } catch (err: any) {
         console.error('Error fetching raport data:', err)
         setError(err.message || 'Gagal memuat data raport.')

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { apiPost } from '@/lib/api-client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Alert } from '@/components/app/alert'
@@ -14,9 +14,8 @@ import { SCHOOL_NAME } from '@/lib/constants'
 
 export default function LoginPage() {
   const router = useRouter()
-  const supabase = createClient()
 
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
@@ -27,19 +26,14 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      setError(error.message)
+    try {
+      await apiPost('/api/auth/login', { username, password })
+      router.push('/santri')
+      router.refresh()
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Gagal masuk')
       setLoading(false)
-      return
     }
-
-    router.push('/santri')
-    router.refresh()
   }
 
   return (
@@ -99,19 +93,19 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <label
-              htmlFor="email"
+              htmlFor="username"
               className="block text-[13px] font-semibold text-foreground"
             >
-              Email
+              Username
             </label>
             <Input
-              id="email"
-              type="email"
+              id="username"
+              type="text"
               required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@contoh.com"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="username"
               className="h-11"
             />
           </div>

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { apiPost } from '@/lib/api-client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Alert } from '@/components/app/alert'
@@ -14,10 +14,9 @@ import { SCHOOL_NAME } from '@/lib/constants'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
@@ -27,8 +26,12 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
 
-    if (!name.trim() || !email.trim() || !password) {
+    if (!name.trim() || !username.trim() || !password) {
       setError('Semua field wajib diisi.')
+      return
+    }
+    if (username.trim().length < 3) {
+      setError('Username minimal 3 karakter.')
       return
     }
     if (password.length < 6) {
@@ -38,20 +41,14 @@ export default function RegisterPage() {
 
     setLoading(true)
 
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name } },
-    })
-
-    if (signUpError) {
-      setError(signUpError.message)
+    try {
+      await apiPost('/api/auth/register', { name, username, password })
+      router.push('/santri')
+      router.refresh()
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Gagal mendaftar')
       setLoading(false)
-      return
     }
-
-    router.push('/santri')
-    router.refresh()
   }
 
   return (
@@ -113,19 +110,19 @@ export default function RegisterPage() {
 
           <div className="space-y-1.5">
             <label
-              htmlFor="email"
+              htmlFor="username"
               className="block text-[13px] font-semibold text-foreground"
             >
-              Email
+              Username
             </label>
             <Input
-              id="email"
-              type="email"
+              id="username"
+              type="text"
               required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@contoh.com"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Minimal 3 karakter"
               className="h-11"
             />
           </div>
