@@ -20,10 +20,25 @@ import {
 } from '@/lib/helpers'
 import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/toast-wrapper'
-import { ArrowLeft, Trash2, CheckCircle2, RotateCcw, Circle } from 'lucide-react'
+import { SectionCard } from '@/components/app/section-card'
+import { ProgressBar } from '@/components/app/progress-bar'
+import { EmptyState } from '@/components/app/empty-state'
+import {
+  ArrowLeft,
+  Trash2,
+  CheckCircle2,
+  RotateCcw,
+  Circle,
+  BookOpen,
+  User,
+  Layers,
+  GraduationCap,
+  History,
+} from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import { cn } from '@/lib/utils'
 
 export default function ProfilPage({
   params,
@@ -32,26 +47,31 @@ export default function ProfilPage({
 }) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { state, refreshStudents, refreshMemorization, getStudent, getStudentMemorization } =
-    useDashboard()
+  const {
+    state,
+    refreshStudents,
+    refreshMemorization,
+    getStudent,
+    getStudentMemorization,
+  } = useDashboard()
   const { toast } = useToast()
 
   const [studentId, setStudentId] = useState<number | null>(null)
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
-  const [deleteSubmissionTarget, setDeleteSubmissionTarget] = useState<{ id: number; surahName: string } | null>(null)
+  const [deleteSubmissionTarget, setDeleteSubmissionTarget] = useState<{
+    id: number
+    surahName: string
+  } | null>(null)
 
-  // Unwrap async params
   useEffect(() => {
     params.then((p) => setStudentId(Number(p.id)))
   }, [params])
 
   const student = studentId != null ? getStudent(studentId) : undefined
-
   const memorization =
     studentId != null ? getStudentMemorization(studentId) : []
 
-  // Build hafalan map from memorization
   const hafalan = useMemo(() => {
     const map: Record<number, number> = {}
     memorization.forEach((m) => {
@@ -60,7 +80,6 @@ export default function ProfilPage({
     return map
   }, [memorization])
 
-  // Student submissions
   const studentSubmissions = useMemo(() => {
     if (studentId == null) return []
     return state.submissions
@@ -68,9 +87,10 @@ export default function ProfilPage({
       .sort((a, b) => b.id - a.id)
   }, [state.submissions, studentId])
 
-  // Juz percentages
   const juzPcts = useMemo(() => {
-    return [...Array(30)].map((_, i) => getJuzSurahsFromHafalan(hafalan, i + 1))
+    return [...Array(30)].map((_, i) =>
+      getJuzSurahsFromHafalan(hafalan, i + 1)
+    )
   }, [hafalan])
 
   const juzSelesai = useMemo(
@@ -90,24 +110,31 @@ export default function ProfilPage({
     return state.students.findIndex((s) => s.id === student.id)
   }, [student, state.students])
 
-  // Toggle surah status
   async function toggleSurah(surahNo: number) {
     if (studentId == null) return
     const current = hafalan[surahNo] || 0
     const next = toggleSurahCycle(current)
 
-    // Optimistic update
     const prev = queryClient.getQueryData(QK.memorization)
     queryClient.setQueryData<Memorization[]>(QK.memorization, (old) => {
       if (!old) return old
-      const idx = old.findIndex((m) => m.student_id === studentId && m.surah_no === surahNo)
+      const idx = old.findIndex(
+        (m) => m.student_id === studentId && m.surah_no === surahNo
+      )
       const existing = old[idx]
       if (idx >= 0 && existing) {
         const updated = [...old]
         updated[idx] = { ...existing, status: next }
         return updated
       }
-      return [...old, { student_id: studentId, surah_no: surahNo, status: next } as Memorization]
+      return [
+        ...old,
+        {
+          student_id: studentId,
+          surah_no: surahNo,
+          status: next,
+        } as Memorization,
+      ]
     })
 
     try {
@@ -115,16 +142,10 @@ export default function ProfilPage({
       await refreshMemorization()
       toast('Status hafalan berhasil diperbarui!')
     } catch (e: unknown) {
-      // Rollback on error
       queryClient.setQueryData(QK.memorization, prev)
       const msg = e instanceof Error ? e.message : String(e)
       toast('Gagal memperbarui status hafalan: ' + msg, 'error')
     }
-  }
-
-  function handleDelete() {
-    if (!student || studentId == null) return
-    setDeleteConfirmOpen(true)
   }
 
   async function handleDeleteConfirmed() {
@@ -140,10 +161,6 @@ export default function ProfilPage({
     }
   }
 
-  function handleDeleteSubmission(sub: { id: number; surah_no: number }) {
-    setDeleteSubmissionTarget({ id: sub.id, surahName: getSurahNama(sub.surah_no) })
-  }
-
   async function handleDeleteSubmissionConfirmed() {
     if (!deleteSubmissionTarget) return
     try {
@@ -157,26 +174,43 @@ export default function ProfilPage({
     }
   }
 
-  // Not found
   if (studentId != null && !student) {
     return (
-      <div className="py-16 text-center text-sm text-muted-foreground border border-border/50 rounded-lg bg-card border-dashed">
-        Santri tidak ditemukan
+      <div className="space-y-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push('/santri')}
+          className="-ml-2 gap-1.5 text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Kembali
+        </Button>
+        <EmptyState
+          icon={<User />}
+          title="Santri tidak ditemukan"
+          description="Data santri yang Anda cari tidak tersedia atau telah dihapus."
+          action={
+            <Button onClick={() => router.push('/santri')}>
+              Kembali ke Daftar Siswa
+            </Button>
+          }
+        />
       </div>
     )
   }
 
   if (!student) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-sm text-muted-foreground">Memuat data...</div>
+      <div className="flex items-center justify-center py-24">
+        <p className="text-sm font-medium text-muted-foreground">
+          Memuat data...
+        </p>
       </div>
     )
   }
 
   const avatarColor = getColor(student, colorIndex)
-
-  // Surahs for selected juz
   const juzSurahs = selectedJuz ? getJuzSurahs(selectedJuz) : []
   const juzHafalCount = selectedJuz
     ? juzSurahs.filter((s) => hafalan[s.no] === 1).length
@@ -184,252 +218,326 @@ export default function ProfilPage({
 
   return (
     <>
-    <div className="max-w-4xl pb-10">
-      {/* Back button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => router.push('/santri')}
-        className="mb-6 -ml-3 text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Kembali
-      </Button>
+      <div className="space-y-6 pb-10">
+        {/* Tombol kembali */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push('/santri')}
+          className="-ml-2 gap-1.5 text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Kembali ke Daftar Siswa
+        </Button>
 
-      {/* Student info card */}
-      <Card className="mb-8 border-border/40 shadow-sm overflow-hidden">
-        <div className="h-16 bg-gradient-to-r from-primary/10 to-accent/5"></div>
-        <CardContent className="p-6 pt-0 sm:flex sm:items-end sm:justify-between">
-          <div className="flex flex-col sm:flex-row gap-5 -mt-8 sm:-mt-10 mb-6 sm:mb-0 items-center sm:items-end">
-            <div
-              className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl text-3xl font-semibold text-white shadow-md ring-4 ring-surface"
-              style={{ backgroundColor: avatarColor }}
-            >
-              {initials(student.nama)}
-            </div>
-            <div className="text-center sm:text-left">
-              <h1 className="text-2xl font-bold text-foreground mb-1">
-                {student.nama}
-              </h1>
-              <div className="text-sm font-medium text-muted-foreground flex items-center justify-center sm:justify-start gap-2">
-                <span className="bg-background px-2.5 py-0.5 rounded-md border border-border">{student.kelas || 'Tanpa kelas'}</span>
-                {student.group_name && <span>• {student.group_name}</span>}
-              </div>
-            </div>
-          </div>
-
-          {/* Stats row */}
-          <div className="grid grid-cols-3 gap-3 w-full sm:w-auto">
-            <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
-              <div className="text-xl font-bold text-foreground">{hafalCount}</div>
-              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">Surah</div>
-            </div>
-            <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
-              <div className="text-xl font-bold text-foreground">{juzSelesai}</div>
-              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">Juz Selesai</div>
-            </div>
-            <div className="rounded-md bg-background p-3 text-center border border-border/50 shadow-sm">
-              <div className="text-xl font-bold text-primary">{pct}%</div>
-              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">Progress</div>
-            </div>
-          </div>
-        </CardContent>
-        <div className="px-6 pb-6 pt-2">
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-border/40">
-            <div
-              className="h-full rounded-full transition-all duration-700 ease-out"
-              style={{ width: `${pct}%`, backgroundColor: avatarColor }}
-            />
-          </div>
-        </div>
-      </Card>
-
-      {/* Juz view or grid */}
-      {selectedJuz ? (
-        <Card className="border-border/40 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <CardContent className="p-6">
-            <div className="mb-6 flex items-center justify-between border-b border-border/50 pb-4">
-              <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm" onClick={() => setSelectedJuz(null)} className="h-8 px-2">
-                  <ArrowLeft className="w-4 h-4" />
-                </Button>
-                <div>
-                  <h3 className="text-lg font-bold text-foreground">Juz {selectedJuz}</h3>
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {juzHafalCount} dari {juzSurahs.length} surah dihafal
-                  </p>
+        {/* Kartu identitas + statistik */}
+        <section className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-soft">
+          <div className="h-20 bg-gradient-to-r from-primary/15 via-accent/10 to-transparent" />
+          <div className="px-5 pb-5 sm:px-6">
+            <div className="-mt-12 flex flex-col items-center gap-4 sm:flex-row sm:items-end">
+              <span
+                className="flex size-24 shrink-0 items-center justify-center rounded-2xl text-3xl font-bold text-white shadow-soft-lg ring-4 ring-card"
+                style={{ backgroundColor: avatarColor }}
+              >
+                {initials(student.nama)}
+              </span>
+              <div className="pb-1 text-center sm:text-left">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                  {student.nama}
+                </h1>
+                <div className="mt-1.5 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                  <Badge
+                    variant="outline"
+                    className="border-primary/20 bg-primary/10 text-primary"
+                  >
+                    <GraduationCap className="size-3" />
+                    {student.kelas || 'Tanpa kelas'}
+                  </Badge>
+                  {student.group_name ? (
+                    <Badge variant="secondary">
+                      <Layers className="size-3" />
+                      {student.group_name}
+                    </Badge>
+                  ) : null}
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2">
+            {/* Statistik */}
+            <div className="mt-5 grid grid-cols-3 gap-3">
+              {[
+                { label: 'Surah', value: hafalCount, tone: 'text-foreground' },
+                {
+                  label: 'Juz Selesai',
+                  value: juzSelesai,
+                  tone: 'text-foreground',
+                },
+                { label: 'Progress', value: `${pct}%`, tone: 'text-primary' },
+              ].map((m) => (
+                <div
+                  key={m.label}
+                  className="rounded-xl border border-border/70 bg-muted/30 px-3 py-3 text-center"
+                >
+                  <div className={cn('tabular text-xl font-bold', m.tone)}>
+                    {m.value}
+                  </div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {m.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4">
+              <ProgressBar value={pct} size="md" />
+            </div>
+          </div>
+        </section>
+
+        {/* Detail juz atau grid */}
+        {selectedJuz ? (
+          <SectionCard
+            title={`Juz ${selectedJuz}`}
+            description={`${juzHafalCount} dari ${juzSurahs.length} surah dihafal`}
+            icon={<BookOpen />}
+            action={
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedJuz(null)}
+                className="gap-1.5"
+              >
+                <ArrowLeft className="size-4" />
+                Kembali
+              </Button>
+            }
+            flush
+          >
+            <div className="divide-y divide-border/50">
               {juzSurahs.map((s) => {
                 const status = hafalan[s.no] || 0
                 return (
-                  <Button
-                    variant="ghost"
+                  <button
                     key={s.no}
                     onClick={() => toggleSurah(s.no)}
-                    className="group flex w-full items-center gap-4 p-3 text-left hover:bg-card border border-transparent hover:border-border/50 justify-start"
+                    className="group flex w-full items-center gap-3.5 px-5 py-3 text-left transition-colors hover:bg-muted/40"
                   >
-                    {/* Status Toggle */}
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors ${
-                      status === 1 ? 'bg-primary/10 text-primary border border-primary/20' : 
-                      status === 2 ? 'bg-accent/10 text-accent border border-accent/20' : 
-                      'bg-background text-muted-foreground border border-border group-hover:border-border-hover'
-                    }`}>
-                      {status === 1 ? (
-                        <CheckCircle2 className="w-5 h-5" />
-                      ) : status === 2 ? (
-                        <RotateCcw className="w-5 h-5" />
-                      ) : (
-                        <Circle className="w-5 h-5 opacity-40" />
+                    <span
+                      className={cn(
+                        'flex size-9 shrink-0 items-center justify-center rounded-xl border transition-colors',
+                        status === 1
+                          ? 'border-primary/25 bg-primary/10 text-primary'
+                          : status === 2
+                            ? 'border-accent/25 bg-accent/10 text-accent'
+                            : 'border-border bg-background text-muted-foreground group-hover:border-primary/30'
                       )}
-                    </div>
+                    >
+                      {status === 1 ? (
+                        <CheckCircle2 className="size-4" />
+                      ) : status === 2 ? (
+                        <RotateCcw className="size-4" />
+                      ) : (
+                        <Circle className="size-4 opacity-40" />
+                      )}
+                    </span>
 
-                    {/* Surah info */}
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[15px] font-semibold text-foreground">{s.no}. {s.nama}</div>
-                      <div className="text-[12px] font-medium text-muted-foreground mt-0.5">
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold text-foreground">
+                        {s.no}. {s.nama}
+                      </span>
+                      <span className="block text-xs font-medium text-muted-foreground">
                         {s.ayat} ayat
-                      </div>
-                    </div>
+                      </span>
+                    </span>
 
-                    {/* Arabic */}
-                    <div className="shrink-0 text-xl text-muted-foreground font-arabic pr-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <span className="shrink-0 pr-1 font-arabic text-lg text-muted-foreground opacity-50 transition-opacity group-hover:opacity-100">
                       {s.arab}
-                    </div>
-                  </Button>
+                    </span>
+                  </button>
                 )
               })}
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-foreground">Pencapaian Juz</h3>
-              <span className="text-xs font-medium text-muted-foreground bg-card px-2.5 py-1 rounded-md border border-border">Pilih juz untuk detail</span>
-            </div>
-            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
-              {[...Array(30)].map((_, i) => {
-                const j = i + 1
-                const p = juzPcts[i] ?? 0
-                return (
-                  <Button
-                    key={j}
-                    onClick={() => setSelectedJuz(j)}
-                    className={`group relative flex flex-col items-center justify-center p-3 text-center hover:-translate-y-0.5 justify-center ${
-                      p === 100
-                        ? 'bg-primary text-white shadow-md shadow-primary/20 hover:bg-primary/90'
-                        : p > 0
-                          ? 'bg-accent/10 text-accent border border-accent/20 hover:bg-accent/15'
-                          : 'bg-card border border-border text-muted-foreground hover:border-text-muted/30 hover:text-muted-foreground'
-                    }`}
-                  >
-                    <div className="text-[15px] font-bold">{j}</div>
-                    {p > 0 && p < 100 && (
-                      <div className="text-[10px] font-semibold mt-1 bg-accent/20 px-1.5 py-0.5 rounded text-accent-dark">{p}%</div>
-                    )}
-                    {p === 100 && (
-                      <div className="absolute top-1 right-1">
-                        <CheckCircle2 className="w-3 h-3 text-white/70" />
-                      </div>
-                    )}
-                    </Button>
-                  )
-              })}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-bold text-foreground mb-4">Riwayat Setoran</h3>
-            
-            {studentSubmissions.length === 0 ? (
-              <div className="py-10 text-center text-sm text-muted-foreground border border-border/50 rounded-lg bg-card border-dashed">
-                Belum ada setoran
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {studentSubmissions.map((sub) => (
-                  <Card key={sub.id} className="border-border/40 shadow-sm overflow-hidden group">
-                    <div className="flex">
-                      <div className="w-1.5 bg-primary/20 group-hover:bg-primary/40 transition-colors"></div>
-                      <div className="p-4 flex-1">
-                        <div className="flex items-start justify-between gap-3 mb-1">
-                          <div className="font-semibold text-[14px] text-foreground">
-                            {getSurahNama(sub.surah_no)}
-                            {sub.ayat_start && sub.ayat_end ? (
-                              <span className="text-muted-foreground font-normal ml-1">
-                                ayat {sub.ayat_start}{sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}
-                              </span>
-                            ) : null}
-                          </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handleDeleteSubmission(sub)}
-                              title="Hapus Setoran"
-                              className="text-destructive hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                            <span className="inline-flex shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary px-2 py-0.5 text-[11px] font-bold border border-primary/20">
-                              {sub.nilai}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-[12px] font-medium text-muted-foreground mb-2">
-                          {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}
-                        </div>
-                        {sub.catatan && (
-                          <div className="text-[13px] text-muted-foreground bg-background rounded-md p-2.5 border border-border/50">
-                            {sub.catatan}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-10 border-t border-border pt-6">
-              <Button
-                variant="destructive"
-                className="w-full gap-2 opacity-90 hover:opacity-100"
-                onClick={handleDelete}
+          </SectionCard>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Peta juz */}
+            <div className="lg:col-span-2">
+              <SectionCard
+                title="Pencapaian Juz"
+                description="Pilih juz untuk melihat dan mengubah status surah."
+                icon={<BookOpen />}
+                action={
+                  <div className="hidden items-center gap-3 text-[10px] font-bold text-muted-foreground sm:flex">
+                    <span className="flex items-center gap-1.5">
+                      <span className="size-2.5 rounded-sm bg-primary" />
+                      Lengkap
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="size-2.5 rounded-sm border border-accent/40 bg-accent/20" />
+                      Progres
+                    </span>
+                  </div>
+                }
               >
-                <Trash2 className="w-4 h-4" />
-                Hapus Data Santri
-              </Button>
-              <p className="text-[11px] text-muted-foreground text-center mt-2">
-                Tindakan ini tidak dapat dibatalkan.
-              </p>
+                <div className="grid grid-cols-5 gap-2 sm:grid-cols-6">
+                  {[...Array(30)].map((_, i) => {
+                    const j = i + 1
+                    const p = juzPcts[i] ?? 0
+                    return (
+                      <button
+                        key={j}
+                        onClick={() => setSelectedJuz(j)}
+                        className={cn(
+                          'group relative flex flex-col items-center justify-center rounded-xl border py-3 text-center transition-all hover:-translate-y-0.5',
+                          p === 100
+                            ? 'border-primary bg-primary text-primary-foreground shadow-soft'
+                            : p > 0
+                              ? 'border-accent/30 bg-accent/10 text-accent'
+                              : 'border-border bg-card text-muted-foreground hover:border-primary/30'
+                        )}
+                      >
+                        <span className="text-[9px] font-bold uppercase tracking-wide opacity-70">
+                          Juz
+                        </span>
+                        <span className="tabular mt-0.5 text-base font-bold leading-none">
+                          {j}
+                        </span>
+                        {p > 0 && p < 100 ? (
+                          <span className="tabular mt-1 rounded bg-accent/20 px-1 text-[9px] font-bold text-accent">
+                            {p}%
+                          </span>
+                        ) : null}
+                        {p === 100 ? (
+                          <CheckCircle2 className="absolute right-1 top-1 size-3 text-primary-foreground/70" />
+                        ) : null}
+                      </button>
+                    )
+                  })}
+                </div>
+              </SectionCard>
+            </div>
+
+            {/* Riwayat setoran */}
+            <div>
+              <SectionCard
+                title="Riwayat Setoran"
+                icon={<History />}
+                action={
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {studentSubmissions.length}
+                  </span>
+                }
+                flush
+              >
+                {studentSubmissions.length === 0 ? (
+                  <EmptyState
+                    icon={<History />}
+                    title="Belum ada setoran"
+                    description="Setoran hafalan santri akan tampil di sini."
+                    className="border-0 bg-transparent"
+                  />
+                ) : (
+                  <div className="max-h-[520px] divide-y divide-border/50 overflow-y-auto">
+                    {studentSubmissions.map((sub) => (
+                      <div
+                        key={sub.id}
+                        className="group flex gap-3 px-5 py-3.5 transition-colors hover:bg-muted/40"
+                      >
+                        <span className="w-1 shrink-0 rounded-full bg-primary/25" />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="truncate text-sm font-bold text-foreground">
+                              {getSurahNama(sub.surah_no)}
+                              {sub.ayat_start && sub.ayat_end ? (
+                                <span className="ml-1 font-normal text-muted-foreground">
+                                  :{sub.ayat_start}
+                                  {sub.ayat_end !== sub.ayat_start
+                                    ? `–${sub.ayat_end}`
+                                    : ''}
+                                </span>
+                              ) : null}
+                            </span>
+                            <div className="flex shrink-0 items-center gap-1">
+                              <button
+                                onClick={() =>
+                                  setDeleteSubmissionTarget({
+                                    id: sub.id,
+                                    surahName: getSurahNama(sub.surah_no),
+                                  })
+                                }
+                                title="Hapus Setoran"
+                                aria-label="Hapus setoran"
+                                className="rounded-md p-1 text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </button>
+                              <Badge
+                                variant="outline"
+                                className="border-primary/20 bg-primary/10 text-primary"
+                              >
+                                {sub.nilai}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="mt-0.5 text-[11px] font-medium text-muted-foreground">
+                            {formatWaktu(sub.waktu).tanggal} ·{' '}
+                            {formatWaktu(sub.waktu).jam}
+                          </div>
+                          {sub.catatan ? (
+                            <p className="mt-1.5 rounded-lg border border-border/50 bg-muted/40 p-2 text-xs leading-relaxed text-muted-foreground">
+                              {sub.catatan}
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SectionCard>
+
+              {/* Zona hapus */}
+              <div className="mt-6 rounded-2xl border border-destructive/25 bg-destructive/5 p-4">
+                <h4 className="text-[11px] font-bold uppercase tracking-wider text-destructive">
+                  Zona Berbahaya
+                </h4>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Menghapus santri akan menghapus seluruh riwayat hafalan dan
+                  setorannya secara permanen.
+                </p>
+                <Button
+                  variant="destructive"
+                  className="mt-3 w-full gap-2"
+                  onClick={() => setDeleteConfirmOpen(true)}
+                >
+                  <Trash2 className="size-4" />
+                  Hapus Data Santri
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
 
-    <ConfirmDialog
-      open={deleteConfirmOpen}
-      onOpenChange={setDeleteConfirmOpen}
-      title="Hapus Santri?"
-      description={`Hapus santri "${student?.nama}"? Semua data terkait akan dihapus.`}
-      confirmText="Hapus"
-      onConfirm={handleDeleteConfirmed}
-    />
-    <ConfirmDialog
-      open={deleteSubmissionTarget !== null}
-      onOpenChange={(open) => { if (!open) setDeleteSubmissionTarget(null) }}
-      title="Hapus Setoran?"
-      description={`Hapus setoran ${deleteSubmissionTarget?.surahName || ''}? Data yang dihapus tidak dapat dikembalikan.`}
-      confirmText="Hapus"
-      onConfirm={handleDeleteSubmissionConfirmed}
-    />
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Hapus Santri?"
+        description={`Hapus santri "${student?.nama}"? Semua data terkait akan dihapus.`}
+        confirmText="Hapus"
+        onConfirm={handleDeleteConfirmed}
+      />
+      <ConfirmDialog
+        open={deleteSubmissionTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteSubmissionTarget(null)
+        }}
+        title="Hapus Setoran?"
+        description={`Hapus setoran ${
+          deleteSubmissionTarget?.surahName || ''
+        }? Data yang dihapus tidak dapat dikembalikan.`}
+        confirmText="Hapus"
+        onConfirm={handleDeleteSubmissionConfirmed}
+      />
     </>
   )
 }

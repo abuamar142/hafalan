@@ -14,8 +14,6 @@ import {
   Settings,
   LogOut,
   FolderOpen,
-  Moon,
-  Sun,
   ChevronRight,
 } from 'lucide-react'
 import {
@@ -41,6 +39,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import { ThemeToggle } from '@/components/app/theme-toggle'
 import ConfirmDialog from '@/components/ConfirmDialog'
 
 interface NavItem {
@@ -54,12 +53,12 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/dashboard',
-    icon: <LayoutDashboard className="w-5 h-5" />,
+    icon: <LayoutDashboard />,
   },
   {
-    label: 'Management',
+    label: 'Manajemen',
     href: '/management',
-    icon: <FolderOpen className="w-5 h-5" />,
+    icon: <FolderOpen />,
     children: [
       { label: 'Kelas', href: '/kelas' },
       { label: 'Kelompok', href: '/kelompok' },
@@ -69,7 +68,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Setoran',
     href: '/setoran',
-    icon: <CheckSquare className="w-5 h-5" />,
+    icon: <CheckSquare />,
     children: [
       { label: 'Tambah Setoran', href: '/setoran/tambah' },
       { label: 'Riwayat Setoran', href: '/setoran/riwayat' },
@@ -78,7 +77,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Laporan',
     href: '/laporan',
-    icon: <FileBarChart className="w-5 h-5" />,
+    icon: <FileBarChart />,
   },
 ]
 
@@ -100,7 +99,7 @@ function CollapsibleWithState({
 }) {
   const [open, setOpen] = useState(isParentActive)
 
-  // Sync open state when parent becomes active (e.g. direct navigation)
+  // Buka otomatis saat salah satu anaknya menjadi aktif.
   useEffect(() => {
     if (isParentActive) setOpen(true)
   }, [isParentActive])
@@ -112,14 +111,25 @@ function CollapsibleWithState({
       className="group/collapsible"
     >
       <SidebarMenuItem>
-        <CollapsibleTrigger render={<SidebarMenuButton tooltip={item.label} />}>
+        <CollapsibleTrigger
+          render={
+            <SidebarMenuButton
+              tooltip={item.label}
+              isActive={isParentActive}
+              className="font-medium"
+            />
+          }
+        >
           {item.icon}
           <span>{item.label}</span>
         </CollapsibleTrigger>
         <SidebarMenuAction
-          className={cn("transition-transform duration-200", open && "rotate-90")}
+          className={cn(
+            'transition-transform duration-200',
+            open && 'rotate-90'
+          )}
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight />
         </SidebarMenuAction>
         <CollapsibleContent>
           <SidebarMenuSub>
@@ -128,6 +138,7 @@ function CollapsibleWithState({
                 <SidebarMenuSubButton
                   isActive={pathname.startsWith(child.href)}
                   onClick={() => onNavigate(child.href)}
+                  className="cursor-pointer"
                 >
                   <span>{child.label}</span>
                 </SidebarMenuSubButton>
@@ -140,33 +151,15 @@ function CollapsibleWithState({
   )
 }
 
-export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps) {
+export default function AppSidebar({
+  userName,
+  onOpenSettings,
+}: AppSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
   const { setOpenMobile } = useSidebar()
-  const [dark, setDark] = useState(false)
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
-
-  useEffect(() => {
-    const stored = localStorage.getItem('theme')
-    const isDark =
-      stored === 'dark' ||
-      (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    setDark(isDark)
-    document.documentElement.classList.toggle('dark', isDark)
-  }, [])
-
-  function toggleTheme() {
-    const next = !dark
-    setDark(next)
-    document.documentElement.classList.toggle('dark', next)
-    localStorage.setItem('theme', next ? 'dark' : 'light')
-  }
-
-  function handleLogout() {
-    setLogoutConfirmOpen(true)
-  }
 
   async function handleLogoutConfirm() {
     await supabase.auth.signOut()
@@ -178,30 +171,40 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
     setOpenMobile(false)
   }
 
+  const initials =
+    (userName || 'Guru')
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase())
+      .join('') || 'G'
+
   return (
     <Sidebar collapsible="offcanvas">
-      <SidebarHeader>
+      <SidebarHeader className="border-b border-sidebar-border/60">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" tooltip={SCHOOL_NAME}>
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+            <SidebarMenuButton
+              size="lg"
+              tooltip={SCHOOL_NAME}
+              className="cursor-default hover:bg-transparent data-active:bg-transparent"
+            >
+              <div className="flex size-9 items-center justify-center overflow-hidden rounded-xl ring-1 ring-sidebar-border">
                 <Image
                   src="/images/logo.jpg"
                   alt="Logo"
-                  width={32}
-                  height={32}
-                  className="size-8 rounded-lg object-cover"
+                  width={36}
+                  height={36}
+                  className="size-9 object-cover"
                 />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
+              <div className="grid flex-1 text-left leading-tight">
+                <span className="truncate text-sm font-bold">
                   {SCHOOL_NAME}
                 </span>
-                {userName && (
-                  <span className="truncate text-xs text-sidebar-muted-foreground">
-                    {userName}
-                  </span>
-                )}
+                <span className="truncate text-[11px] font-medium text-sidebar-foreground/60">
+                  E-Raport Tahfidz
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -210,12 +213,15 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider">
+            Menu Utama
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1">
               {NAV_ITEMS.map((item) => {
                 const isParentActive =
-                  item.children?.some((c) => pathname.startsWith(c.href)) ?? false
+                  item.children?.some((c) => pathname.startsWith(c.href)) ??
+                  false
                 const hasChildren = item.children && item.children.length > 0
 
                 if (!hasChildren) {
@@ -229,6 +235,7 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
                         isActive={isActive}
                         tooltip={item.label}
                         onClick={() => navigateTo(item.href)}
+                        className="cursor-pointer font-medium"
                       >
                         {item.icon}
                         <span>{item.label}</span>
@@ -252,9 +259,25 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarSeparator />
+      <SidebarFooter className="border-t border-sidebar-border/60">
+        {/* Identitas pengguna */}
+        <div className="flex items-center gap-2.5 px-2 py-2">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-sidebar-primary/15 text-xs font-bold text-sidebar-primary">
+            {initials}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-semibold leading-tight">
+              {userName || 'Guru'}
+            </p>
+            <p className="truncate text-[11px] text-sidebar-foreground/60">
+              Ustadz / Ustadzah
+            </p>
+          </div>
+          <ThemeToggle />
+        </div>
 
-      <SidebarFooter>
+        <SidebarSeparator className="mx-0" />
+
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -263,26 +286,19 @@ export default function AppSidebar({ userName, onOpenSettings }: AppSidebarProps
                 onOpenSettings()
                 setOpenMobile(false)
               }}
+              className="cursor-pointer"
             >
-              <Settings className="w-5 h-5" />
+              <Settings />
               <span>Pengaturan</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={dark ? 'Mode Terang' : 'Mode Gelap'}
-              onClick={toggleTheme}
-            >
-              {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              <span>{dark ? 'Mode Terang' : 'Mode Gelap'}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
               tooltip="Keluar"
-              onClick={handleLogout}
+              onClick={() => setLogoutConfirmOpen(true)}
+              className="cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut />
               <span>Keluar</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

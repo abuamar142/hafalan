@@ -1,7 +1,14 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Combobox } from '@/components/ui/combobox'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +17,8 @@ import { useToast } from '@/components/ui/toast-wrapper'
 import { ALL_SURAHS, NILAI_OPTIONS } from '@/lib/constants'
 import { updateSubmissionAction } from '@/lib/actions/submissions'
 import type { SetoranItem } from '@/lib/types'
-import { Save, Loader2 } from 'lucide-react'
+import { Save, Loader2, Check, User } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface EditSubmissionModalProps {
   submission: SetoranItem | null
@@ -22,6 +30,24 @@ interface EditSubmissionModalProps {
 function toLocalDatetimeString(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+/** Label field yang konsisten. */
+function FieldLabel({
+  htmlFor,
+  children,
+}: {
+  htmlFor?: string
+  children: React.ReactNode
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+    >
+      {children}
+    </label>
+  )
 }
 
 export default function EditSubmissionModal({
@@ -40,7 +66,6 @@ export default function EditSubmissionModal({
   const [ayatEnd, setAyatEnd] = useState<number | ''>('')
   const [saving, setSaving] = useState(false)
 
-  // Map Surahs to Combobox Options
   const surahOptions = useMemo(() => {
     return ALL_SURAHS.map((s) => ({
       id: s.no,
@@ -50,10 +75,11 @@ export default function EditSubmissionModal({
     }))
   }, [])
 
-  const selectedSurah = surahNo ? ALL_SURAHS.find(s => s.no === Number(surahNo)) : null
+  const selectedSurah = surahNo
+    ? ALL_SURAHS.find((s) => s.no === Number(surahNo))
+    : null
   const maxAyat = selectedSurah ? selectedSurah.ayat : 1
 
-  // Populate form values when submission is loaded
   useEffect(() => {
     if (submission) {
       setSurahNo(String(submission.surah_no))
@@ -65,9 +91,12 @@ export default function EditSubmissionModal({
     }
   }, [submission, isOpen])
 
-  // Reset range if surah changes during editing
   useEffect(() => {
-    if (selectedSurah && submission && Number(surahNo) !== submission.surah_no) {
+    if (
+      selectedSurah &&
+      submission &&
+      Number(surahNo) !== submission.surah_no
+    ) {
       setAyatStart(1)
       setAyatEnd(selectedSurah.ayat)
     }
@@ -81,7 +110,6 @@ export default function EditSubmissionModal({
     }
 
     setSaving(true)
-
     try {
       const formData = new FormData()
       formData.append('id', String(submission.id))
@@ -107,116 +135,157 @@ export default function EditSubmissionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Setoran Hafalan</DialogTitle>
+          <DialogDescription>
+            Perbarui detail setoran hafalan santri.
+          </DialogDescription>
         </DialogHeader>
-        {submission && (
+
+        {submission ? (
           <div className="space-y-5">
-            {/* Header Santri */}
-            <div className="bg-card p-3 rounded-lg border border-border/50 text-xs text-muted-foreground leading-relaxed">
-              <span className="font-semibold text-foreground block">Santri:</span>
-              {submission.santri_nama}
+            {/* Identitas santri */}
+            <div className="flex items-center gap-2.5 rounded-xl border border-border/70 bg-muted/30 px-3.5 py-2.5">
+              <User className="size-4 shrink-0 text-primary" />
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Santri
+                </p>
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {submission.santri_nama}
+                </p>
+              </div>
             </div>
 
-            {/* Grid Layout on Desktop */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Left Column: Surah */}
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="edit-modal-surah" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Surah
-                  </label>
-                  <Combobox
-                    id="edit-modal-surah"
-                    options={surahOptions}
-                    value={surahNo}
-                    onChange={setSurahNo}
-                    placeholder="Pilih surah..."
-                    searchPlaceholder="Ketik nama surah..."
-                    emptyText="Surah tidak ditemukan"
-                  />
+            {/* Surah + waktu */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <FieldLabel htmlFor="edit-modal-surah">Surah</FieldLabel>
+                <Combobox
+                  id="edit-modal-surah"
+                  options={surahOptions}
+                  value={surahNo}
+                  onChange={setSurahNo}
+                  placeholder="Pilih surah..."
+                  searchPlaceholder="Ketik nama surah..."
+                  emptyText="Surah tidak ditemukan"
+                />
+              </div>
+              <div>
+                <FieldLabel htmlFor="edit-modal-waktu">
+                  Waktu Setoran
+                </FieldLabel>
+                <Input
+                  id="edit-modal-waktu"
+                  type="datetime-local"
+                  value={waktu}
+                  onChange={(e) => setWaktu(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Pratinjau surah + rentang ayat */}
+            {selectedSurah ? (
+              <div className="animate-fade-in space-y-4 rounded-xl border border-border/70 bg-muted/30 p-4">
+                <div className="flex items-start justify-between gap-4 border-b border-border/50 pb-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Surah Terpilih
+                    </p>
+                    <p className="mt-0.5 text-sm font-bold text-foreground">
+                      {selectedSurah.nama}
+                    </p>
+                    <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                      Juz {selectedSurah.juz} • {selectedSurah.ayat} Ayat
+                    </p>
+                  </div>
+                  <span className="shrink-0 font-arabic text-2xl leading-none text-primary">
+                    {selectedSurah.arab}
+                  </span>
                 </div>
 
-                {selectedSurah && (
-                  <div className="flex items-center justify-between bg-card p-3 rounded-lg border border-border/40 h-[72px]">
-                    <div>
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground">Surah Terpilih</p>
-                      <p className="text-xs font-bold text-foreground mt-0.5">{selectedSurah.nama} (Juz {selectedSurah.juz})</p>
-                    </div>
-                    <span className="text-xl font-bold text-primary font-serif select-none" style={{ fontFamily: 'var(--font-arabic), serif' }}>
-                      {selectedSurah.arab}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-foreground">
+                      Rentang Ayat
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAyatStart(1)
+                        setAyatEnd(selectedSurah.ayat)
+                      }}
+                      className="cursor-pointer text-xs font-medium text-primary hover:underline"
+                    >
+                      Set semua (1–{selectedSurah.ayat})
+                    </button>
                   </div>
-                )}
-              </div>
-
-              {/* Right Column: Time & Verse Range */}
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="edit-modal-waktu" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                    Waktu Setoran
-                  </label>
-                  <Input
-                    id="edit-modal-waktu"
-                    type="datetime-local"
-                    value={waktu}
-                    onChange={(e) => setWaktu(e.target.value)}
-                  />
-                </div>
-
-                {selectedSurah && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                        Rentang Ayat
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAyatStart(1)
-                          setAyatEnd(selectedSurah.ayat)
-                        }}
-                        className="text-xs font-medium text-primary hover:underline cursor-pointer"
+                  <div className="flex items-end gap-3">
+                    <div className="flex-1">
+                      <label
+                        htmlFor="edit-ayat-mulai"
+                        className="mb-1 block text-[10px] font-medium text-muted-foreground"
                       >
-                        Set Semua Ayat
-                      </button>
+                        Dari Ayat
+                      </label>
+                      <Input
+                        id="edit-ayat-mulai"
+                        type="number"
+                        min={1}
+                        max={maxAyat}
+                        value={ayatStart}
+                        onChange={(e) =>
+                          setAyatStart(
+                            Math.max(
+                              1,
+                              Math.min(maxAyat, Number(e.target.value) || 1)
+                            )
+                          )
+                        }
+                      />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <span className="text-[10px] text-muted-foreground mb-1 block">Dari Ayat</span>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={maxAyat}
-                          value={ayatStart}
-                          onChange={(e) => setAyatStart(Math.max(1, Math.min(maxAyat, Number(e.target.value) || 1)))}
-                        />
-                      </div>
-                      <span className="text-muted-foreground mt-5 shrink-0 text-xs">hingga</span>
-                      <div className="flex-1">
-                        <span className="text-[10px] text-muted-foreground mb-1 block">Sampai Ayat</span>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={maxAyat}
-                          value={ayatEnd}
-                          onChange={(e) => setAyatEnd(e.target.value === '' ? '' : Math.max(1, Math.min(maxAyat, Number(e.target.value) || 1)))}
-                          placeholder={String(maxAyat)}
-                        />
-                      </div>
+                    <span className="pb-2.5 text-xs text-muted-foreground">
+                      hingga
+                    </span>
+                    <div className="flex-1">
+                      <label
+                        htmlFor="edit-ayat-selesai"
+                        className="mb-1 block text-[10px] font-medium text-muted-foreground"
+                      >
+                        Sampai Ayat
+                      </label>
+                      <Input
+                        id="edit-ayat-selesai"
+                        type="number"
+                        min={1}
+                        max={maxAyat}
+                        value={ayatEnd}
+                        onChange={(e) =>
+                          setAyatEnd(
+                            e.target.value === ''
+                              ? ''
+                              : Math.max(
+                                  1,
+                                  Math.min(
+                                    maxAyat,
+                                    Number(e.target.value) || 1
+                                  )
+                                )
+                          )
+                        }
+                        placeholder={String(maxAyat)}
+                      />
                     </div>
                   </div>
-                )}
+                </div>
               </div>
-            </div>
+            ) : null}
 
-            {/* Score Pills (Pills row is full-width below the columns) */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                Predikat / Nilai
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            {/* Predikat */}
+            <div>
+              <FieldLabel>Predikat / Nilai</FieldLabel>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
                 {NILAI_OPTIONS.map((n) => {
                   const isSelected = nilai === n
                   return (
@@ -224,12 +293,14 @@ export default function EditSubmissionModal({
                       key={n}
                       type="button"
                       onClick={() => setNilai(n)}
-                      className={`px-2.5 py-2.5 rounded-md text-xs font-semibold border transition-all text-center cursor-pointer ${
+                      className={cn(
+                        'flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-2.5 py-2.5 text-xs font-bold transition-all',
                         isSelected
-                          ? 'bg-primary border-primary text-white shadow-sm ring-2 ring-primary/20'
-                          : 'border-border bg-card text-muted-foreground hover:bg-card/65'
-                      }`}
+                          ? 'border-primary bg-primary text-primary-foreground shadow-soft'
+                          : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                      )}
                     >
+                      {isSelected ? <Check className="size-3.5" /> : null}
                       {n}
                     </button>
                   )
@@ -237,11 +308,11 @@ export default function EditSubmissionModal({
               </div>
             </div>
 
-            {/* Catatan Textarea */}
-            <div className="space-y-1.5">
-              <label htmlFor="edit-modal-catatan" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+            {/* Catatan */}
+            <div>
+              <FieldLabel htmlFor="edit-modal-catatan">
                 Catatan (Opsional)
-              </label>
+              </FieldLabel>
               <Textarea
                 id="edit-modal-catatan"
                 value={catatan}
@@ -252,18 +323,25 @@ export default function EditSubmissionModal({
               />
             </div>
 
-            {/* Action buttons */}
             <DialogFooter>
               <Button variant="outline" onClick={onClose} disabled={saving}>
                 Batal
               </Button>
-              <Button onClick={handleSave} disabled={saving} className="gap-2 cursor-pointer">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="cursor-pointer gap-2"
+              >
+                {saving ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Save className="size-4" />
+                )}
                 {saving ? 'Menyimpan...' : 'Perbarui Setoran'}
               </Button>
             </DialogFooter>
           </div>
-        )}
+        ) : null}
       </DialogContent>
     </Dialog>
   )

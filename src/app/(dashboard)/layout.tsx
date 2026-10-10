@@ -5,12 +5,21 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { SidebarInset } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/app-sidebar'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { useAppState, QK } from '@/hooks/useAppState'
 import { createClient } from '@/lib/supabase/client'
 import type { SantriWithCount, Memorization } from '@/lib/types'
 import { ToastProvider } from '@/components/ui/toast-wrapper'
+import { Loader2 } from 'lucide-react'
 
 type App = ReturnType<typeof useAppState>
 
@@ -40,12 +49,13 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 })
 
-// Inner component — must be nested under QueryClientProvider so useQueryClient works
+// Komponen dalam — harus di bawah QueryClientProvider agar useQueryClient bekerja.
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const app = useAppState()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guruInput, setGuruInput] = useState('')
   const [userName, setUserName] = useState('')
+  const [savingName, setSavingName] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -60,10 +70,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   }
 
   async function handleSaveGuru() {
-    const supabase = createClient()
-    await supabase.auth.updateUser({ data: { name: guruInput.trim() } })
-    setUserName(guruInput.trim())
-    setSettingsOpen(false)
+    setSavingName(true)
+    try {
+      const supabase = createClient()
+      await supabase.auth.updateUser({ data: { name: guruInput.trim() } })
+      setUserName(guruInput.trim())
+      setSettingsOpen(false)
+    } finally {
+      setSavingName(false)
+    }
   }
 
   return (
@@ -82,52 +97,69 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     >
       <SidebarProvider>
         <AppSidebar userName={userName} onOpenSettings={openSettings} />
-        <SidebarInset>
-          <header className="flex h-14 shrink-0 items-center gap-2 px-4 md:hidden">
+        <SidebarInset className="bg-background">
+          {/* Topbar */}
+          <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl md:px-6">
             <SidebarTrigger className="-ml-1" />
+            <div className="h-5 w-px bg-border" />
+            <span className="text-[13px] font-semibold text-muted-foreground">
+              Sistem Informasi Hafalan
+            </span>
           </header>
 
-          <div className="flex min-h-screen flex-1 flex-col">
-            {/* Loading */}
-            {app.loading && (
-              <div className="flex flex-1 items-center justify-center py-16">
-                <div className="text-sm text-muted-foreground">Memuat data...</div>
+          <div className="flex min-h-[calc(100svh-3.5rem)] flex-1 flex-col">
+            {app.loading ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-3 py-24">
+                <Loader2 className="size-6 animate-spin text-primary" />
+                <p className="text-sm font-medium text-muted-foreground">
+                  Memuat data...
+                </p>
               </div>
-            )}
-
-            {/* Content */}
-            {!app.loading && (
-              <main className="flex-1 px-4 py-6 md:px-8 md:py-10 w-full max-w-6xl mx-auto">{children}</main>
+            ) : (
+              <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8 md:py-8">
+                {children}
+              </main>
             )}
           </div>
         </SidebarInset>
       </SidebarProvider>
 
-      {/* Settings Dialog */}
+      {/* Dialog pengaturan */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Pengaturan</DialogTitle>
+            <DialogDescription>
+              Nama ini muncul pada laporan dan raport yang Anda cetak.
+            </DialogDescription>
           </DialogHeader>
-          <div className="mb-3">
-            <label className="mb-1.5 block text-xs text-muted-foreground">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="guru-name"
+              className="block text-[13px] font-semibold text-foreground"
+            >
               Nama Ustadz / Guru
             </label>
             <Input
+              id="guru-name"
               type="text"
               value={guruInput}
               onChange={(e) => setGuruInput(e.target.value)}
               placeholder="Ustadz Ahmad..."
             />
           </div>
-          <div className="mt-3.5 flex justify-end">
-            <button
-              onClick={handleSaveGuru}
-              className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white hover:opacity-85 transition-opacity"
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setSettingsOpen(false)}
+              disabled={savingName}
             >
-              Simpan
-            </button>
-          </div>
+              Batal
+            </Button>
+            <Button onClick={handleSaveGuru} disabled={savingName}>
+              {savingName ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </DashboardContext.Provider>

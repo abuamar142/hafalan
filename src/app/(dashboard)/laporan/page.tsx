@@ -10,10 +10,20 @@ import {
 } from '@/lib/data/memorization'
 import { getStudentSubmissions } from '@/lib/data/submissions'
 import { computeRanking } from '@/lib/domain/statistics'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
-import { Printer, Users, User, BarChart3, Eye } from 'lucide-react'
+import { PageHeader } from '@/components/app/page-header'
+import { SectionCard } from '@/components/app/section-card'
+import { Alert } from '@/components/app/alert'
+import {
+  Printer,
+  Users,
+  User,
+  BarChart3,
+  Eye,
+  FileText,
+  CheckCircle2,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type ReportType = 'kolektif' | 'individu' | 'perkembangan'
@@ -46,12 +56,10 @@ export default function LaporanPage() {
     [state.students]
   )
 
-  // ── Collect full memorization data for all students ──
   async function fetchAllMemorization(): Promise<
     Record<number, Record<number, number>>
   > {
     const memMap = await getAllMemorizationMap()
-
     const fullSantri: Record<number, Record<number, number>> = {}
     for (const [studentIdStr, memos] of Object.entries(memMap)) {
       const studentId = Number(studentIdStr)
@@ -60,25 +68,19 @@ export default function LaporanPage() {
         fullSantri[studentId][m.surah_no] = m.status
       }
     }
-
     return fullSantri
   }
 
-  // ── Collect individual student data ──
   async function fetchStudentData(studentId: number) {
     const memos = await getStudentMemorization(studentId)
-
     const hafalan: Record<number, number> = {}
     memos.forEach((m) => {
       hafalan[m.surah_no] = m.status
     })
-
     const subs = await getStudentSubmissions(studentId)
-
     return { hafalan, submissions: subs || [] }
   }
 
-  // ── Generate preview (no print) ──
   async function generateKolektif() {
     setIsGenerating(true)
     try {
@@ -166,7 +168,10 @@ export default function LaporanPage() {
   img { max-width: 100%; }
 </style></head><body>${printHtml}</body></html>`)
     win.document.close()
-    win.onload = () => { win.print(); win.close() }
+    win.onload = () => {
+      win.print()
+      win.close()
+    }
   }
 
   function handleCardClick(type: ReportType) {
@@ -180,120 +185,185 @@ export default function LaporanPage() {
     }
   }
 
-  const cardBase = "border-border/40 shadow-sm flex flex-col cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary/30"
-  const cardSelected = "ring-2 ring-primary border-primary"
+  const reports: {
+    type: ReportType
+    title: string
+    subtitle: string
+    description: string
+    icon: React.ReactNode
+    tone: 'primary' | 'accent' | 'purple'
+  }[] = [
+    {
+      type: 'kolektif',
+      title: 'Kolektif',
+      subtitle: 'Ranking & rekap seluruh santri',
+      description:
+        'Daftar seluruh santri yang diurutkan berdasarkan pencapaian hafalan terbanyak. Berguna untuk evaluasi bulanan atau semester.',
+      icon: <Users />,
+      tone: 'primary',
+    },
+    {
+      type: 'individu',
+      title: 'Individu',
+      subtitle: 'Rapor progres per santri',
+      description:
+        'Detail pencapaian juz, progres hafalan, dan riwayat setoran lengkap untuk satu santri.',
+      icon: <User />,
+      tone: 'accent',
+    },
+    {
+      type: 'perkembangan',
+      title: 'Perkembangan Tahfidz',
+      subtitle: 'Rekap level juz per kelas',
+      description:
+        'Rekapitulasi pencapaian level juz untuk setiap kelas, untuk melihat distribusi hafalan santri.',
+      icon: <BarChart3 />,
+      tone: 'purple',
+    },
+  ]
+
+  const toneStyles = {
+    primary: 'bg-primary/10 text-primary',
+    accent: 'bg-accent/10 text-accent',
+    purple: 'bg-purple/10 text-purple',
+  } as const
 
   return (
-    <div className="max-w-5xl">
-      {/* Title */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Laporan</h2>
-        <p className="text-sm text-muted-foreground mt-1">Pilih jenis laporan, pratinjau, lalu cetak.</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Laporan"
+        description="Pilih jenis laporan, pratinjau, lalu cetak."
+        icon={<FileText />}
+      />
 
-      {/* Report cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Collective */}
-        <Card
-          className={cn(cardBase, activeReport === 'kolektif' && cardSelected)}
-          onClick={() => handleCardClick('kolektif')}
-        >
-          <CardHeader className="pb-4 border-b border-border/30">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 p-2.5 rounded-lg text-primary">
-                <Users className="w-5 h-5" />
-              </div>
-              <div>
-                <CardTitle className="text-lg">Kolektif</CardTitle>
-                <CardDescription className="text-[13px] mt-0.5">Ranking & rekap seluruh santri</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6 flex-1">
-            <div className="text-sm text-muted-foreground leading-relaxed">
-              Laporan ini mencakup daftar seluruh santri yang diurutkan berdasarkan pencapaian hafalan terbanyak. Berguna untuk evaluasi kelas bulanan atau semester.
-            </div>
-          </CardContent>
-        </Card>
+      {state.students.length === 0 ? (
+        <Alert variant="info" title="Belum ada data">
+          Tambahkan santri terlebih dahulu untuk dapat membuat laporan.
+        </Alert>
+      ) : null}
 
-        {/* Individual */}
-        <Card
-          className={cn(cardBase, activeReport === 'individu' && cardSelected)}
-        >
-          <CardHeader className="pb-4 border-b border-border/30">
-            <div className="flex items-center gap-3">
-              <div className="bg-accent/10 p-2.5 rounded-lg text-accent">
-                <User className="w-5 h-5" />
-              </div>
-              <div>
-                <CardTitle className="text-lg">Individu</CardTitle>
-                <CardDescription className="text-[13px] mt-0.5">Rapor progres per santri</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6 flex-1 flex flex-col gap-4">
-            <div className="text-sm text-muted-foreground leading-relaxed">
-              Laporan ini berisi detail pencapaian juz, progres hafalan, dan riwayat setoran lengkap untuk satu santri secara spesifik.
-            </div>
-            <div className="space-y-1.5" onClick={(e) => e.stopPropagation()}>
-              <label className="block text-[13px] font-medium text-muted-foreground">Pilih Santri</label>
-              <Combobox
-                options={studentOptions}
-                value={selectedStudent}
-                onChange={setSelectedStudent}
-                placeholder="Cari dan pilih santri..."
-                searchPlaceholder="Ketik nama santri..."
-              />
-            </div>
-            <Button
-              onClick={(e) => { e.stopPropagation(); handleCardClick('individu') }}
-              disabled={!selectedStudent || isGenerating}
-              variant={selectedStudent ? 'default' : 'secondary'}
-              className="w-full gap-2 shadow-sm"
+      {/* Kartu jenis laporan */}
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        {reports.map((r) => {
+          const isActive = activeReport === r.type
+          const isLoadingThis = isGenerating && isActive
+          return (
+            <button
+              key={r.type}
+              type="button"
+              onClick={() => handleCardClick(r.type)}
+              disabled={isGenerating}
+              className={cn(
+                'flex flex-col rounded-2xl border bg-card p-5 text-left shadow-soft transition-all duration-200',
+                'hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-soft-lg',
+                'disabled:cursor-not-allowed disabled:opacity-70',
+                isActive
+                  ? 'border-primary ring-2 ring-primary/20'
+                  : 'border-border/70'
+              )}
             >
-              <Eye className="w-4 h-4" />
-              {isGenerating && activeReport === 'individu' ? 'Menyiapkan...' : 'Pratinjau'}
-            </Button>
-          </CardContent>
-        </Card>
+              <div className="flex items-start gap-3">
+                <span
+                  className={cn(
+                    'flex size-11 shrink-0 items-center justify-center rounded-xl [&_svg]:size-5',
+                    toneStyles[r.tone]
+                  )}
+                >
+                  {r.icon}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold text-foreground">
+                    {r.title}
+                  </h3>
+                  <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                    {r.subtitle}
+                  </p>
+                </div>
+                {isActive ? (
+                  <CheckCircle2 className="ml-auto size-5 shrink-0 text-primary" />
+                ) : null}
+              </div>
 
-        {/* Perkembangan Tahfidz */}
-        <Card
-          className={cn(cardBase, activeReport === 'perkembangan' && cardSelected)}
-          onClick={() => handleCardClick('perkembangan')}
-        >
-          <CardHeader className="pb-4 border-b border-border/30">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 p-2.5 rounded-lg text-primary">
-                <BarChart3 className="w-5 h-5" />
+              <p className="mt-3.5 flex-1 text-[13px] leading-relaxed text-muted-foreground">
+                {r.description}
+              </p>
+
+              {/* Pemilih santri untuk laporan individu */}
+              {r.type === 'individu' ? (
+                <div
+                  className="mt-4"
+                  onClick={(e) => e.stopPropagation()}
+                  role="presentation"
+                >
+                  <Combobox
+                    options={studentOptions}
+                    value={selectedStudent}
+                    onChange={setSelectedStudent}
+                    placeholder="Pilih santri..."
+                    searchPlaceholder="Ketik nama santri..."
+                  />
+                </div>
+              ) : null}
+
+              <div className="mt-4">
+                <span
+                  className={cn(
+                    'inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2 text-[13px] font-semibold transition-colors',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-foreground'
+                  )}
+                >
+                  <Eye className="size-4" />
+                  {isLoadingThis
+                    ? 'Menyiapkan...'
+                    : r.type === 'individu' && !selectedStudent
+                      ? 'Pilih santri dulu'
+                      : 'Pratinjau'}
+                </span>
               </div>
-              <div>
-                <CardTitle className="text-lg">Perkembangan Tahfidz</CardTitle>
-                <CardDescription className="text-[13px] mt-0.5">Rekap level juz per kelas</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6 flex-1">
-            <div className="text-sm text-muted-foreground leading-relaxed">
-              Laporan ini menampilkan rekapitulasi pencapaian level juz untuk setiap kelas. Berguna untuk melihat distribusi hafalan santri secara keseluruhan.
-            </div>
-          </CardContent>
-        </Card>
+            </button>
+          )
+        })}
       </div>
 
-      {/* Print button — only visible when preview loaded */}
-      {printHtml && (
-        <div className="flex justify-end mb-6">
-          <Button onClick={handlePrint} className="gap-2 shadow-sm">
-            <Printer className="w-4 h-4" />
+      {/* Tombol cetak */}
+      {printHtml ? (
+        <div className="flex justify-end">
+          <Button onClick={handlePrint} size="lg" className="gap-2">
+            <Printer className="size-4" />
             Cetak Laporan
           </Button>
         </div>
-      )}
+      ) : null}
 
-      {/* Preview area */}
-      {printHtml && (
-        <div id="print-area" dangerouslySetInnerHTML={{ __html: printHtml }} />
+      {/* Area pratinjau */}
+      {printHtml ? (
+        <SectionCard
+          title="Pratinjau Laporan"
+          description="Inilah yang akan tercetak."
+          icon={<FileText />}
+          contentClassName="p-0 overflow-x-auto bg-white"
+        >
+          <div
+            id="print-area"
+            className="min-w-full p-4 text-black"
+            dangerouslySetInnerHTML={{ __html: printHtml }}
+          />
+        </SectionCard>
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/20 py-16 text-center">
+          <span className="mb-3 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Eye className="size-6" />
+          </span>
+          <h3 className="text-sm font-bold text-foreground">
+            Belum ada pratinjau
+          </h3>
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+            Pilih salah satu jenis laporan di atas untuk menampilkan pratinjau
+            sebelum dicetak.
+          </p>
+        </div>
       )}
     </div>
   )

@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useDashboard } from '../layout'
-import { addStudentAction, deleteStudentAction, updateStudentAction } from '@/lib/actions/students'
+import {
+  addStudentAction,
+  deleteStudentAction,
+  updateStudentAction,
+} from '@/lib/actions/students'
 import { toggleMemorizationAction } from '@/lib/actions/memorization'
 import {
   getPct,
@@ -16,7 +20,14 @@ import { toggleSurahCycle } from '@/lib/domain/hafalan'
 import { getPageNumbers } from '@/lib/pagination'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
 import {
   Pagination,
   PaginationContent,
@@ -27,10 +38,20 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { Combobox } from '@/components/ui/combobox'
 import { useToast } from '@/components/ui/toast-wrapper'
+import { PageHeader } from '@/components/app/page-header'
+import { EmptyState } from '@/components/app/empty-state'
+import { ProgressBar } from '@/components/app/progress-bar'
+import { Alert } from '@/components/app/alert'
 import {
   Plus,
   Eye,
@@ -44,7 +65,9 @@ import {
   Circle,
   FileText,
   Search,
+  SearchX,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export default function SantriPage() {
   const { state, refreshStudents, getStudentMemorization } = useDashboard()
@@ -52,7 +75,8 @@ export default function SantriPage() {
 
   const groupOptions = useMemo(() => {
     return state.groups.map((g) => {
-      const cName = state.classes.find(c => c.id === g.class_id)?.name || 'Tanpa Kelas'
+      const cName =
+        state.classes.find((c) => c.id === g.class_id)?.name || 'Tanpa Kelas'
       return {
         id: g.id,
         label: `${g.name} (${cName})`,
@@ -86,9 +110,14 @@ export default function SantriPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: number
+    name: string
+  } | null>(null)
 
-  const [selectedStudent, setSelectedStudent] = useState<typeof state.students[number] | null>(null)
+  const [selectedStudent, setSelectedStudent] = useState<
+    (typeof state.students)[number] | null
+  >(null)
   const [selectedJuz, setSelectedJuz] = useState<number | null>(null)
 
   const [nama, setNama] = useState('')
@@ -97,42 +126,45 @@ export default function SantriPage() {
   const [toggling, setToggling] = useState(false)
   const [error, setError] = useState('')
 
-  // Selected student's client-side computations
-  const { hafalan, studentSubmissions, juzPcts, juzSelesai, hafalCount, pct } = useMemo(() => {
-    if (!selectedStudent) {
-      return {
-        hafalan: {} as Record<number, number>,
-        studentSubmissions: [],
-        juzPcts: [],
-        juzSelesai: 0,
-        hafalCount: 0,
-        pct: 0,
+  // Perhitungan sisi klien untuk santri terpilih
+  const { hafalan, studentSubmissions, juzPcts, juzSelesai, hafalCount, pct } =
+    useMemo(() => {
+      if (!selectedStudent) {
+        return {
+          hafalan: {} as Record<number, number>,
+          studentSubmissions: [],
+          juzPcts: [] as number[],
+          juzSelesai: 0,
+          hafalCount: 0,
+          pct: 0,
+        }
       }
-    }
-    const memos = getStudentMemorization(selectedStudent.id)
-    const map: Record<number, number> = {}
-    memos.forEach((m) => {
-      map[m.surah_no] = m.status
-    })
+      const memos = getStudentMemorization(selectedStudent.id)
+      const map: Record<number, number> = {}
+      memos.forEach((m) => {
+        map[m.surah_no] = m.status
+      })
 
-    const subs = state.submissions
-      .filter((s) => s.santri_id === selectedStudent.id)
-      .sort((a, b) => b.id - a.id)
+      const subs = state.submissions
+        .filter((s) => s.santri_id === selectedStudent.id)
+        .sort((a, b) => b.id - a.id)
 
-    const pcts = [...Array(30)].map((_, i) => getJuzSurahsFromHafalan(map, i + 1))
-    const selesai = getJuzSelesaiFromHafalan(map)
-    const count = Object.values(map).filter((v) => v === 1).length
-    const p = getPct(selectedStudent)
+      const pcts = [...Array(30)].map((_, i) =>
+        getJuzSurahsFromHafalan(map, i + 1)
+      )
+      const selesai = getJuzSelesaiFromHafalan(map)
+      const count = Object.values(map).filter((v) => v === 1).length
+      const p = getPct(selectedStudent)
 
-    return {
-      hafalan: map,
-      studentSubmissions: subs,
-      juzPcts: pcts,
-      juzSelesai: selesai,
-      hafalCount: count,
-      pct: p,
-    }
-  }, [selectedStudent, state.submissions, getStudentMemorization])
+      return {
+        hafalan: map,
+        studentSubmissions: subs,
+        juzPcts: pcts,
+        juzSelesai: selesai,
+        hafalCount: count,
+        pct: p,
+      }
+    }, [selectedStudent, state.submissions, getStudentMemorization])
 
   function openAddModal() {
     setError('')
@@ -141,7 +173,7 @@ export default function SantriPage() {
     setAddOpen(true)
   }
 
-  function openEditModal(s: typeof state.students[number]) {
+  function openEditModal(s: (typeof state.students)[number]) {
     setError('')
     setSelectedStudent(s)
     setNama(s.nama)
@@ -149,7 +181,7 @@ export default function SantriPage() {
     setEditOpen(true)
   }
 
-  function openDetailModal(s: typeof state.students[number]) {
+  function openDetailModal(s: (typeof state.students)[number]) {
     setSelectedStudent(s)
     setSelectedJuz(null)
     setDetailOpen(true)
@@ -248,156 +280,198 @@ export default function SantriPage() {
     }
   }
 
-  // Details components
   const juzSurahs = selectedJuz ? getJuzSurahs(selectedJuz) : []
   const juzHafalCount = selectedJuz
     ? juzSurahs.filter((s) => hafalan[s.no] === 1).length
     : 0
 
   return (
-    <div className="max-w-6xl pb-10">
-      {/* Top Bar */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">Manajemen Siswa</h2>
-          <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
-            <Users className="w-4 h-4" />
+    <div className="space-y-6 pb-10">
+      <PageHeader
+        title="Manajemen Siswa"
+        description={
+          <span className="inline-flex items-center gap-1.5">
+            <Users className="size-3.5" />
             {state.students.length} siswa terdaftar
-          </p>
-        </div>
-        <Button
-          onClick={openAddModal}
-          className="gap-2 shadow-sm"
-          disabled={saving}
-        >
-          <Plus className="w-4 h-4" />
-          Tambah Siswa
-        </Button>
-      </div>
+          </span>
+        }
+        icon={<Users />}
+        actions={
+          <Button onClick={openAddModal} disabled={saving} className="gap-2">
+            <Plus className="size-4" />
+            Tambah Siswa
+          </Button>
+        }
+      />
 
-      {/* Search */}
-      <div className="relative mb-6 max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+      {/* Pencarian */}
+      <div className="relative max-w-xs">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Cari siswa..."
-          className="pl-9 h-9 text-sm"
+          className="h-10 pl-9"
+          aria-label="Cari siswa"
         />
       </div>
 
-      {/* Main Table */}
+      {/* Tabel utama */}
       {state.students.length === 0 ? (
-        <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
-          Belum ada siswa yang didaftarkan.
-        </div>
+        <EmptyState
+          icon={<Users />}
+          title="Belum ada siswa"
+          description="Tambahkan siswa pertama untuk mulai mencatat hafalan dan setoran."
+          action={
+            <Button onClick={openAddModal} className="gap-2">
+              <Plus className="size-4" />
+              Tambah Siswa
+            </Button>
+          }
+        />
       ) : filtered.length === 0 ? (
-        <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
-          Tidak ada siswa yang sesuai dengan pencarian.
-        </div>
+        <EmptyState
+          icon={<SearchX />}
+          title="Tidak ada hasil"
+          description={`Tidak ada siswa yang cocok dengan "${searchQuery}".`}
+        />
       ) : (
         <>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
-                <TableHead className="py-3.5 px-4 w-16 text-center">No</TableHead>
-                <TableHead className="py-3.5 px-4">Nama Siswa</TableHead>
-                <TableHead className="py-3.5 px-4">Kelompok</TableHead>
-                <TableHead className="py-3.5 px-4">Kelas</TableHead>
-                <TableHead className="py-3.5 px-4 text-center">Progress</TableHead>
-                <TableHead className="py-3.5 px-4 w-44 text-center">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className="divide-y divide-border/30 text-sm">
-              {paginated.map((s, index) => {
-                const group = state.groups.find((g) => g.id === s.group_id)
-                const groupName = group?.name || 'Tanpa Kelompok'
-                const className = group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
-                const p = getPct(s)
+          <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-soft">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-b border-border/60 bg-muted/40 hover:bg-muted/40">
+                  <TableHead className="w-14 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    No
+                  </TableHead>
+                  <TableHead className="py-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Nama Siswa
+                  </TableHead>
+                  <TableHead className="py-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Kelompok
+                  </TableHead>
+                  <TableHead className="hidden py-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground md:table-cell">
+                    Kelas
+                  </TableHead>
+                  <TableHead className="py-3 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Progress
+                  </TableHead>
+                  <TableHead className="w-40 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Aksi
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="divide-y divide-border/50 text-sm">
+                {paginated.map((s, index) => {
+                  const group = state.groups.find((g) => g.id === s.group_id)
+                  const groupName = group?.name || 'Tanpa Kelompok'
+                  const className = group
+                    ? state.classes.find((c) => c.id === group.class_id)?.name ||
+                      'Tanpa Kelas'
+                    : 'Tanpa Kelas'
+                  const p = getPct(s)
 
-                return (
-                  <TableRow key={s.id} className="hover:bg-card/30 transition-colors">
-                    <TableCell className="py-3.5 px-4 text-center font-medium text-muted-foreground">
-                      {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-semibold text-foreground">{s.nama}</span>
-                    </TableCell>
-                    <TableCell className="py-3.5 px-4 text-muted-foreground font-medium">
-                      {groupName !== 'Tanpa Kelompok' ? (
-                        <Badge variant="secondary" className="gap-1.5 font-medium">
-                          <Layers className="w-3.5 h-3.5 text-primary shrink-0" />
-                          {groupName}
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground italic">{groupName}</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-3.5 px-4 text-muted-foreground font-medium">
-                      {className !== 'Tanpa Kelas' ? (
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-semibold">
-                          {className}
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground italic">{className}</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-3.5 px-4">
-                      <div className="flex items-center justify-center gap-3 max-w-[120px] mx-auto">
-                        <span className="text-xs font-bold text-muted-foreground w-9 text-right">{p}%</span>
-                        <div className="flex-1 h-2 bg-border/40 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-primary transition-all duration-500"
-                            style={{ width: `${p}%` }}
-                          />
+                  return (
+                    <TableRow
+                      key={s.id}
+                      className="transition-colors hover:bg-muted/40"
+                    >
+                      <TableCell className="py-3 text-center font-medium text-muted-foreground">
+                        {(page - 1) * ITEMS_PER_PAGE + index + 1}
+                      </TableCell>
+                      <TableCell className="py-3 font-semibold text-foreground">
+                        {s.nama}
+                      </TableCell>
+                      <TableCell className="py-3">
+                        {groupName !== 'Tanpa Kelompok' ? (
+                          <Badge variant="secondary" className="gap-1.5">
+                            <Layers className="size-3 shrink-0 text-primary" />
+                            {groupName}
+                          </Badge>
+                        ) : (
+                          <span className="text-xs italic text-muted-foreground">
+                            {groupName}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden py-3 md:table-cell">
+                        {className !== 'Tanpa Kelas' ? (
+                          <Badge
+                            variant="outline"
+                            className="border-primary/20 bg-primary/10 font-semibold text-primary"
+                          >
+                            {className}
+                          </Badge>
+                        ) : (
+                          <span className="text-xs italic text-muted-foreground">
+                            {className}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-3">
+                        <div className="mx-auto flex max-w-[130px] items-center gap-2.5">
+                          <ProgressBar value={p} size="sm" />
+                          <span className="tabular w-9 shrink-0 text-right text-[11px] font-bold text-muted-foreground">
+                            {p}%
+                          </span>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-3.5 px-4 text-center">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openDetailModal(s)}
-                          className="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-card rounded-lg"
-                          title="Progres Hafalan"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditModal(s)}
-                          className="h-8.5 w-8.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(s.id, s.nama)}
-                          className="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
-                          title="Hapus"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+                      </TableCell>
+                      <TableCell className="py-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openDetailModal(s)}
+                            className="text-muted-foreground hover:text-foreground"
+                            title="Progres Hafalan"
+                            aria-label={`Lihat progres ${s.nama}`}
+                          >
+                            <Eye className="size-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openEditModal(s)}
+                            className="text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                            title="Edit"
+                            aria-label={`Edit ${s.nama}`}
+                          >
+                            <Edit className="size-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleDelete(s.id, s.nama)}
+                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                            title="Hapus"
+                            aria-label={`Hapus ${s.nama}`}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </div>
 
-          {totalPages > 1 && (
-            <Pagination className="mt-4">
+          {totalPages > 1 ? (
+            <Pagination>
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious
-                    onClick={(e: React.MouseEvent) => { e.preventDefault(); if (page > 1) setPage(page - 1) }}
-                    className={page === 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault()
+                      if (page > 1) setPage(page - 1)
+                    }}
+                    className={
+                      page === 1
+                        ? 'pointer-events-none opacity-40'
+                        : 'cursor-pointer'
+                    }
                   />
                 </PaginationItem>
                 {getPageNumbers(page, totalPages).map((p, i) =>
@@ -409,7 +483,10 @@ export default function SantriPage() {
                     <PaginationItem key={p}>
                       <PaginationLink
                         isActive={p === page}
-                        onClick={(e: React.MouseEvent) => { e.preventDefault(); setPage(p) }}
+                        onClick={(e: React.MouseEvent) => {
+                          e.preventDefault()
+                          setPage(p)
+                        }}
                         className="cursor-pointer"
                       >
                         {p}
@@ -419,30 +496,37 @@ export default function SantriPage() {
                 )}
                 <PaginationItem>
                   <PaginationNext
-                    onClick={(e: React.MouseEvent) => { e.preventDefault(); if (page < totalPages) setPage(page + 1) }}
-                    className={page === totalPages ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault()
+                      if (page < totalPages) setPage(page + 1)
+                    }}
+                    className={
+                      page === totalPages
+                        ? 'pointer-events-none opacity-40'
+                        : 'cursor-pointer'
+                    }
                   />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
-          )}
+          ) : null}
         </>
       )}
 
-      {/* Add Modal */}
+      {/* Dialog tambah */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Tambah Siswa Baru</DialogTitle>
           </DialogHeader>
-          {error && (
-            <div className="mb-4 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+          {error ? (
+            <Alert variant="error" className="mb-2">
               {error}
-            </div>
-          )}
-          <div className="space-y-5">
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            </Alert>
+          ) : null}
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Nama Lengkap <span className="text-destructive">*</span>
               </label>
               <Input
@@ -453,9 +537,11 @@ export default function SantriPage() {
                 disabled={saving}
               />
             </div>
-
-            <div>
-              <label htmlFor="add-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="add-group-select"
+                className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+              >
                 Kelompok Halaqah <span className="text-destructive">*</span>
               </label>
               <Combobox
@@ -470,7 +556,11 @@ export default function SantriPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)} disabled={saving}>
+            <Button
+              variant="outline"
+              onClick={() => setAddOpen(false)}
+              disabled={saving}
+            >
               Batal
             </Button>
             <Button onClick={handleAdd} disabled={saving}>
@@ -480,20 +570,20 @@ export default function SantriPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Modal */}
+      {/* Dialog edit */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Siswa</DialogTitle>
           </DialogHeader>
-          {error && (
-            <div className="mb-4 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
+          {error ? (
+            <Alert variant="error" className="mb-2">
               {error}
-            </div>
-          )}
-          <div className="space-y-5">
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            </Alert>
+          ) : null}
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Nama Lengkap <span className="text-destructive">*</span>
               </label>
               <Input
@@ -504,9 +594,11 @@ export default function SantriPage() {
                 disabled={saving}
               />
             </div>
-
-            <div>
-              <label htmlFor="edit-group-select" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="edit-group-select"
+                className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+              >
                 Kelompok Halaqah <span className="text-destructive">*</span>
               </label>
               <Combobox
@@ -521,7 +613,11 @@ export default function SantriPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
+            <Button
+              variant="outline"
+              onClick={() => setEditOpen(false)}
+              disabled={saving}
+            >
               Batal
             </Button>
             <Button onClick={handleEdit} disabled={saving}>
@@ -531,100 +627,137 @@ export default function SantriPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Interactive Detail Modal (with Juz Grid and Setoran History) */}
+      {/* Dialog detail */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="sm:max-w-5xl">
           <DialogHeader>
-            <DialogTitle>Detail & Progres Siswa</DialogTitle>
+            <DialogTitle>Detail &amp; Progres Siswa</DialogTitle>
           </DialogHeader>
-          {selectedStudent && (
-            <div className="space-y-6">
-              {/* Header info */}
-              <div className="bg-background p-4 rounded-lg border border-border/50 space-y-3">
+          {selectedStudent ? (
+            <div className="space-y-5">
+              {/* Ringkasan */}
+              <div className="rounded-2xl border border-border/70 bg-muted/30 p-4">
                 <div className="text-center sm:text-left">
-                  <h4 className="text-lg font-bold text-foreground">{selectedStudent.nama}</h4>
-                  <div className="text-xs text-muted-foreground mt-1 font-medium flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
-                    <span className="bg-card px-2 py-0.5 rounded border border-border/50">
-                      {state.groups.find(g => g.id === selectedStudent.group_id)?.name || 'Tanpa Kelompok'}
+                  <h4 className="text-lg font-bold text-foreground">
+                    {selectedStudent.nama}
+                  </h4>
+                  <div className="mt-1.5 flex flex-wrap items-center justify-center gap-2 text-xs font-medium text-muted-foreground sm:justify-start">
+                    <span className="rounded-md border border-border/60 bg-card px-2 py-0.5">
+                      {state.groups.find(
+                        (g) => g.id === selectedStudent.group_id
+                      )?.name || 'Tanpa Kelompok'}
                     </span>
-                    <span>•</span>
                     <span>
                       {(() => {
-                        const group = state.groups.find(g => g.id === selectedStudent.group_id)
-                        return group ? (state.classes.find(c => c.id === group.class_id)?.name || 'Tanpa Kelas') : 'Tanpa Kelas'
+                        const group = state.groups.find(
+                          (g) => g.id === selectedStudent.group_id
+                        )
+                        return group
+                          ? state.classes.find((c) => c.id === group.class_id)
+                              ?.name || 'Tanpa Kelas'
+                          : 'Tanpa Kelas'
                       })()}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-6 bg-card px-4 py-2.5 rounded-lg border border-border/40 shadow-sm">
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-foreground">{hafalCount}</div>
-                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Surah</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-foreground">{juzSelesai}</div>
-                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Juz Selesai</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-bold text-primary">{pct}%</div>
-                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Progress</div>
-                  </div>
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  {[
+                    { label: 'Surah', value: hafalCount, tone: 'text-foreground' },
+                    {
+                      label: 'Juz Selesai',
+                      value: juzSelesai,
+                      tone: 'text-foreground',
+                    },
+                    { label: 'Progress', value: `${pct}%`, tone: 'text-primary' },
+                  ].map((m) => (
+                    <div
+                      key={m.label}
+                      className="rounded-xl border border-border/60 bg-card px-3 py-2.5 text-center"
+                    >
+                      <div
+                        className={cn(
+                          'tabular text-lg font-bold',
+                          m.tone
+                        )}
+                      >
+                        {m.value}
+                      </div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {m.label}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Layout with Juz on Left and History on Right */}
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                {/* Juz Grid Column */}
-                <div className="lg:col-span-3 space-y-4">
+              {/* Grid juz + riwayat */}
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
+                {/* Kolom juz */}
+                <div className="space-y-3 lg:col-span-3">
                   {selectedJuz ? (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                      <div className="flex items-center gap-3 border-b border-border/30 pb-3">
-                        <Button variant="outline" size="sm" onClick={() => setSelectedJuz(null)} className="h-8 px-2">
-                          <ArrowLeft className="w-4 h-4" />
+                    <div className="animate-fade-in space-y-3">
+                      <div className="flex items-center gap-3 border-b border-border/60 pb-3">
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          onClick={() => setSelectedJuz(null)}
+                          aria-label="Kembali ke daftar juz"
+                        >
+                          <ArrowLeft className="size-4" />
                         </Button>
                         <div>
-                          <h5 className="font-bold text-foreground text-sm">Juz {selectedJuz}</h5>
-                          <p className="text-[11px] font-semibold text-muted-foreground mt-0.5">
+                          <h5 className="text-sm font-bold text-foreground">
+                            Juz {selectedJuz}
+                          </h5>
+                          <p className="text-[11px] font-medium text-muted-foreground">
                             {juzHafalCount} dari {juzSurahs.length} surah dihafal
                           </p>
                         </div>
                       </div>
 
-                      <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+                      <div className="max-h-80 space-y-1.5 overflow-y-auto pr-1">
                         {juzSurahs.map((s) => {
                           const status = hafalan[s.no] || 0
                           return (
-                            <Button
-                              variant="ghost"
+                            <button
                               key={s.no}
                               onClick={() => toggleSurah(s.no)}
                               disabled={toggling}
-                              className="group flex w-full items-center gap-3 p-2 text-left border border-transparent hover:bg-card hover:border-border/40 justify-start"
+                              className="group flex w-full items-center gap-3 rounded-xl border border-transparent p-2 text-left transition-colors hover:border-border/60 hover:bg-muted/40 disabled:opacity-60"
                             >
-                              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
-                                status === 1 ? 'bg-primary/10 text-primary border border-primary/20' : 
-                                status === 2 ? 'bg-accent/10 text-accent border border-accent/20' : 
-                                'bg-background text-muted-foreground border border-border group-hover:border-border-hover'
-                              }`}>
-                                {status === 1 ? (
-                                  <CheckCircle2 className="w-4 h-4" />
-                                ) : status === 2 ? (
-                                  <RotateCcw className="w-4 h-4" />
-                                ) : (
-                                  <Circle className="w-4 h-4 opacity-40" />
+                              <span
+                                className={cn(
+                                  'flex size-8 shrink-0 items-center justify-center rounded-lg border transition-colors',
+                                  status === 1
+                                    ? 'border-primary/20 bg-primary/10 text-primary'
+                                    : status === 2
+                                      ? 'border-accent/20 bg-accent/10 text-accent'
+                                      : 'border-border bg-background text-muted-foreground group-hover:border-border'
                                 )}
-                              </div>
+                              >
+                                {status === 1 ? (
+                                  <CheckCircle2 className="size-4" />
+                                ) : status === 2 ? (
+                                  <RotateCcw className="size-4" />
+                                ) : (
+                                  <Circle className="size-4 opacity-40" />
+                                )}
+                              </span>
 
-                              <div className="min-w-0 flex-1">
-                                <div className="text-xs font-bold text-foreground truncate">{s.no}. {s.nama}</div>
-                                <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">{s.ayat} ayat</div>
-                              </div>
-                              
-                              <div className="shrink-0 text-sm text-muted-foreground font-arabic pr-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-xs font-bold text-foreground">
+                                  {s.no}. {s.nama}
+                                </span>
+                                <span className="block text-[10px] font-medium text-muted-foreground">
+                                  {s.ayat} ayat
+                                </span>
+                              </span>
+
+                              <span className="shrink-0 pr-1 font-arabic text-sm text-muted-foreground opacity-50 transition-opacity group-hover:opacity-100">
                                 {s.arab}
-                              </div>
-                            </Button>
+                              </span>
+                            </button>
                           )
                         })}
                       </div>
@@ -632,35 +765,40 @@ export default function SantriPage() {
                   ) : (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h5 className="font-bold text-foreground text-sm">Pencapaian Juz</h5>
-                        <span className="text-[10px] font-semibold text-muted-foreground">Pilih Juz untuk detail</span>
+                        <h5 className="text-sm font-bold text-foreground">
+                          Pencapaian Juz
+                        </h5>
+                        <span className="text-[10px] font-medium text-muted-foreground">
+                          Pilih juz untuk detail
+                        </span>
                       </div>
                       <div className="grid grid-cols-5 gap-2">
                         {[...Array(30)].map((_, i) => {
                           const j = i + 1
-                           const p = juzPcts[i] ?? 0
+                          const p = juzPcts[i] ?? 0
                           return (
-                            <Button
+                            <button
                               key={j}
                               onClick={() => setSelectedJuz(j)}
-                              className={`group relative flex flex-col items-center justify-center p-2 text-center hover:-translate-y-0.5 justify-center ${
+                              className={cn(
+                                'group relative flex flex-col items-center justify-center rounded-xl p-2 text-center transition-all hover:-translate-y-0.5',
                                 p === 100
-                                  ? 'bg-primary text-white shadow-sm shadow-primary/20'
+                                  ? 'bg-primary text-primary-foreground shadow-soft'
                                   : p > 0
-                                    ? 'bg-accent/10 text-accent border border-accent/20'
-                                    : 'bg-card border border-border text-muted-foreground'
-                              }`}
+                                    ? 'border border-accent/25 bg-accent/10 text-accent'
+                                    : 'border border-border bg-card text-muted-foreground'
+                              )}
                             >
-                              <div className="text-[13px] font-bold">{j}</div>
-                              {p > 0 && p < 100 && (
-                                <div className="text-[8px] font-bold mt-0.5 bg-accent/20 px-1 py-0.2 rounded text-accent-dark">{p}%</div>
-                              )}
-                              {p === 100 && (
-                                <div className="absolute top-0.5 right-0.5">
-                                  <CheckCircle2 className="w-2.5 h-2.5 text-white/70" />
-                                </div>
-                              )}
-                            </Button>
+                              <span className="text-[13px] font-bold">{j}</span>
+                              {p > 0 && p < 100 ? (
+                                <span className="tabular mt-0.5 rounded bg-accent/20 px-1 text-[8px] font-bold text-accent">
+                                  {p}%
+                                </span>
+                              ) : null}
+                              {p === 100 ? (
+                                <CheckCircle2 className="absolute right-0.5 top-0.5 size-2.5 text-primary-foreground/70" />
+                              ) : null}
+                            </button>
                           )
                         })}
                       </div>
@@ -668,46 +806,55 @@ export default function SantriPage() {
                   )}
                 </div>
 
-                {/* History Column */}
-                <div className="lg:col-span-2 space-y-4">
-                  <div className="flex items-center gap-2 border-b border-border/30 pb-3">
-                    <FileText className="w-4 h-4 text-primary shrink-0" />
-                    <h5 className="font-bold text-foreground text-sm">Riwayat Setoran</h5>
+                {/* Kolom riwayat */}
+                <div className="space-y-3 lg:col-span-2">
+                  <div className="flex items-center gap-2 border-b border-border/60 pb-3">
+                    <FileText className="size-4 shrink-0 text-primary" />
+                    <h5 className="text-sm font-bold text-foreground">
+                      Riwayat Setoran
+                    </h5>
                   </div>
 
-                  <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
                     {studentSubmissions.length === 0 ? (
-                      <div className="py-8 text-center text-xs text-muted-foreground italic border border-dashed border-border/50 bg-background rounded-lg">
+                      <div className="rounded-xl border border-dashed border-border/60 bg-muted/30 py-8 text-center text-xs italic text-muted-foreground">
                         Belum ada setoran dicatat
                       </div>
                     ) : (
                       studentSubmissions.map((sub) => (
-                        <div key={sub.id} className="bg-card rounded-lg p-3 border border-border/50 text-[13px] relative overflow-hidden flex">
-                          <div className="w-1 bg-primary/20 mr-2.5 shrink-0 rounded-full"></div>
+                        <div
+                          key={sub.id}
+                          className="flex overflow-hidden rounded-xl border border-border/60 bg-card p-3 text-[13px]"
+                        >
+                          <span className="mr-2.5 w-1 shrink-0 rounded-full bg-primary/25" />
                           <div className="min-w-0 flex-1 space-y-1">
                             <div className="flex items-start justify-between gap-2">
-                              <span className="font-bold text-foreground truncate">
+                              <span className="truncate font-bold text-foreground">
                                 {getSurahNama(sub.surah_no)}
                                 {sub.ayat_start && sub.ayat_end ? (
-                                  <span className="text-muted-foreground font-semibold ml-1">
-                                    :{sub.ayat_start}{sub.ayat_end !== sub.ayat_start ? `–${sub.ayat_end}` : ''}
+                                  <span className="ml-1 font-semibold text-muted-foreground">
+                                    :{sub.ayat_start}
+                                    {sub.ayat_end !== sub.ayat_start
+                                      ? `–${sub.ayat_end}`
+                                      : ''}
                                   </span>
                                 ) : null}
                               </span>
-                              <span className="shrink-0 bg-primary/10 text-primary border border-primary/20 text-[10px] font-bold px-1.5 py-0.2 rounded">
+                              <span className="shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
                                 {sub.nilai}
                               </span>
                             </div>
-                            
-                            <div className="text-[10px] text-muted-foreground font-medium">
-                              {formatWaktu(sub.waktu).tanggal} · {formatWaktu(sub.waktu).jam}
+
+                            <div className="text-[10px] font-medium text-muted-foreground">
+                              {formatWaktu(sub.waktu).tanggal} ·{' '}
+                              {formatWaktu(sub.waktu).jam}
                             </div>
 
-                            {sub.catatan && (
-                              <div className="text-xs text-muted-foreground bg-background rounded p-1.5 border border-border/40 mt-1 truncate">
+                            {sub.catatan ? (
+                              <div className="mt-1 truncate rounded border border-border/50 bg-muted/40 p-1.5 text-xs text-muted-foreground">
                                 {sub.catatan}
                               </div>
-                            )}
+                            ) : null}
                           </div>
                         </div>
                       ))
@@ -720,14 +867,16 @@ export default function SantriPage() {
                 <Button onClick={() => setDetailOpen(false)}>Tutup</Button>
               </DialogFooter>
             </div>
-          )}
+          ) : null}
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
+      {/* Konfirmasi hapus */}
       <ConfirmDialog
         open={deleteTarget !== null}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null)
+        }}
         title="Hapus Siswa?"
         description={`Hapus siswa "${deleteTarget?.name}"? Semua riwayat setoran & hafalan akan dihapus permanen.`}
         confirmText="Hapus"

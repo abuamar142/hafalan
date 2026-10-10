@@ -1,19 +1,40 @@
-import { Inter, Geist } from 'next/font/google'
-import type { Metadata } from 'next'
+import { Geist, Plus_Jakarta_Sans, Amiri } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+  display: 'swap',
+})
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' })
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-jakarta',
+  display: 'swap',
+  weight: ['500', '600', '700', '800'],
+})
+
+const amiri = Amiri({
+  subsets: ['arabic'],
+  variable: '--font-amiri',
+  display: 'swap',
+  weight: ['400', '700'],
+})
 
 export const metadata: Metadata = {
-  title: 'Hafalan — SMA Islam Bunga Bangsa',
-  description: 'Catat hafalan & setoran santri',
+  title: {
+    default: 'Hafalan — SMA Islam Bunga Bangsa',
+    template: '%s · Hafalan',
+  },
+  description:
+    'Portal wali murid dan guru untuk memantau hafalan serta raport santri SMA Islam Bunga Bangsa.',
+  applicationName: 'Hafalan',
   openGraph: {
     title: 'Hafalan — SMA Islam Bunga Bangsa',
-    description: 'Catat hafalan & setoran santri',
+    description: 'Pantau progres hafalan & raport santri secara transparan.',
     url: 'https://hafalan.abuamar.online',
     siteName: 'Hafalan',
     locale: 'id_ID',
@@ -22,7 +43,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Hafalan — SMA Islam Bunga Bangsa',
-    description: 'Catat hafalan & setoran santri',
+    description: 'Pantau progres hafalan & raport santri secara transparan.',
   },
   icons: {
     icon: [
@@ -37,17 +58,35 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f5f7f9' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a1120' },
+  ],
+}
+
+/**
+ * Terapkan tema sebelum paint pertama supaya tidak ada kedipan (FOUC)
+ * saat pengguna memilih mode gelap.
+ */
+const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="id" className={cn("font-sans", geist.variable)}>
-      <body className={`${inter.className} text-foreground antialiased selection:bg-primary/20 selection:text-primary`}>
-        <TooltipProvider>
-          {children}
-        </TooltipProvider>
+    <html
+      lang="id"
+      suppressHydrationWarning
+      className={cn(geist.variable, jakarta.variable, amiri.variable)}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+        <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>
   )

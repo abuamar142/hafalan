@@ -24,7 +24,10 @@ import {
 } from '@/components/ui/pagination'
 import { Combobox } from '@/components/ui/combobox'
 import { useToast } from '@/components/ui/toast-wrapper'
-import { Plus, Eye, Edit, Trash2, User, Search } from 'lucide-react'
+import { PageHeader } from '@/components/app/page-header'
+import { EmptyState } from '@/components/app/empty-state'
+import { Alert } from '@/components/app/alert'
+import { Plus, Eye, Edit, Trash2, User, Search, SearchX, Users } from 'lucide-react'
 import { getPageNumbers } from '@/lib/pagination'
 
 export default function KelompokPage() {
@@ -194,55 +197,66 @@ export default function KelompokPage() {
 
   return (
     <div className="max-w-6xl pb-10">
-      {/* Top Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">Manajemen Kelompok</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Kelola kelompok halaqah, asosiasi kelas, dan penugasan ustadz pengampu.
-          </p>
-        </div>
-        <Button
-          onClick={openAddModal}
-          className="gap-2 shadow-sm"
-          disabled={saving}
-        >
-          <Plus className="w-4 h-4" />
-          Tambah Kelompok
-        </Button>
-      </div>
+      <PageHeader
+        title="Manajemen Kelompok"
+        description={
+          <span className="inline-flex items-center gap-1.5">
+            <Users className="size-3.5" />
+            {state.groups.length} kelompok halaqah
+          </span>
+        }
+        icon={<Users />}
+        actions={
+          <Button onClick={openAddModal} disabled={saving} className="gap-2">
+            <Plus className="size-4" />
+            Tambah Kelompok
+          </Button>
+        }
+      />
 
-      {/* Search */}
-      <div className="relative mb-6 max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+      {/* Pencarian */}
+      <div className="relative max-w-xs">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Cari kelompok..."
-          className="pl-9 h-9 text-sm"
+          aria-label="Cari kelompok"
+          className="h-10 pl-9"
         />
       </div>
 
       {/* Main Table */}
       {state.groups.length === 0 ? (
-        <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
-          Belum ada kelompok yang didaftarkan.
-        </div>
+        <EmptyState
+          icon={<Users />}
+          title="Belum ada kelompok"
+          description="Tambahkan kelompok halaqah pertama untuk mulai menugaskan ustadz."
+          action={
+            <Button onClick={openAddModal} className="gap-2">
+              <Plus className="size-4" />
+              Tambah Kelompok
+            </Button>
+          }
+        />
       ) : filtered.length === 0 ? (
-        <div className="py-16 text-center text-sm text-muted-foreground border-dashed">
-          Tidak ada kelompok yang sesuai dengan pencarian.
-        </div>
+        <EmptyState
+          icon={<SearchX />}
+          title="Tidak ada hasil"
+          description={`Tidak ada kelompok yang cocok dengan "${searchQuery}".`}
+        />
       ) : (
         <>
+          <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-soft">
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-border/50 bg-card/50 text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">
-                <TableHead className="py-3.5 px-4 w-16 text-center">No</TableHead>
-                <TableHead className="py-3.5 px-4">Nama Kelompok</TableHead>
-                <TableHead className="py-3.5 px-4">Kelas</TableHead>
-                <TableHead className="py-3.5 px-4">Ustadz Pengampu</TableHead>
-                <TableHead className="py-3.5 px-4 w-44 text-center">Aksi</TableHead>
+              <TableRow className="border-b border-border/60 bg-muted/40 hover:bg-muted/40">
+                <TableHead className="w-16 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">No</TableHead>
+                <TableHead className="py-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Nama Kelompok</TableHead>
+                <TableHead className="py-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Kelas</TableHead>
+                <TableHead className="py-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Ustadz Pengampu</TableHead>
+                <TableHead className="w-44 py-3 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-border/30 text-sm">
@@ -294,31 +308,33 @@ export default function KelompokPage() {
                       <div className="flex items-center justify-center gap-1.5">
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="icon-sm"
                           onClick={() => openDetailModal(group)}
-                          className="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-card rounded-lg"
+                          className="text-muted-foreground hover:text-foreground"
                           title="Detail"
+                          aria-label="Lihat detail kelompok"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="size-4" />
                         </Button>
-                        
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="icon-sm"
                           onClick={() => openEditModal(group)}
-                          className="h-8.5 w-8.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
+                          className="text-muted-foreground hover:bg-primary/10 hover:text-primary"
                           title="Edit"
+                          aria-label="Edit kelompok"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="size-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="icon-sm"
                           onClick={() => handleDeleteGroup(group.id, group.name)}
-                          className="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                           title="Hapus"
+                          aria-label="Hapus kelompok"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="size-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -327,6 +343,7 @@ export default function KelompokPage() {
               })}
             </TableBody>
           </Table>
+          </div>
 
           {totalPages > 1 && (
             <Pagination className="mt-4">
@@ -372,11 +389,7 @@ export default function KelompokPage() {
           <DialogHeader>
             <DialogTitle>Buat Kelompok Baru</DialogTitle>
           </DialogHeader>
-          {error && (
-            <div className="mb-4 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
-              {error}
-            </div>
-          )}
+          {error ? <Alert variant="error">{error}</Alert> : null}
           <div className="space-y-5">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -408,11 +421,7 @@ export default function KelompokPage() {
           <DialogHeader>
             <DialogTitle>Edit Kelompok</DialogTitle>
           </DialogHeader>
-          {error && (
-            <div className="mb-4 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-3 py-2.5 text-sm text-destructive font-medium">
-              {error}
-            </div>
-          )}
+          {error ? <Alert variant="error">{error}</Alert> : null}
           {selectedGroup && (
             <div className="space-y-5">
               <div>

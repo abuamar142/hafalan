@@ -1,7 +1,8 @@
 {
   "name": "hafalan",
   "version": "4.0.0",
-  "description": "Hafalan Hafalan — catat hafalan & setoran santri",
+  "description": "Portal Wali Murid — Sistem Informasi Hafalan & Raport Santri, SMA Islam Bunga Bangsa",
+  "packageManager": "bun@1.4.0",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

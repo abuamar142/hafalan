@@ -1,5 +1,6 @@
 'use client'
-import Image from "next/image";
+
+import Image from 'next/image'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -7,6 +8,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Alert } from '@/components/app/alert'
 import { Eye, EyeOff } from 'lucide-react'
 import { SCHOOL_NAME } from '@/lib/constants'
 
@@ -53,40 +55,48 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
-      {/* Decorative background blur */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-50"></div>
-      
-      <div className="w-full max-w-md bg-card/80 backdrop-blur-xl rounded-[var(--radius-lg)] border border-border/50 p-10 shadow-xl bento-shadow relative z-10">
-        
-        {/* Brand */}
-        <div className="text-center mb-8">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+      {/* Latar dekoratif */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-grid opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/3 size-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-[130px]"
+      />
+
+      <div className="relative z-10 w-full max-w-md rounded-3xl border border-border/70 bg-card/85 p-8 shadow-card backdrop-blur-xl sm:p-10">
+        {/* Merek */}
+        <div className="mb-8 text-center">
           <Image
             src="/images/logo.jpg"
             alt="Logo Hafalan"
-            width={80}
-            height={80}
-            className="w-20 h-20 rounded-lg object-cover mx-auto mb-4 shadow-sm ring-1 ring-border"
+            width={72}
+            height={72}
+            className="mx-auto mb-4 size-[72px] rounded-2xl object-cover ring-1 ring-border"
+            priority
           />
-          <h1 className="text-2xl font-bold text-foreground mb-1 tracking-tight">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Daftar Akun
           </h1>
-          <p className="text-sm font-medium text-muted-foreground">
-            Hafalan {SCHOOL_NAME}
+          <p className="mt-1 text-sm font-medium text-muted-foreground">
+            {SCHOOL_NAME}
           </p>
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="mb-6 rounded-md border-l-[3px] border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive font-medium">
+        {error ? (
+          <Alert variant="error" className="mb-6">
             {error}
-          </div>
-        )}
+          </Alert>
+        ) : null}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="name" className="block text-sm font-medium text-foreground">
+            <label
+              htmlFor="name"
+              className="block text-[13px] font-semibold text-foreground"
+            >
               Nama Lengkap (Ustadz / Ustadzah)
             </label>
             <Input
@@ -102,7 +112,10 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="email" className="block text-sm font-medium text-foreground">
+            <label
+              htmlFor="email"
+              className="block text-[13px] font-semibold text-foreground"
+            >
               Email
             </label>
             <Input
@@ -118,7 +131,10 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="block text-sm font-medium text-foreground">
+            <label
+              htmlFor="password"
+              className="block text-[13px] font-semibold text-foreground"
+            >
               Password
             </label>
             <div className="relative">
@@ -137,10 +153,16 @@ export default function RegisterPage() {
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
+                aria-label={
+                  showPassword ? 'Sembunyikan password' : 'Tampilkan password'
+                }
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -148,24 +170,21 @@ export default function RegisterPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-11 text-base shadow-sm mt-4"
+            className="mt-2 h-11 w-full text-[15px] font-semibold"
           >
             {loading ? 'Mendaftar...' : 'Daftar Akun'}
           </Button>
         </form>
 
-        {/* Login link */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Sudah punya akun?{' '}
-            <Link
-              href="/login"
-              className="font-semibold text-primary hover:text-primary-dark hover:underline transition-colors"
-            >
-              Masuk di sini
-            </Link>
-          </p>
-        </div>
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          Sudah punya akun?{' '}
+          <Link
+            href="/login"
+            className="font-semibold text-primary underline-offset-4 transition-colors hover:underline"
+          >
+            Masuk di sini
+          </Link>
+        </p>
       </div>
     </main>
   )

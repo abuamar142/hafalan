@@ -1,139 +1,186 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import ParentSearchWizard from '@/components/public/ParentSearchWizard'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { BookOpen, LogIn, School, Users, FileBarChart, Sparkles } from 'lucide-react'
-import { SCHOOL_NAME } from '@/lib/constants'
+import { BrandMark } from '@/components/app/brand-mark'
+import { ThemeToggle } from '@/components/app/theme-toggle'
+import {
+  BookOpen,
+  LogIn,
+  School,
+  Users,
+  FileBarChart,
+  ShieldCheck,
+  Clock3,
+  HeartHandshake,
+} from 'lucide-react'
+import { SCHOOL_NAME, SCHOOL_CITY } from '@/lib/constants'
+
+const STEPS = [
+  {
+    icon: School,
+    title: 'Pilih Kelas',
+    desc: 'Tentukan kelas aktif ananda dari daftar yang tersedia.',
+    tone: 'bg-primary/10 text-primary ring-primary/15',
+  },
+  {
+    icon: Users,
+    title: 'Pilih Halaqah',
+    desc: 'Pilih kelompok halaqah atau ustadz pembina ananda.',
+    tone: 'bg-accent/10 text-accent ring-accent/15',
+  },
+  {
+    icon: FileBarChart,
+    title: 'Lihat Raport',
+    desc: 'Buka raport hafalan lengkap beserta riwayat setoran.',
+    tone: 'bg-purple/10 text-purple ring-purple/15',
+  },
+] as const
+
+const HIGHLIGHTS = [
+  {
+    icon: ShieldCheck,
+    title: 'Transparan',
+    desc: 'Progres hafalan tercatat rapi dan dapat dipantau kapan saja.',
+  },
+  {
+    icon: Clock3,
+    title: 'Terkini',
+    desc: 'Setoran yang dicatat guru langsung tampil di raport ananda.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Dari Rumah',
+    desc: 'Tidak perlu menunggu pembagian raport untuk melihat capaian.',
+  },
+] as const
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between overflow-hidden">
-      {/* Repeating Islamic Geometric Pattern */}
-      <div className="absolute inset-0 text-primary/10 opacity-[0.04] pointer-events-none">
-        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="islamic-pattern" width="80" height="80" patternUnits="userSpaceOnUse">
-              <path d="M40 0 L80 40 L40 80 L0 40 Z" fill="none" stroke="currentColor" strokeWidth="1" />
-              <path d="M40 12 L68 40 L40 68 L12 40 Z" fill="none" stroke="currentColor" strokeWidth="0.75" />
-              <path d="M40 24 L56 40 L40 56 L24 40 Z" fill="none" stroke="currentColor" strokeWidth="0.5" />
-              <circle cx="40" cy="40" r="3" fill="currentColor" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#islamic-pattern)" />
-        </svg>
-      </div>
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background text-foreground">
+      {/* ── Latar dekoratif ─────────────────────────────────── */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-grid opacity-[0.35] [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-32 -top-40 size-[36rem] rounded-full bg-primary/10 blur-[120px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-48 -right-32 size-[40rem] rounded-full bg-accent/10 blur-[130px]"
+      />
 
-      {/* Decorative Glow Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-primary/5 blur-3xl pointer-events-none animate-pulse duration-10000" />
-      <div className="absolute bottom-[-15%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-accent/5 blur-3xl pointer-events-none animate-pulse duration-10000" />
-
-      {/* Navigation Header */}
-      <header className="relative w-full max-w-6xl mx-auto px-4 py-4 sm:px-6 flex items-center justify-between border-b border-border/20 z-10">
-        <div className="flex items-center gap-3">
-          <Image
-            src="/images/logo.jpg"
-            alt="Logo"
-            width={38}
-            height={38}
-            className="w-9 h-9 rounded-lg object-cover shadow-sm ring-1 ring-black/5"
-          />
-          <div>
-            <h1 className="text-sm font-bold leading-tight text-foreground">{SCHOOL_NAME}</h1>
-            <p className="text-[10px] text-muted-foreground">E-Raport Tahfidz</p>
+      {/* ── Header ──────────────────────────────────────────── */}
+      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <BrandMark size={38} subtitle={`Tahfidz · ${SCHOOL_CITY}`} />
+          <div className="flex items-center gap-1.5">
+            <ThemeToggle />
+            <Link href="/login">
+              <Button size="sm" className="gap-2">
+                <LogIn className="size-3.5" />
+                Login Guru
+              </Button>
+            </Link>
           </div>
         </div>
-        <Link href="/login">
-          <Button variant="outline" size="sm" className="gap-2 cursor-pointer text-xs font-semibold hover:bg-card">
-            <LogIn className="w-3.5 h-3.5" />
-            Login Guru
-          </Button>
-        </Link>
       </header>
 
-      {/* Main Content */}
-      <main className="relative flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-16 md:py-20 max-w-5xl mx-auto w-full space-y-12 z-10">
-        {/* Hero Section */}
-        <div className="text-center space-y-4 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold">
-            <BookOpen className="w-4 h-4" />
-            <span>Portal Wali Murid</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]">
-            Sistem Informasi <br/>
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Hafalan & Raport Santri</span>
-          </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            Pantau progres hafalan Quran ananda secara berkala, transparan, dan lengkap langsung dari rumah.
+      {/* ── Konten utama ────────────────────────────────────── */}
+      <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-4 pb-20 pt-14 sm:px-6 sm:pt-20">
+        {/* Hero */}
+        <section className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold text-primary">
+            <BookOpen className="size-3.5" />
+            Portal Wali Murid
+          </span>
+
+          <h1 className="mt-6 text-balance text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-5xl md:text-[3.4rem]">
+            Sistem Informasi{' '}
+            <span className="text-gradient">Hafalan &amp; Raport</span> Santri
+          </h1>
+
+          <p className="mx-auto mt-5 max-w-xl text-pretty text-[15px] leading-relaxed text-muted-foreground sm:text-base">
+            Pantau capaian hafalan Al-Qur&apos;an ananda secara berkala,
+            transparan, dan lengkap — langsung dari rumah.
           </p>
-        </div>
+        </section>
 
-        {/* Wizard Card Wrapper */}
-        <div className="w-full max-w-4xl mx-auto">
+        {/* Wizard pencarian */}
+        <section className="mx-auto mt-10 w-full max-w-4xl sm:mt-12">
           <ParentSearchWizard />
-        </div>
+        </section>
 
-        {/* Portal Guide (3-Step Visual Instruction) */}
-        <div className="w-full max-w-4xl space-y-6 pt-6">
-          <div className="text-center space-y-1">
-            <div className="inline-flex items-center gap-1 text-primary text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 animate-bounce" />
-              Petunjuk Pencarian
+        {/* Panduan 3 langkah */}
+        <section className="mx-auto mt-16 w-full max-w-4xl sm:mt-20">
+          <div className="text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">
+              Panduan
+            </p>
+            <h2 className="mt-1.5 text-xl font-extrabold tracking-tight text-foreground sm:text-2xl">
+              Cara Melihat Raport
+            </h2>
+          </div>
+
+          <ol className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-3">
+            {STEPS.map((step, i) => (
+              <li
+                key={step.title}
+                className="group relative rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card"
+              >
+                <div className="flex items-start gap-4">
+                  <span
+                    className={`flex size-11 shrink-0 items-center justify-center rounded-xl ring-1 [&_svg]:size-5 ${step.tone}`}
+                  >
+                    <step.icon />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Langkah {i + 1}
+                    </p>
+                    <h3 className="mt-0.5 text-[15px] font-bold text-foreground">
+                      {step.title}
+                    </h3>
+                    <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                      {step.desc}
+                    </p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Nilai tambah */}
+        <section className="mx-auto mt-14 grid w-full max-w-4xl grid-cols-1 gap-4 border-t border-border/60 pt-10 sm:grid-cols-3">
+          {HIGHLIGHTS.map((item) => (
+            <div key={item.title} className="flex items-start gap-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-primary [&_svg]:size-4">
+                <item.icon />
+              </span>
+              <div>
+                <h3 className="text-[13px] font-bold text-foreground">
+                  {item.title}
+                </h3>
+                <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                  {item.desc}
+                </p>
+              </div>
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Panduan Cek Rapor</h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <Card className="border-border/30 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-              <CardContent className="p-5 flex gap-4 items-start">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
-                  <School className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-foreground mb-1">1. Pilih Kelas</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Pilih kelas aktif ananda dari daftar dropdown langkah pertama.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/30 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-              <CardContent className="p-5 flex gap-4 items-start">
-                <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center font-bold shrink-0">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-foreground mb-1">2. Pilih Halaqah</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Tentukan nama ustadz pembina atau kelompok halaqah ananda.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/30 bg-card/50 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-              <CardContent className="p-5 flex gap-4 items-start">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
-                  <FileBarChart className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-foreground mb-1">3. Lihat Raport</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Pilih nama ananda, lalu tekan tombol untuk menampilkan raport hafalan lengkap.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+          ))}
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="relative w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 border-t border-border/20 text-center z-10">
-        <p className="text-[11px] font-medium text-muted-foreground">
-          &copy; {new Date().getFullYear()} {SCHOOL_NAME}. Hak Cipta Dilindungi Undang-Undang.
-        </p>
+      {/* ── Footer ──────────────────────────────────────────── */}
+      <footer className="relative z-10 border-t border-border/60 bg-card/40">
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 sm:flex-row sm:px-6">
+          <BrandMark size={32} />
+          <p className="text-center text-xs font-medium text-muted-foreground sm:text-right">
+            &copy; {new Date().getFullYear()} {SCHOOL_NAME} · Hak Cipta Dilindungi
+            Undang-Undang
+          </p>
+        </div>
       </footer>
     </div>
   )

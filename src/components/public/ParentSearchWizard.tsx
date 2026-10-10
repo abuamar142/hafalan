@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Combobox } from '@/components/ui/combobox'
 import { Button } from '@/components/ui/button'
-import { Loader2, Search } from 'lucide-react'
+import { Alert } from '@/components/app/alert'
+import { Loader2, Search, School, Users, GraduationCap } from 'lucide-react'
 
 interface ClassData {
   id: number
@@ -23,26 +24,31 @@ interface StudentData {
   color: string
 }
 
+const STEPS = [
+  { n: 1, label: 'Kelas', icon: School },
+  { n: 2, label: 'Halaqah', icon: Users },
+  { n: 3, label: 'Santri', icon: GraduationCap },
+] as const
+
 export default function ParentSearchWizard() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  // Selections
+  // Pilihan
   const [classId, setClassId] = useState('')
   const [groupId, setGroupId] = useState('')
   const [studentId, setStudentId] = useState('')
 
-  // Loaded Options
+  // Opsi yang dimuat
   const [classes, setClasses] = useState<ClassData[]>([])
   const [groups, setGroups] = useState<GroupData[]>([])
   const [students, setStudents] = useState<StudentData[]>([])
 
-  // States
+  // Status
   const [loadingGroups, setLoadingGroups] = useState(false)
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [error, setError] = useState('')
 
-  // Fetch classes on mount
   useEffect(() => {
     async function loadClasses() {
       setError('')
@@ -54,41 +60,43 @@ export default function ParentSearchWizard() {
 
         if (error) throw error
         setClasses(data || [])
-      } catch (e: unknown) {
+      } catch {
         setError('Gagal memuat data kelas.')
       }
     }
     loadClasses()
-  }, [])
+  }, [supabase])
 
-  // Map Classes to Combobox Options
-  const classOptions = useMemo(() => {
-    return classes.map((c) => ({
-      id: c.id,
-      label: c.nama,
-      searchText: c.nama.toLowerCase(),
-    }))
-  }, [classes])
+  const classOptions = useMemo(
+    () =>
+      classes.map((c) => ({
+        id: c.id,
+        label: c.nama,
+        searchText: c.nama.toLowerCase(),
+      })),
+    [classes]
+  )
 
-  // Map Groups to Combobox Options
-  const groupOptions = useMemo(() => {
-    return groups.map((g) => ({
-      id: g.id,
-      label: g.nama,
-      searchText: g.nama.toLowerCase(),
-    }))
-  }, [groups])
+  const groupOptions = useMemo(
+    () =>
+      groups.map((g) => ({
+        id: g.id,
+        label: g.nama,
+        searchText: g.nama.toLowerCase(),
+      })),
+    [groups]
+  )
 
-  // Map Students to Combobox Options
-  const studentOptions = useMemo(() => {
-    return students.map((s) => ({
-      id: s.id,
-      label: s.nama,
-      searchText: s.nama.toLowerCase(),
-    }))
-  }, [students])
+  const studentOptions = useMemo(
+    () =>
+      students.map((s) => ({
+        id: s.id,
+        label: s.nama,
+        searchText: s.nama.toLowerCase(),
+      })),
+    [students]
+  )
 
-  // Fetch groups when classId changes
   useEffect(() => {
     if (!classId) {
       setGroups([])
@@ -109,7 +117,7 @@ export default function ParentSearchWizard() {
         if (error) throw error
         setGroups(data || [])
         setGroupId('')
-      } catch (e: unknown) {
+      } catch {
         setError('Gagal memuat data kelompok.')
       } finally {
         setLoadingGroups(false)
@@ -117,9 +125,8 @@ export default function ParentSearchWizard() {
     }
 
     loadGroups()
-  }, [classId])
+  }, [classId, supabase])
 
-  // Fetch students when groupId changes
   useEffect(() => {
     if (!groupId) {
       setStudents([])
@@ -140,7 +147,7 @@ export default function ParentSearchWizard() {
         if (error) throw error
         setStudents(data || [])
         setStudentId('')
-      } catch (e: unknown) {
+      } catch {
         setError('Gagal memuat data santri.')
       } finally {
         setLoadingStudents(false)
@@ -148,34 +155,69 @@ export default function ParentSearchWizard() {
     }
 
     loadStudents()
-  }, [groupId])
+  }, [groupId, supabase])
 
   function handleGoToReport() {
-    if (studentId) {
-      router.push(`/raport/${studentId}`)
-    }
+    if (studentId) router.push(`/raport/${studentId}`)
   }
+
+  // Langkah aktif untuk indikator progres
+  const activeStep = studentId ? 4 : groupId ? 3 : classId ? 2 : 1
 
   return (
     <div className="w-full space-y-4">
-      {error && (
-        <div className="max-w-4xl mx-auto rounded-lg border-l-[3px] border-destructive bg-destructive/10 px-4 py-2.5 text-xs text-destructive font-semibold animate-in fade-in duration-200">
-          {error}
+      {error ? <Alert variant="error">{error}</Alert> : null}
+
+      <div className="rounded-3xl border border-border/70 bg-card/90 p-5 shadow-card backdrop-blur-xl sm:p-7">
+        {/* Indikator langkah */}
+        <div className="mb-6 flex items-center gap-2">
+          {STEPS.map((step, i) => {
+            const done = activeStep > step.n
+            const current = activeStep === step.n
+            return (
+              <div key={step.n} className="flex flex-1 items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`flex size-7 items-center justify-center rounded-lg text-[11px] font-bold transition-colors ${
+                      done
+                        ? 'bg-primary text-primary-foreground'
+                        : current
+                          ? 'bg-primary/15 text-primary ring-1 ring-primary/30'
+                          : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {done ? <step.icon className="size-3.5" /> : step.n}
+                  </span>
+                  <span
+                    className={`hidden text-xs font-semibold sm:block ${
+                      current || done
+                        ? 'text-foreground'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+                {i < STEPS.length - 1 ? (
+                  <span
+                    className={`h-px flex-1 rounded-full transition-colors ${
+                      done ? 'bg-primary/40' : 'bg-border'
+                    }`}
+                  />
+                ) : null}
+              </div>
+            )
+          })}
         </div>
-      )}
 
-      {/* Spacious, integrated horizontal search panel */}
-      <div className="w-full max-w-4xl mx-auto rounded-2xl border border-border/40 bg-card/80 backdrop-blur-md p-6 shadow-xl relative group hover:border-primary/20 transition-all duration-500">
-        
-        {/* Glow Blobs within Panel */}
-        <div className="absolute -top-12 -left-12 w-28 h-28 bg-primary/5 rounded-full blur-2xl pointer-events-none group-hover:bg-primary/8 transition-all duration-500" />
-        <div className="absolute -bottom-12 -right-12 w-28 h-28 bg-accent/5 rounded-full blur-2xl pointer-events-none group-hover:bg-accent/8 transition-all duration-500" />
-
-        <div className="relative grid grid-cols-1 md:grid-cols-12 gap-5 items-end">
-          
-          {/* Step 1: Kelas */}
-          <div className="md:col-span-3 space-y-2">
-            <label htmlFor="class-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
+        {/* Form pencarian */}
+        <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
+          {/* Langkah 1 — Kelas */}
+          <div className="space-y-2 md:col-span-3">
+            <label
+              htmlFor="class-select"
+              className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+            >
               1. Pilih Kelas
             </label>
             <Combobox
@@ -193,14 +235,17 @@ export default function ParentSearchWizard() {
             />
           </div>
 
-          {/* Step 2: Kelompok */}
-          <div className="md:col-span-3 space-y-2">
-            <label htmlFor="group-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
+          {/* Langkah 2 — Halaqah */}
+          <div className="space-y-2 md:col-span-3">
+            <label
+              htmlFor="group-select"
+              className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+            >
               2. Pilih Halaqah
             </label>
             {loadingGroups ? (
-              <div className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-card/40 text-xs text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin mr-2 text-primary" />
+              <div className="flex h-10 w-full items-center justify-center rounded-lg border border-border bg-muted/40 text-xs text-muted-foreground">
+                <Loader2 className="mr-2 size-4 animate-spin text-primary" />
                 Memuat halaqah...
               </div>
             ) : (
@@ -212,22 +257,25 @@ export default function ParentSearchWizard() {
                   setGroupId(val)
                   setStudentId('')
                 }}
-                placeholder={classId ? "Pilih kelompok..." : "Pilih kelas dahulu"}
+                placeholder={classId ? 'Pilih kelompok...' : 'Pilih kelas dahulu'}
                 searchPlaceholder="Ketik nama kelompok..."
                 emptyText="Kelompok tidak ditemukan"
-                className={!classId ? "opacity-60 pointer-events-none" : ""}
+                className={!classId ? 'pointer-events-none opacity-60' : ''}
               />
             )}
           </div>
 
-          {/* Step 3: Santri */}
-          <div className="md:col-span-4 space-y-2">
-            <label htmlFor="student-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
+          {/* Langkah 3 — Santri */}
+          <div className="space-y-2 md:col-span-4">
+            <label
+              htmlFor="student-select"
+              className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+            >
               3. Pilih Santri
             </label>
             {loadingStudents ? (
-              <div className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-card/40 text-xs text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin mr-2 text-primary" />
+              <div className="flex h-10 w-full items-center justify-center rounded-lg border border-border bg-muted/40 text-xs text-muted-foreground">
+                <Loader2 className="mr-2 size-4 animate-spin text-primary" />
                 Memuat santri...
               </div>
             ) : (
@@ -236,27 +284,28 @@ export default function ParentSearchWizard() {
                 options={studentOptions}
                 value={studentId}
                 onChange={setStudentId}
-                placeholder={groupId ? "Pilih nama santri..." : "Pilih halaqah dahulu"}
+                placeholder={
+                  groupId ? 'Pilih nama santri...' : 'Pilih halaqah dahulu'
+                }
                 searchPlaceholder="Ketik nama santri..."
                 emptyText="Santri tidak ditemukan"
-                className={!groupId ? "opacity-60 pointer-events-none" : ""}
+                className={!groupId ? 'pointer-events-none opacity-60' : ''}
               />
             )}
           </div>
 
-          {/* Action Button */}
+          {/* Aksi */}
           <div className="md:col-span-2">
             <Button
               type="button"
               onClick={handleGoToReport}
               disabled={!studentId}
-              className="w-full gap-2 bg-primary hover:bg-primary/95 text-white shadow-md shadow-primary/10 cursor-pointer h-10 font-bold transition-all text-xs"
+              className="h-10 w-full gap-2 font-bold"
             >
-              <Search className="w-4 h-4" />
+              <Search className="size-4" />
               Cari Rapor
             </Button>
           </div>
-
         </div>
       </div>
     </div>
